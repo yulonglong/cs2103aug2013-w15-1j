@@ -1,10 +1,11 @@
 package com.licensetokil.atypistcalendar.parser;
 
 import java.util.Calendar;
+import java.util.StringTokenizer;
 
 public class Parser {;
 	enum ACTION_TYPE {
-		ADD, DELETE, DISPLAY, UPDATE, SEARCH, MARK, EXIT, GCAL, INVALID;
+		ADD, DELETE, DISPLAY, UPDATE, SEARCH, MARK, EXIT, GCAL, GCAL_SYNC, GCAL_QUICK_ADD, INVALID;
 	};
 
 	private static String ADD = "add";
@@ -15,8 +16,10 @@ public class Parser {;
 	private static String MARK = "mark";
 	private static String EXIT = "exit";
 	private static String GCAL = "gcal";
+	private static String GCAL_SYNC = "gcal sync";
+	private static String GCAL_QUICK_ADD = "gcal quick add";
 	
-	private static ACTION_TYPE determineCommandType(String commandTypeString) {
+	private static ACTION_TYPE determineActionType(String commandTypeString) {
 		if (commandTypeString == null)
 			throw new Error("command type string cannot be null!");
 		if (commandTypeString.equalsIgnoreCase(ADD)) {
@@ -35,6 +38,10 @@ public class Parser {;
 			return ACTION_TYPE.EXIT;
 		} else if (commandTypeString.equalsIgnoreCase(GCAL)) {
 			return ACTION_TYPE.GCAL;
+		} else if (commandTypeString.equalsIgnoreCase(GCAL_SYNC)) {
+			return ACTION_TYPE.GCAL_SYNC;
+		} else if (commandTypeString.equalsIgnoreCase(GCAL_QUICK_ADD)) {
+			return ACTION_TYPE.GCAL_QUICK_ADD;
 		} else {
 			return ACTION_TYPE.INVALID;
 		}
@@ -43,7 +50,11 @@ public class Parser {;
 	
 	abstract class Action{
 		ACTION_TYPE type;
+		
+		abstract ACTION_TYPE getType();
+		abstract void setType (ACTION_TYPE newActionType);
 	}
+	
 	class LocalAction extends Action{
 		private ACTION_TYPE type;
 		private Calendar startTime;
@@ -101,7 +112,78 @@ public class Parser {;
 		
 	}
 	
+	class GoogleAction extends Action{
+		private ACTION_TYPE type;
+		private String userInput;
+		
+		public GoogleAction(){
+			type = null;
+			userInput = new String();
+		}
+		
+		public ACTION_TYPE getType(){
+			return type;
+		}
+		
+		public String getUserInput(){
+			return userInput;
+		}
+		
+		public void setType(ACTION_TYPE newActionType){
+			type = newActionType;
+		}
+		
+		public void setUserInput(String newUserInput){
+			userInput = newUserInput;
+		}
+	}
+	
+	private String getRemainingTokens(StringTokenizer strRemaining){
+		String strResult = new String();
+		while (strRemaining.hasMoreTokens()) {
+	         strResult = strResult + " " +strRemaining.nextToken();
+	    }
+		return strResult;
+	}
+	
 	Action Parse(String userInput){
+		 StringTokenizer st = new StringTokenizer(userInput);
+		 String stringUserAction;
+	     stringUserAction = new String(st.nextToken());
+	     
+	     ACTION_TYPE actionType = determineActionType(stringUserAction);
+	     
+	     //if GCAL type
+	     if(actionType == ACTION_TYPE.GCAL){
+	    	 GoogleAction userAction = new GoogleAction();
+	    	 stringUserAction = stringUserAction + " " + st.nextToken();
+	    	 actionType = determineActionType(stringUserAction);
+	    	 
+	    	 if(actionType == ACTION_TYPE.GCAL_SYNC){
+	    		 userInput = new String(getRemainingTokens(st));
+	    		 userAction.setUserInput(userInput);
+	    		 return userAction;
+	    	 }
+	    	 else{
+	    		 stringUserAction = stringUserAction + " " + st.nextToken();
+		    	 actionType = determineActionType(stringUserAction);
+		    	 
+		    	 if(actionType == ACTION_TYPE.GCAL_QUICK_ADD){
+		    		 userAction.setType(ACTION_TYPE.GCAL_QUICK_ADD);
+		    		 userInput = new String(getRemainingTokens(st));
+		    		 userAction.setUserInput(userInput);
+		    		 return userAction;
+		    	 }
+		    	 else{
+		    		 System.out.println("Error! Invalid GCAL Command!");
+		    	 }
+	    		 
+	    	 }
+	    	 
+	     }
+	    
+	    
+		
 		Action userAction = new LocalAction();
 		return userAction;
 	}
