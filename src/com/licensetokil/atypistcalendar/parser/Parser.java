@@ -48,14 +48,14 @@ public class Parser {;
 	}
 	
 	
-	abstract class Action{
+	public static abstract class Action{
 		ACTION_TYPE type;
 	
 		abstract ACTION_TYPE getType();
 		abstract void setType (ACTION_TYPE newActionType);
 	}
 	
-	class LocalAction extends Action{
+	public static class LocalAction extends Action{
 		private ACTION_TYPE type;
 		private Calendar startTime;
 		private Calendar endTime;
@@ -109,10 +109,18 @@ public class Parser {;
 		public void setPlace(String newPlace){
 			place = newPlace;
 		}
+		
+		public String toString(){
+			return (type + "\n" +
+				   startTime + "\n" +
+			       endTime + "\n" +
+			       description + "\n" +
+			       place + "\n");
+		}
 	
 	}
 	
-	class GoogleAction extends Action{
+	public static class GoogleAction extends Action{
 		private ACTION_TYPE type;
 		private String userInput;
 	
@@ -138,7 +146,7 @@ public class Parser {;
 		}
 	}
 	
-	private String getRemainingTokens(StringTokenizer strRemaining){
+	private static String getRemainingTokens(StringTokenizer strRemaining){
 		String strResult = new String();
 		while (strRemaining.hasMoreTokens()) {
 			strResult = strResult + " " +strRemaining.nextToken();
@@ -146,9 +154,49 @@ public class Parser {;
 		return strResult;
 	}
 	
-	LocalAction addParser(StringTokenizer st){
-		LocalAction userAction = new LocalAction();
-		return userAction;
+	private static boolean addParser(StringTokenizer st, LocalAction userAction){
+
+		userAction.setType(ACTION_TYPE.ADD);
+		
+		Calendar startTimeCal = Calendar.getInstance();
+		Calendar endTimeCal = Calendar.getInstance();
+		
+		String description = new String(st.nextToken());
+		
+		String prep = new String (st.nextToken());
+		String place = new String(st.nextToken());
+		
+		
+		prep = new String (st.nextToken());
+		String date = new String(st.nextToken());
+		String strday = new String();
+		strday = date.substring(0,2);
+		int day = Integer.parseInt(strday);
+		String strmonth = new String();
+		strmonth = date.substring(3,5);
+		int month = Integer.parseInt(strmonth);
+		int year = 2013;
+		
+		prep = new String (st.nextToken());
+		String startTime = new String(st.nextToken());
+		startTime = startTime.substring(0,2);
+		int intStartTime = Integer.parseInt(startTime);
+		
+		prep = new String (st.nextToken());
+		String endTime = new String(st.nextToken());
+		endTime = endTime.substring(0,2);
+		int intEndTime = Integer.parseInt(endTime);
+		
+		startTimeCal.set(year, month, day, intStartTime, 0);
+		endTimeCal.set(year, month, day, intEndTime, 0);
+		
+		
+		userAction.setStartTime(startTimeCal);
+		userAction.setEndTime(endTimeCal);
+		userAction.setDescription(description);
+		userAction.setPlace(place);
+		
+		return true;
 	}
 	LocalAction deleteParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
@@ -171,7 +219,7 @@ public class Parser {;
 		return userAction;
 	}
 	
-	Action Parse(String userInput){
+	public static Action Parse(String userInput){
 		StringTokenizer st = new StringTokenizer(userInput);
 		String stringUserAction;
 		stringUserAction = new String(st.nextToken());
@@ -213,22 +261,22 @@ public class Parser {;
 			LocalAction userAction = new LocalAction();
 			switch(actionType){
 			case ADD:
-				userAction = addParser(st);
+				addParser(st,userAction);
 				break;
 			case DELETE:
-				userAction = deleteParser(st);
+				//userAction = deleteParser(st);
 				break;
 			case DISPLAY:
-				userAction = displayParser(st);
+				//userAction = displayParser(st);
 				break;
 			case UPDATE:
-				userAction = updateParser(st);
+				//userAction = updateParser(st);
 				break;
 			case SEARCH:
-				userAction = searchParser(st);
+				//userAction = searchParser(st);
 				break;
 			case MARK:
-				userAction = markParser(st);
+				//userAction = markParser(st);
 				break;
 			case EXIT:
 				userAction.setType(ACTION_TYPE.EXIT);
