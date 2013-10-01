@@ -4,10 +4,7 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 
 public class Parser {;
-	enum ACTION_TYPE {
-		ADD, DELETE, DISPLAY, UPDATE, SEARCH, MARK, EXIT, GCAL, GCAL_SYNC, GCAL_QUICK_ADD, INVALID;
-	};
-	
+
 	private static String ADD = "add";
 	private static String DELETE = "delete";
 	private static String DISPLAY = "display";
@@ -86,7 +83,7 @@ public class Parser {;
 			return description;
 		}
 	
-		public String place(){
+		public String getPlace(){
 			return place;
 		}
 	
