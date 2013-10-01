@@ -199,9 +199,44 @@ public class Parser {;
 		LocalAction userAction = new LocalAction();
 		return userAction;
 	}
-	LocalAction displayParser(StringTokenizer st){
-		LocalAction userAction = new LocalAction();
-		return userAction;
+	private static boolean displayParser(StringTokenizer st, LocalAction userAction){
+
+		userAction.setType(ACTION_TYPE.DISPLAY);
+		
+		Calendar startTimeCal = Calendar.getInstance();
+		Calendar endTimeCal = Calendar.getInstance();
+		
+	
+		
+		
+		String prep = new String (st.nextToken());
+		String date = new String(st.nextToken());
+		String strday = new String();
+		strday = date.substring(0,2);
+		int day = Integer.parseInt(strday);
+		String strmonth = new String();
+		strmonth = date.substring(3,5);
+		int month = Integer.parseInt(strmonth);
+		int year = 2013;
+		
+		prep = new String (st.nextToken());
+		String startTime = new String(st.nextToken());
+		startTime = startTime.substring(0,2);
+		int intStartTime = Integer.parseInt(startTime);
+		
+		prep = new String (st.nextToken());
+		String endTime = new String(st.nextToken());
+		endTime = endTime.substring(0,2);
+		int intEndTime = Integer.parseInt(endTime);
+		
+		startTimeCal.set(year, month, day, intStartTime, 0);
+		endTimeCal.set(year, month, day, intEndTime, 0);
+		
+		
+		userAction.setStartTime(startTimeCal);
+		userAction.setEndTime(endTimeCal);
+		
+		return true;
 	}
 	LocalAction updateParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
@@ -264,7 +299,7 @@ public class Parser {;
 				//userAction = deleteParser(st);
 				break;
 			case DISPLAY:
-				//userAction = displayParser(st);
+				displayParser(st,userAction);
 				break;
 			case UPDATE:
 				//userAction = updateParser(st);
