@@ -14,33 +14,7 @@ public class Parser {
 
 		//if GCAL type
 		if(actionType == ActionType.GCAL){
-			GoogleAction userAction = new GoogleAction();
-			stringUserAction = stringUserAction + " " + st.nextToken();
-			actionType = determineActionType(stringUserAction);
-
-			if(actionType == ActionType.GCAL_SYNC){
-				userInput = new String(getRemainingTokens(st));
-				userAction.setUserInput(userInput);
-				return userAction;
-			}
-			else{
-				stringUserAction = stringUserAction + " " + st.nextToken();
-				actionType = determineActionType(stringUserAction);
-
-				if(actionType == ActionType.GCAL_QUICK_ADD){
-					userAction.setType(ActionType.GCAL_QUICK_ADD);
-					userInput = new String(getRemainingTokens(st));
-					userAction.setUserInput(userInput);
-					return userAction;
-				}
-				else{
-					System.out.println("Error! Invalid GCAL Command!");
-					userAction.setType(ActionType.INVALID);
-					return userAction;
-				}
-
-			}
-
+				return gcalParser(st,userInput,stringUserAction);
 		}
 		//if not GCAL type (means Local type)
 		else{
@@ -75,47 +49,35 @@ public class Parser {
 		}
 	}
 
-	private static String ADD = "add";
-	private static String DELETE = "delete";
-	private static String DISPLAY = "display";
-	private static String UPDATE = "update";
-	private static String SEARCH = "search";
-	private static String MARK = "mark";
-	private static String EXIT = "exit";
-	private static String GCAL = "gcal";
-	private static String GCAL_SYNC = "gcal sync";
-	private static String GCAL_QUICK_ADD = "gcal quick add";
-
 	private static ActionType determineActionType(String commandTypeString) {
+		//i am so sorry Ian, i cannot use switch case, because they need constant value
+		//if i want to use my string value from the Enum, it has to use if (because the String has a non constant value)
 		if (commandTypeString == null)
 			throw new Error("command type string cannot be null!");
-		if (commandTypeString.equalsIgnoreCase(ADD)) {
+		if (commandTypeString.equalsIgnoreCase(ActionType.ADD.getString())) {
 			return ActionType.ADD;
-		} else if (commandTypeString.equalsIgnoreCase(DELETE)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.DELETE.getString())) {
 			return ActionType.DELETE;
-		} else if (commandTypeString.equalsIgnoreCase(DISPLAY)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.DISPLAY.getString())) {
 			return ActionType.DISPLAY;
-		} else if (commandTypeString.equalsIgnoreCase(UPDATE)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.UPDATE.getString())) {
 			return ActionType.UPDATE;
-		} else if (commandTypeString.equalsIgnoreCase(SEARCH)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.SEARCH.getString())) {
 			return ActionType.SEARCH;
-		} else if (commandTypeString.equalsIgnoreCase(MARK)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.MARK.getString())) {
 			return ActionType.MARK;
-		} else if (commandTypeString.equalsIgnoreCase(EXIT)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.EXIT.getString())) {
 			return ActionType.EXIT;
-		} else if (commandTypeString.equalsIgnoreCase(GCAL)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL.getString())) {
 			return ActionType.GCAL;
-		} else if (commandTypeString.equalsIgnoreCase(GCAL_SYNC)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL_SYNC.getString())) {
 			return ActionType.GCAL_SYNC;
-		} else if (commandTypeString.equalsIgnoreCase(GCAL_QUICK_ADD)) {
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL_QUICK_ADD.getString())) {
 			return ActionType.GCAL_QUICK_ADD;
 		} else {
 			return ActionType.INVALID;
 		}
 	}
-
-
-
 
 	private static String getRemainingTokens(StringTokenizer strRemaining){
 		String strResult = new String();
@@ -124,9 +86,37 @@ public class Parser {
 		}
 		return strResult;
 	}
+	
+	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction){
+		GoogleAction userAction = new GoogleAction();
+		stringUserAction = stringUserAction + " " + st.nextToken();
+		ActionType actionType = determineActionType(stringUserAction);
 
+		if(actionType == ActionType.GCAL_SYNC){
+			userInput = new String(getRemainingTokens(st));
+			userAction.setUserInput(userInput);
+			return userAction;
+		}
+		else{
+			stringUserAction = stringUserAction + " " + st.nextToken();
+			actionType = determineActionType(stringUserAction);
+
+			if(actionType == ActionType.GCAL_QUICK_ADD){
+				userAction.setType(ActionType.GCAL_QUICK_ADD);
+				userInput = new String(getRemainingTokens(st));
+				userAction.setUserInput(userInput);
+				return userAction;
+			}
+			else{
+				System.out.println("Error! Invalid GCAL Command!");
+				userAction.setType(ActionType.INVALID);
+				return userAction;
+			}
+		}
+	}
+	
+	//list of approved format:
 	//add swimming at CommunityClub on 21/11 from 1300 to 1400
-
 	private static boolean addParser(StringTokenizer st, LocalAction userAction){
 
 		userAction.setType(ActionType.ADD);
@@ -171,10 +161,12 @@ public class Parser {
 
 		return true;
 	}
+	
 	LocalAction deleteParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
 		return userAction;
 	}
+	
 	private static boolean displayParser(StringTokenizer st, LocalAction userAction){
 
 		userAction.setType(ActionType.DISPLAY);
