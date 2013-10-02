@@ -7,45 +7,16 @@ public class Parser {
 
 	public static Action parse(String userInput){
 		StringTokenizer st = new StringTokenizer(userInput);
-		String stringUserAction;
-		stringUserAction = new String(st.nextToken());
-
+		String stringUserAction = new String(st.nextToken());
 		ActionType actionType = determineActionType(stringUserAction);
-
+		
 		//if GCAL type
 		if(actionType == ActionType.GCAL){
-				return gcalParser(st,userInput,stringUserAction);
+			return gcalParser(st,userInput,stringUserAction);
 		}
 		//if not GCAL type (means Local type)
 		else{
-			LocalAction userAction = new LocalAction();
-			switch(actionType){
-			case ADD:
-				addParser(st,userAction);
-				break;
-			case DELETE:
-				//userAction = deleteParser(st);
-				break;
-			case DISPLAY:
-				displayParser(st,userAction);
-				break;
-			case UPDATE:
-				//userAction = updateParser(st);
-				break;
-			case SEARCH:
-				//userAction = searchParser(st);
-				break;
-			case MARK:
-				//userAction = markParser(st);
-				break;
-			case EXIT:
-				userAction.setType(ActionType.EXIT);
-				break;
-			default:
-				userAction.setType(ActionType.INVALID);
-				break;
-			} 
-			return userAction;
+			return localParser(st,actionType);
 		}
 	}
 
@@ -115,6 +86,35 @@ public class Parser {
 		}
 	}
 	
+	private static LocalAction localParser(StringTokenizer st, ActionType actionType){
+		LocalAction userAction = new LocalAction();
+		switch(actionType){
+		case ADD:
+			addParser(st,userAction);
+			break;
+		case DELETE:
+			break;
+		case DISPLAY:
+			displayParser(st,userAction);
+			break;
+		case UPDATE:
+			break;
+		case SEARCH:
+			break;
+		case MARK:
+			break;
+		case EXIT:
+			userAction.setType(ActionType.EXIT);
+			break;
+		default:
+			userAction.setType(ActionType.INVALID);
+			break;
+		} 
+		return userAction;
+	}
+	
+	//add function : 10% done
+	
 	//list of approved format:
 	//add swimming at CommunityClub on 21/11 from 1300 to 1400
 	private static boolean addParser(StringTokenizer st, LocalAction userAction){
@@ -162,20 +162,18 @@ public class Parser {
 		return true;
 	}
 	
+	//delete function : 0 %
 	LocalAction deleteParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
 		return userAction;
 	}
 	
+	//display function : 10 %
 	private static boolean displayParser(StringTokenizer st, LocalAction userAction){
-
 		userAction.setType(ActionType.DISPLAY);
 
 		Calendar startTimeCal = Calendar.getInstance();
 		Calendar endTimeCal = Calendar.getInstance();
-
-
-
 
 		String prep = new String (st.nextToken());
 		String date = new String(st.nextToken());
@@ -206,20 +204,19 @@ public class Parser {
 
 		return true;
 	}
+	//update function: 0 %
 	LocalAction updateParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
 		return userAction;
 	}
+	//search function: 0 %
 	LocalAction searchParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
 		return userAction;
 	}
+	//mark function: 0 %
 	LocalAction markParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
 		return userAction;
 	}
-
-
-
-
 }
