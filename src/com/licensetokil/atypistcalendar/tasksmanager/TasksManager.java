@@ -119,8 +119,8 @@ public class TasksManager {
 
 	private Parser.LocalAction action;
 	private ArrayList<Task> memory;
-
-	public void TaskManager(Parser.LocalAction action) {
+	
+	public TasksManager(Parser.LocalAction action) {
 		this.action = action;
 		memory = new ArrayList<Task>();
 	}
@@ -183,17 +183,18 @@ public class TasksManager {
 
 	}
 
-	public int executeCommand(Parser.LocalAction ac) {
+	public String executeCommand(Parser.LocalAction ac) {
 		Task t = classify(ac);
 
 		try {
 			switch (ac.getType()) {
 			case ADD:
 				add(t);
-				break;
+				return "added succesfully";
+				//break;
 			case DISPLAY:
-				display(t);
-				break;
+				return display(t);
+				//break;
 			case DELETE:
 			case UPDATE:
 			case SEARCH:
@@ -204,10 +205,10 @@ public class TasksManager {
 			case GCAL_QUICK_ADD:
 			case INVALID:
 			}
-			return COMMAND_SUCCESSFUL;
+			//return COMMAND_SUCCESSFUL;
 		} catch (Exception e) {
-			return COMMAND_UNSUCCESSFUL;
+			//return COMMAND_UNSUCCESSFUL;
 		}
-
+		return "error";
 	}
 }
