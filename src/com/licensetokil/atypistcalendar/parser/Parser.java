@@ -6,10 +6,11 @@ import java.util.StringTokenizer;
 public class Parser {
 
 	public static Action parse(String userInput){
+		//tokenize user input
 		StringTokenizer st = new StringTokenizer(userInput);
+		//get the actionType by getting the first token (first word) from the user input
 		String stringUserAction = new String(st.nextToken());
 		ActionType actionType = determineActionType(stringUserAction);
-		
 		//if GCAL type
 		if(actionType == ActionType.GCAL){
 			return gcalParser(st,userInput,stringUserAction);
@@ -50,13 +51,6 @@ public class Parser {
 		}
 	}
 
-	private static String getRemainingTokens(StringTokenizer strRemaining){
-		String strResult = new String();
-		while (strRemaining.hasMoreTokens()) {
-			strResult = strResult + " " +strRemaining.nextToken();
-		}
-		return strResult;
-	}
 	
 	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction){
 		GoogleAction userAction = new GoogleAction();
@@ -114,9 +108,10 @@ public class Parser {
 	}
 	
 	//add function : 10% done
-	
 	//list of approved format:
-	//add swimming at CommunityClub on 21/11 from 1300 to 1400
+	//add swimming at CommunityClub on 30/12 from 1300 to 1400 (fixed not flexible format)
+	//add swimming on 21/11 from 1300 to 1400 (without place)
+	//add swimming at Bukit Batok Community Club Swimming Pool on 21/11 from 1300 to 1400 (long place string, separated by space)
 	private static boolean addParser(StringTokenizer st, LocalAction userAction){
 
 		userAction.setType(ActionType.ADD);
@@ -125,12 +120,31 @@ public class Parser {
 		Calendar endTimeCal = Calendar.getInstance();
 
 		String description = new String(st.nextToken());
-
+		String place = new String();
 		String prep = new String (st.nextToken());
-		String place = new String(st.nextToken());
-
-
+		
+		//check if place is included in user input
+		if(isValidPlacePreposition(prep)){
+			place = new String(st.nextToken());
+			userAction.setPlace(place);
+		}
+		else{
+			String tempUserInput = new String();
+			tempUserInput = getRemainingTokens(st);
+			tempUserInput = prep + " " + tempUserInput;
+			st = new StringTokenizer(tempUserInput);
+		}
+		
+		//check for place name, separated by space, and incorporate the proper place name
 		prep = new String (st.nextToken());
+		while(!isValidDayPreposition(prep)){
+			place = place + " " + prep;
+			userAction.setPlace(place);
+			prep = new String (st.nextToken());
+		}
+		
+		
+		
 		String date = new String(st.nextToken());
 		String strday = new String();
 		strday = date.substring(0,2);
@@ -138,6 +152,7 @@ public class Parser {
 		String strmonth = new String();
 		strmonth = date.substring(3,5);
 		int month = Integer.parseInt(strmonth);
+		month--; // Calendar in java, stores month starting from 0 (january) to 11 (december)
 		int year = 2013;
 
 		prep = new String (st.nextToken());
@@ -157,16 +172,12 @@ public class Parser {
 		userAction.setStartTime(startTimeCal);
 		userAction.setEndTime(endTimeCal);
 		userAction.setDescription(description);
-		userAction.setPlace(place);
+		
 
 		return true;
 	}
 	
-	//delete function : 0 %
-	LocalAction deleteParser(StringTokenizer st){
-		LocalAction userAction = new LocalAction();
-		return userAction;
-	}
+	
 	
 	//display function : 10 %
 	private static boolean displayParser(StringTokenizer st, LocalAction userAction){
@@ -204,6 +215,12 @@ public class Parser {
 
 		return true;
 	}
+	
+	//delete function : 0 %
+	LocalAction deleteParser(StringTokenizer st){
+		LocalAction userAction = new LocalAction();
+		return userAction;
+	}
 	//update function: 0 %
 	LocalAction updateParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
@@ -218,5 +235,35 @@ public class Parser {
 	LocalAction markParser(StringTokenizer st){
 		LocalAction userAction = new LocalAction();
 		return userAction;
+	}
+	
+
+	private static String getRemainingTokens(StringTokenizer strRemaining){
+		String strResult = new String();
+		while (strRemaining.hasMoreTokens()) {
+			strResult = strResult + " " +strRemaining.nextToken();
+		}
+		return strResult;
+	}
+	
+	private static boolean isValidPlacePreposition(String preposition){
+		if((preposition.equalsIgnoreCase("in"))||(preposition.equalsIgnoreCase("at"))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidDayPreposition(String preposition){
+		if((preposition.equalsIgnoreCase("on"))||(preposition.equalsIgnoreCase(","))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidTimePreposition(String preposition){
+		if((preposition.equalsIgnoreCase("from"))||(preposition.equalsIgnoreCase("at"))||(preposition.equalsIgnoreCase(","))){
+			return true;
+		}
+		return false;
 	}
 }

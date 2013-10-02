@@ -18,11 +18,11 @@ public class LocalAction extends Action{
 	}
 	
 	public String toString(){
-		return (type + "\n" +
-			   startTime + "\n" +
-		       endTime + "\n" +
-		       description + "\n" +
-		       place + "\n");
+		return ("Type        : " + type + "\n" +
+			    "Start Time  : " + startTime.getTime() + "\n" +
+		        "End Time    : " + endTime.getTime() + "\n" +
+		        "Description : " + description + "\n" +
+		        "Place       : " + place + "\n");
 	}
 
 	public ActionType getType(){
