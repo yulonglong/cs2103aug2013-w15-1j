@@ -21,35 +21,7 @@ public class Parser {
 		}
 	}
 
-	private static ActionType determineActionType(String commandTypeString) {
-		//i am so sorry Ian, i cannot use switch case, because they need constant value
-		//if i want to use my string value from the Enum, it has to use if (because the String has a non constant value)
-		if (commandTypeString == null)
-			throw new Error("command type string cannot be null!");
-		if (commandTypeString.equalsIgnoreCase(ActionType.ADD.getString())) {
-			return ActionType.ADD;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.DELETE.getString())) {
-			return ActionType.DELETE;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.DISPLAY.getString())) {
-			return ActionType.DISPLAY;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.UPDATE.getString())) {
-			return ActionType.UPDATE;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.SEARCH.getString())) {
-			return ActionType.SEARCH;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.MARK.getString())) {
-			return ActionType.MARK;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.EXIT.getString())) {
-			return ActionType.EXIT;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL.getString())) {
-			return ActionType.GCAL;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL_SYNC.getString())) {
-			return ActionType.GCAL_SYNC;
-		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL_QUICK_ADD.getString())) {
-			return ActionType.GCAL_QUICK_ADD;
-		} else {
-			return ActionType.INVALID;
-		}
-	}
+
 
 	
 	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction){
@@ -112,6 +84,8 @@ public class Parser {
 	//add swimming at CommunityClub on 30/12 from 1300 to 1400 (fixed not flexible format)
 	//add swimming on 21/11 from 1300 to 1400 (without place)
 	//add swimming at Bukit Batok Community Club Swimming Pool on 21/11 from 1300 to 1400 (long place string, separated by space)
+	//now date can be detected either in single digits or double digits (e.g. 2/1, 02/01, 12/01, 12/2, 3/11, etc)
+	//add swimming at BB CC on 2/1 from 1200 to 1300
 	private static boolean addParser(StringTokenizer st, LocalAction userAction){
 
 		userAction.setType(ActionType.ADD);
@@ -143,17 +117,10 @@ public class Parser {
 			prep = new String (st.nextToken());
 		}
 		
-		
-		
 		String date = new String(st.nextToken());
-		String strday = new String();
-		strday = date.substring(0,2);
-		int day = Integer.parseInt(strday);
-		String strmonth = new String();
-		strmonth = date.substring(3,5);
-		int month = Integer.parseInt(strmonth);
-		month--; // Calendar in java, stores month starting from 0 (january) to 11 (december)
-		int year = 2013;
+		int[] intDate = new int[3];
+		getDate(intDate,date);
+		
 
 		prep = new String (st.nextToken());
 		String startTime = new String(st.nextToken());
@@ -165,8 +132,8 @@ public class Parser {
 		endTime = endTime.substring(0,2);
 		int intEndTime = Integer.parseInt(endTime);
 
-		startTimeCal.set(year, month, day, intStartTime, 0);
-		endTimeCal.set(year, month, day, intEndTime, 0);
+		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartTime, 0);
+		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndTime, 0);
 
 
 		userAction.setStartTime(startTimeCal);
@@ -175,6 +142,39 @@ public class Parser {
 		
 
 		return true;
+	}
+	
+	//pass a user string of date in any format
+	//and return date in integer format
+	//using intDate array integer to store date as integers.
+	//intDate[0] is daydate,
+	//intDate[1] is month
+	//intDate[2] is year
+	private static void getDate(int[] intDate, String date){
+		int stringDateLength = date.length();
+	
+		int indexOfDelimiter = 0;
+		
+		//get the index of delimiter
+		for(int i=0;(i<stringDateLength)&&(indexOfDelimiter==0);i++){
+			if(!Character.isDigit(date.charAt(i))){
+				indexOfDelimiter = i;
+			}
+		}
+		
+		String strday = new String();
+		strday = date.substring(0,indexOfDelimiter);
+		intDate[0] = Integer.parseInt(strday);
+		
+		String strmonth = new String();
+		strmonth = date.substring(indexOfDelimiter+1);
+		intDate[1] = Integer.parseInt(strmonth);
+		
+		intDate[1]--; // Calendar in java, stores month starting from 0 (january) to 11 (december)
+		
+		intDate[2] = 2013;
+		
+		return;
 	}
 	
 	
@@ -238,13 +238,7 @@ public class Parser {
 	}
 	
 
-	private static String getRemainingTokens(StringTokenizer strRemaining){
-		String strResult = new String();
-		while (strRemaining.hasMoreTokens()) {
-			strResult = strResult + " " +strRemaining.nextToken();
-		}
-		return strResult;
-	}
+	
 	
 	private static boolean isValidPlacePreposition(String preposition){
 		if((preposition.equalsIgnoreCase("in"))||(preposition.equalsIgnoreCase("at"))){
@@ -265,5 +259,43 @@ public class Parser {
 			return true;
 		}
 		return false;
+	}
+	
+	private static String getRemainingTokens(StringTokenizer strRemaining){
+		String strResult = new String();
+		while (strRemaining.hasMoreTokens()) {
+			strResult = strResult + " " +strRemaining.nextToken();
+		}
+		return strResult;
+	}
+	
+	private static ActionType determineActionType(String commandTypeString) {
+		//i am so sorry Ian, i cannot use switch case, because they need constant value
+		//if i want to use my string value from the Enum, it has to use if (because the String has a non constant value)
+		if (commandTypeString == null)
+			throw new Error("command type string cannot be null!");
+		if (commandTypeString.equalsIgnoreCase(ActionType.ADD.getString())) {
+			return ActionType.ADD;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.DELETE.getString())) {
+			return ActionType.DELETE;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.DISPLAY.getString())) {
+			return ActionType.DISPLAY;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.UPDATE.getString())) {
+			return ActionType.UPDATE;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.SEARCH.getString())) {
+			return ActionType.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.MARK.getString())) {
+			return ActionType.MARK;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.EXIT.getString())) {
+			return ActionType.EXIT;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL.getString())) {
+			return ActionType.GCAL;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL_SYNC.getString())) {
+			return ActionType.GCAL_SYNC;
+		} else if (commandTypeString.equalsIgnoreCase(ActionType.GCAL_QUICK_ADD.getString())) {
+			return ActionType.GCAL_QUICK_ADD;
+		} else {
+			return ActionType.INVALID;
+		}
 	}
 }
