@@ -83,13 +83,16 @@ public class Parser {
 		return userAction;
 	}
 	
-	//add function : 10% done
+	
+	//(<timeframe> format is strict "from hhhh to hhhh")
 	//list of approved format:
-	//add swimming at CommunityClub on 30/12 from 1300 to 1400 (fixed not flexible format)
-	//add swimming on 21/11 from 1300 to 1400 (without place)
-	//add swimming at Bukit Batok Community Club Swimming Pool on 21/11 from 1300 to 1400 (long place string, separated by space)
+	//"add swimming at CommunityClub on 30/12 from 1300 to 1400" (fixed not flexible format)
+	//"add swimming on 21/11 from 1300 to 1400" (without place)
+	//"add swimming at Bukit Batok Community Club Swimming Pool on 21/11 from 1300 to 1400" (long place string, separated by space)
 	//now date can be detected either in single digits or double digits (e.g. 2/1, 02/01, 12/01, 12/2, 3/11, etc)
-	//add swimming at BB CC on 2/1 from 1200 to 1300
+	//"add swimming at BB CC on 2/1 from 1200 to 1300"
+	
+	//add function : 25% done
 	private static boolean addParser(StringTokenizer st, LocalAction userAction){
 
 		userAction.setType(ActionType.ADD);
@@ -141,8 +144,8 @@ public class Parser {
 		endTime = endTime.substring(0,2);
 		int intEndTime = Integer.parseInt(endTime);
 
-		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartTime, 0);
-		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndTime, 0);
+		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartTime, 0, 0);
+		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndTime, 0, 0);
 
 
 		userAction.setStartTime(startTimeCal);
@@ -153,11 +156,25 @@ public class Parser {
 		return true;
 	}
 	
+	
+	//(<timeframe> format is strict "from hhhh to hhhh")
+	
+	//approved format:
 	//"display" will return display, startTime 1/1/2005 and endTime 31/12/2020
 	//"display <place preposition> <Place>" is now available
 	//"display at Bukit Batok"
 	//"display in Computing Hall"
-	//display function : 10 %
+	//"display <day prep> <date>  <timeframe>" is now available (however timeframe is strict)
+	//"display on 1/3 from 1200 to 1300"
+	//it can also be combined with place
+	//"display at Bukit Batok on 1/3 from 1200 to 1300"
+	//it accepts input without timeframe
+	//"display <day prep> <date>"
+	//"display on 10/6"
+	//can be combined with place
+	//"display in Korea on 10/12"
+	
+	//display function : 40 % done
 	private static boolean displayParser(StringTokenizer st, LocalAction userAction){
 		userAction.setType(ActionType.DISPLAY);
 
@@ -212,27 +229,44 @@ public class Parser {
 				String date = new String(st.nextToken());
 				getDate(intStartDate,date);
 				
-		
-				prep = new String (st.nextToken());
-				String startTime = new String(st.nextToken());
-				startTime = startTime.substring(0,2);
-				int intStartTime = Integer.parseInt(startTime);
-		
-				prep = new String (st.nextToken());
-				String endTime = new String(st.nextToken());
-				endTime = endTime.substring(0,2);
-				int intEndTime = Integer.parseInt(endTime);
+				if (st.hasMoreTokens()){
+					prep = new String (st.nextToken());
+					if(isValidTimePreposition(prep)){
+						String startTime = new String(st.nextToken());
+						startTime = startTime.substring(0,2);
+						int intStartTime = Integer.parseInt(startTime);
+				
+						prep = new String (st.nextToken());
+						String endTime = new String(st.nextToken());
+						endTime = endTime.substring(0,2);
+						int intEndTime = Integer.parseInt(endTime);
+						
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartTime, 0, 0);
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndTime, 0, 0);
+					}
+					else{
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
+					}
+				}
+				else{
+					startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
+					endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
+				}
+				
+				userAction.setStartTime(startTimeCal);
+				userAction.setEndTime(endTimeCal);
+				
+				return true;
 			}	
 		}
 		
-		startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0]);
-		endTimeCal.set(intEndDate[2], intEndDate[1], intEndDate[0]);
+		startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
+		endTimeCal.set(intEndDate[2], intEndDate[1], intEndDate[0] , 0, 0, 0);
 		
 		userAction.setStartTime(startTimeCal);
 		userAction.setEndTime(endTimeCal);
 		
-		
-
 		return true;
 	}
 	

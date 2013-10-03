@@ -19,6 +19,10 @@ public class ATypistCalendar {
 		System.out.println(Parser.parse("add swimming at BB CC on 2/1 from 1200 to 1300"));
 		System.out.println(Parser.parse("display"));
 		System.out.println(Parser.parse("display at Bukit Batok"));
+		System.out.println(Parser.parse("display on 10/6"));
+		System.out.println(Parser.parse("display in Korea on 10/12"));
+		System.out.println(Parser.parse("display on 1/3 from 1200 to 1300"));
+		System.out.println(Parser.parse("display at Bukit Batok on 1/3 from 1200 to 1300"));
 		/*
 		Scanner sc = new Scanner(System.in);
 		//TasksManager tm = new TasksManager(null);
