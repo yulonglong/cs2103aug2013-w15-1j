@@ -6,13 +6,15 @@ public class LocalAction extends Action{
 	private ActionType type;
 	private Calendar startTime;
 	private Calendar endTime;
+	private Calendar deadlineTime;
 	private String description;
 	private String place;
 
 	public LocalAction(){
 		type = null;
-		startTime = Calendar.getInstance();
-		endTime = Calendar.getInstance();
+		startTime = null;
+		endTime = null;
+		deadlineTime = null;
 		description = new String();
 		place = new String();
 	}

@@ -84,13 +84,18 @@ public class Parser {
 	}
 	
 	
-	//(<timeframe> format is strict "from hhhh to hhhh")
+	//<time> format is completed, can follow those in user guide.
+	//however am and pm is strictly without dots (a.m. is not accepted)
+	//there must be no space between time and am or pm (e.g 3pm, 2.30pm)
+	//
 	//list of approved format:
 	//"add swimming at CommunityClub on 30/12 from 1300 to 1400" (fixed not flexible format)
 	//"add swimming on 21/11 from 1300 to 1400" (without place)
 	//"add swimming at Bukit Batok Community Club Swimming Pool on 21/11 from 1300 to 1400" (long place string, separated by space)
 	//now date can be detected either in single digits or double digits (e.g. 2/1, 02/01, 12/01, 12/2, 3/11, etc)
 	//"add swimming at BB CC on 2/1 from 1200 to 1300"
+	//completed <time> format
+	//"add swimming at BB CC on 2/1 from 1.33pm to 3.20pm"
 	
 	//add function : 25% done
 	private static boolean addParser(StringTokenizer st, LocalAction userAction){
@@ -136,16 +141,16 @@ public class Parser {
 
 		prep = new String (st.nextToken());
 		String startTime = new String(st.nextToken());
-		startTime = startTime.substring(0,2);
-		int intStartTime = Integer.parseInt(startTime);
+		int intStartHour = getTimeHour(startTime);
+		int intStartMinute = getTimeMinute(startTime);
 
 		prep = new String (st.nextToken());
 		String endTime = new String(st.nextToken());
-		endTime = endTime.substring(0,2);
-		int intEndTime = Integer.parseInt(endTime);
+		int intEndHour = getTimeHour(endTime);
+		int intEndMinute = getTimeMinute(endTime);
 
-		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartTime, 0, 0);
-		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndTime, 0, 0);
+		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartHour, intStartMinute, 0);
+		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndHour, intEndMinute, 0);
 
 
 		userAction.setStartTime(startTimeCal);
@@ -157,7 +162,8 @@ public class Parser {
 	}
 	
 	
-	//(<timeframe> format is strict "from hhhh to hhhh")
+	//<time> format is completed,
+	//explanation will be the same as add function above
 	
 	//approved format:
 	//"display" will return display, startTime 1/1/2005 and endTime 31/12/2020
@@ -233,16 +239,16 @@ public class Parser {
 					prep = new String (st.nextToken());
 					if(isValidTimePreposition(prep)){
 						String startTime = new String(st.nextToken());
-						startTime = startTime.substring(0,2);
-						int intStartTime = Integer.parseInt(startTime);
-				
+						int intStartHour = getTimeHour(startTime);
+						int intStartMinute = getTimeMinute(startTime);
+
 						prep = new String (st.nextToken());
 						String endTime = new String(st.nextToken());
-						endTime = endTime.substring(0,2);
-						int intEndTime = Integer.parseInt(endTime);
+						int intEndHour = getTimeHour(endTime);
+						int intEndMinute = getTimeMinute(endTime);
 						
-						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartTime, 0, 0);
-						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndTime, 0, 0);
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndHour, intEndMinute, 0);
 					}
 					else{
 						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
@@ -313,6 +319,94 @@ public class Parser {
 			return true;
 		}
 		return false;
+	}
+	
+	private static int getTimeMinute(String time){
+		int intTimeMinute = 0;
+		int stringTimeLength = time.length();
+		boolean allDigits = true;
+		for(int i=0;(i<stringTimeLength);i++){
+			if(!Character.isDigit(time.charAt(i))){
+				allDigits = false;
+			}
+		}
+		if(allDigits==true){
+			if(stringTimeLength<=2){
+				return 0;
+			}
+			else{
+				time = time.substring(2,4);
+				intTimeMinute = Integer.parseInt(time); 
+				return intTimeMinute;
+			}
+		}
+		else{
+			if(stringTimeLength<=4){
+				return 0;
+			}
+			int indexOfDelimiter = 0;
+			//get the index of delimiter
+			for(int i=0;(i<stringTimeLength);i++){
+				if(!Character.isDigit(time.charAt(i))){
+					indexOfDelimiter = i;
+					break;
+				}
+			}
+			time = time.substring(indexOfDelimiter+1,indexOfDelimiter+3);
+			intTimeMinute = Integer.parseInt(time); 
+			return intTimeMinute;
+			
+		}
+	}
+	
+	private static int getTimeHour(String time){
+		int intTimeHour = 0;
+		int stringTimeLength = time.length();
+		boolean allDigits = true;
+		for(int i=0;(i<stringTimeLength);i++){
+			if(!Character.isDigit(time.charAt(i))){
+				allDigits = false;
+			}
+		}
+		if(allDigits==true){
+			if(stringTimeLength<=2){
+				intTimeHour = Integer.parseInt(time); 
+				return intTimeHour;
+			}
+			else{
+				time = time.substring(0,2);
+				intTimeHour = Integer.parseInt(time); 
+				return intTimeHour;
+			}
+		}
+		else{
+			String day = time.substring(stringTimeLength-2);
+			
+			int indexOfDelimiter = 0;
+			//get the index of delimiter
+			for(int i=0;(i<stringTimeLength);i++){
+				if(!Character.isDigit(time.charAt(i))){
+					indexOfDelimiter = i;
+					break;
+				}
+			}
+			if(indexOfDelimiter==1){
+				time = time.substring(0,1);
+				intTimeHour = Integer.parseInt(time); 
+				if(day.equals("pm")){
+					intTimeHour = intTimeHour + 12;
+				}
+				return intTimeHour;
+			}
+			else{
+				time = time.substring(0,2);
+				intTimeHour = Integer.parseInt(time); 
+				if(day.equals("pm")){
+					intTimeHour = intTimeHour + 12;
+				}
+				return intTimeHour;
+			}
+		}
 	}
 	
 	//pass a user string of date in any format

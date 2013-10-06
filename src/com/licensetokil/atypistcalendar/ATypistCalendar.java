@@ -16,7 +16,7 @@ public class ATypistCalendar {
 		System.out.println(Parser.parse("add swimming on 30/12 from 1300 to 1400"));
 		System.out.println(Parser.parse("add swimming at CommunityClub on 21/11 from 1400 to 1500"));
 		System.out.println(Parser.parse("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600"));
-		System.out.println(Parser.parse("add swimming at BB CC on 2/1 from 1200 to 1300"));
+		System.out.println(Parser.parse("add swimming at BB CC on 2/1 from 1.33pm to 3.20pm"));
 		System.out.println(Parser.parse("display"));
 		System.out.println(Parser.parse("display at Bukit Batok"));
 		System.out.println(Parser.parse("display on 10/6"));
