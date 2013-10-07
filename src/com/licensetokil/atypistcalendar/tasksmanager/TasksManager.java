@@ -4,132 +4,24 @@ import com.licensetokil.atypistcalendar.parser.*;
 
 import java.util.*;
 
-abstract class Task {
-	protected int uniqueID;
-	protected String description;
-
-}
-
 public class TasksManager {
 
 	private static final int COMMAND_SUCCESSFUL = 1;
 	private static final int COMMAND_UNSUCCESSFUL = 0;
 
-	public class Schedule extends Task {
-		private int uniqueID;
-		private Calendar startTime;
-		private Calendar endTime;
-		private String description;
-		private String place;
-
-		public Schedule(Calendar startTime, Calendar endTime,
-				String description, String place) {
-			this.startTime = startTime;
-			this.endTime = endTime;
-			this.description = description;
-			this.place = place;
-		}
-
-		public int getUniqueID() {
-			return uniqueID;
-		}
-
-		public Calendar getStartTime() {
-			return startTime;
-		}
-
-		public Calendar getEndTime() {
-			return endTime;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getPlace() {
-			return place;
-		}
-
-		public String toString() {
-			return "Schedule@" + uniqueID + "@" + startTime.toString() + "@"
-					+ endTime.toString() + "@" + description + "@" + place;
-		}
-	}
-
-	public class Deadline extends Task {
-		private int uniqueID;
-		private Calendar endTime;
-		private String description;
-		private String place;
-
-		public Deadline(Calendar endTime, String description, String place) {
-			this.endTime = endTime;
-			this.description = description;
-			this.place = place;
-		}
-
-		public int getUniqueID() {
-			return uniqueID;
-		}
-
-		public Calendar getEndTime() {
-			return endTime;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getPlace() {
-			return place;
-		}
-
-		public String toString() {
-			return "Deadline@" + uniqueID + "@" + endTime.toString() + "@"
-					+ description + "@" + place;
-		}
-	}
-
-	public class Todo extends Task {
-		private int uniqueID;
-		private String description;
-		private String place;
-
-		public Todo(String description, String place) {
-			this.description = description;
-			this.place = place;
-		}
-
-		public int getUniqueID() {
-			return uniqueID;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getPlace() {
-			return place;
-		}
-
-		public String toString() {
-			return "Todo@" + uniqueID + "@" + description + "@" + place;
-		}
-	}
-
-	private Parser.LocalAction action;
+	private LocalAction action;
 	private ArrayList<Task> memory;
 	
-	public TasksManager(Parser.LocalAction action) {
+	public TasksManager(LocalAction action) {
 		this.action = action;
 		memory = new ArrayList<Task>();
 	}
 
-	public void setAction(Parser.LocalAction action) {
+	public void setAction(LocalAction action) {
 		this.action = action;
 	}
 
-	public Parser.LocalAction getAction() {
+	public LocalAction getAction() {
 		return action;
 	}
 
@@ -137,7 +29,7 @@ public class TasksManager {
 		return memory;
 	}
 
-	public Task classify(Parser.LocalAction action) {
+	public Task classify(LocalAction action) {
 		if (action.getStartTime() == null) {
 			if (action.getEndTime() == null) {
 				Todo td = new Todo(action.getDescription(), action.getPlace());
@@ -183,7 +75,7 @@ public class TasksManager {
 
 	}
 
-	public String executeCommand(Parser.LocalAction ac) {
+	public String executeCommand(LocalAction ac) {
 		Task t = classify(ac);
 
 		try {
