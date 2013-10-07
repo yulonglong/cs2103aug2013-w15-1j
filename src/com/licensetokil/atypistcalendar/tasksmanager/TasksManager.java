@@ -6,11 +6,9 @@ import java.util.*;
 
 public class TasksManager {
 
-	private static final int COMMAND_SUCCESSFUL = 1;
-	private static final int COMMAND_UNSUCCESSFUL = 0;
-
 	private LocalAction action;
-	private ArrayList<Task> memory;
+	private static ArrayList<Task> memory = new ArrayList<Task>();
+	private static int counter = 0;
 	
 	public TasksManager(LocalAction action) {
 		this.action = action;
@@ -29,7 +27,7 @@ public class TasksManager {
 		return memory;
 	}
 
-	public Task classify(LocalAction action) {
+	public static Task classify(LocalAction action) {
 		if (action.getStartTime() == null) {
 			if (action.getEndTime() == null) {
 				Todo td = new Todo(action.getDescription(), action.getPlace());
@@ -40,18 +38,36 @@ public class TasksManager {
 				return dl;
 			}
 		} else {
-			Schedule sch = new Schedule(action.getStartTime(),
+			Schedule sch = new Schedule(counter++, action.getStartTime(),
 					action.getEndTime(), action.getDescription(),
 					action.getPlace());
 			return sch;
 		}
 	}
 
-	public void add(Task t) {
+	public static String add(Task t) {
+		//System.out.println(t.toString());
 		memory.add(t);
+		
+		if(t.getTaskType().equals("schedule")){
+			return "added " + t.getDescription() +" on " + t.getStartTime().getTime() + " to " + t.getEndTime().getTime() +" successfully";
+		}
+		
+		else if(t.getTaskType().equals("deadline")){
+			return "added " + t.getDescription() + " by " + t.getEndTime().getTime() + " successfully";
+		}
+		
+		else if(t.getTaskType().equals("todo")){
+			return "added " + t.getDescription() + " successfully";
+		}
+		
+		else{
+			return "error";
+		}
+
 	}
 
-	public String display(Task t) {
+	public static String display(Task t) {
 		String str = "";
 		for (Task task : memory) {
 			str = str + (task.toString()).replaceAll("@", " ") + "\n";
@@ -75,14 +91,14 @@ public class TasksManager {
 
 	}
 
-	public String executeCommand(LocalAction ac) {
+	public static String executeCommand(LocalAction ac) {
 		Task t = classify(ac);
 
 		try {
 			switch (ac.getType()) {
 			case ADD:
-				add(t);
-				return "added succesfully";
+
+				return add(t);			
 				//break;
 			case DISPLAY:
 				return display(t);

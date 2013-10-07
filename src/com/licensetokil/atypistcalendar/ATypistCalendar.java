@@ -1,6 +1,7 @@
 package com.licensetokil.atypistcalendar;
 import java.util.Calendar;
 import java.util.Scanner;
+import com.licensetokil.atypistcalendar.parser.*;
 
 import com.licensetokil.atypistcalendar.parser.Parser;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
@@ -23,6 +24,11 @@ public class ATypistCalendar {
 		System.out.println(Parser.parse("display in Korea on 10/12"));
 		System.out.println(Parser.parse("display on 1/3 from 1200 to 1300"));
 		System.out.println(Parser.parse("display at Bukit Batok on 1/3 from 1200 to 1300"));
+		
+		Action ac = Parser.parse("add swimming on 30/12 from 1300 to 1400");
+		Action ac2 = Parser.parse("display");
+		System.out.println(TasksManager.executeCommand((LocalAction)ac));
+		System.out.println(TasksManager.executeCommand((LocalAction)ac2));
 		/*
 		Scanner sc = new Scanner(System.in);
 		//TasksManager tm = new TasksManager(null);
