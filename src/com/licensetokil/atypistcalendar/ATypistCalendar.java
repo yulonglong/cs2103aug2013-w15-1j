@@ -27,8 +27,10 @@ public class ATypistCalendar {
 		
 		Action ac = Parser.parse("add swimming on 30/12 from 1300 to 1400");
 		Action ac2 = Parser.parse("display");
+		Action ac3 = Parser.parse("display deadlines");
 		System.out.println(TasksManager.executeCommand((LocalAction)ac));
 		System.out.println(TasksManager.executeCommand((LocalAction)ac2));
+		System.out.println(TasksManager.executeCommand((LocalAction)ac3));
 		/*
 		Scanner sc = new Scanner(System.in);
 		//TasksManager tm = new TasksManager(null);

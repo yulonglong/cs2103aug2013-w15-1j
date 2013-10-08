@@ -7,13 +7,11 @@ import java.util.*;
 public class TasksManager {
 
 	private LocalAction action;
-	private static ArrayList<Task> memory = new ArrayList<Task>();
-	private static int counter = 0;
+	private static ArrayList<Schedule> schedule = new ArrayList<Schedule>();
+	private static ArrayList<Deadline> deadline = new ArrayList<Deadline>();
+	private static ArrayList<Todo> todo = new ArrayList<Todo>();
 	
-	public TasksManager(LocalAction action) {
-		this.action = action;
-		memory = new ArrayList<Task>();
-	}
+	private static int counter = 0;
 
 	public void setAction(LocalAction action) {
 		this.action = action;
@@ -23,8 +21,16 @@ public class TasksManager {
 		return action;
 	}
 
-	public ArrayList<Task> getMemory() {
-		return memory;
+	public ArrayList<Schedule> getSchedule() {
+		return schedule;
+	}
+	
+	public ArrayList<Deadline> getDeadline(){
+		return deadline;
+	}
+	
+	public ArrayList<Todo> getTodo(){
+		return todo;
 	}
 
 	public static Task classify(LocalAction action) {
@@ -46,33 +52,66 @@ public class TasksManager {
 	}
 
 	public static String add(Task t) {
-		//System.out.println(t.toString());
-		memory.add(t);
 		
 		if(t.getTaskType().equals("schedule")){
+			schedule.add((Schedule)t);
 			return "added " + t.getDescription() +" on " + t.getStartTime().getTime() + " to " + t.getEndTime().getTime() +" successfully";
 		}
 		
 		else if(t.getTaskType().equals("deadline")){
+			deadline.add((Deadline)t);
 			return "added " + t.getDescription() + " by " + t.getEndTime().getTime() + " successfully";
 		}
 		
 		else if(t.getTaskType().equals("todo")){
+			todo.add((Todo)t);
 			return "added " + t.getDescription() + " successfully";
 		}
 		
 		else{
-			return "error";
+			return "add unsuccessful";
 		}
 
 	}
 
 	public static String display(Task t) {
-		String str = "";
-		for (Task task : memory) {
-			str = str + (task.toString()).replaceAll("@", " ") + "\n";
+		String message = "";
+		if(t.getDescription().equals("")){
+			for(Schedule s: schedule){
+				message = message + s.toString().replaceAll("@", " ") + "\n";
+			}
+			for(Deadline d: deadline){
+				message = message + d.toString().replaceAll("@", " ") + "\n";
+			}
+			for(Todo td: todo){
+				message = message + td.toString().replaceAll("@", " ") + "\n";
+			}
+			return message;
 		}
-		return str;
+		
+		else if(t.getDescription().equalsIgnoreCase("schedules")){
+			for(Schedule s: schedule){
+				message = message + s.toString().replaceAll("@", " ") + "\n";
+			}
+			return message;
+		}
+		
+		else if(t.getDescription().equalsIgnoreCase("deadlines")){
+			for(Deadline d: deadline){
+				message = message + d.toString().replaceAll("@", " ") + "\n";
+			}
+			return message;
+		}
+		
+		else if(t.getDescription().equalsIgnoreCase("todos")){
+			for(Todo td: todo){
+				message = message + td.toString().replaceAll("@", " ") + "\n";
+			}
+			return message;
+		}
+		else
+			return "error";	
+
 	}
 
 	public void delete(Task t) {
