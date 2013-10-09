@@ -9,6 +9,7 @@ public class MarkAction extends LocalAction{
 	private Calendar startTime;
 	private Calendar endTime;
 	private String locationQuery;
+	private String status;
 	
 	public MarkAction(){
 		type = LocalActionType.MARK;
@@ -16,10 +17,12 @@ public class MarkAction extends LocalAction{
 		endTime = null;
 		query = new String();
 		locationQuery = new String();
+		status = new String();
 	}
 	
 	public String toString(){
 		return ("Type        : " + type + "\n" +
+				"status      : " + status + "\n" +
 				"Ref. Num	 : " + referenceNumber + "\n" +
 			    "Start Time  : " + startTime.getTime() + "\n" +
 		        "End Time    : " + endTime.getTime() + "\n" +
@@ -51,6 +54,10 @@ public class MarkAction extends LocalAction{
 	public ArrayList<Integer> getReferenceNumber(){
 		return referenceNumber;
 	}
+	
+	public String getStatus(){
+		return status;
+	}
 
 	public void setStartTime(Calendar newStartTime){
 		startTime = newStartTime;
@@ -70,5 +77,9 @@ public class MarkAction extends LocalAction{
 	
 	public void setReferenceNumber(ArrayList<Integer> newReferenceNumber){
 		referenceNumber = newReferenceNumber;
+	}
+	
+	public void setStatus(String newStatus){
+		status = newStatus;
 	}
 }

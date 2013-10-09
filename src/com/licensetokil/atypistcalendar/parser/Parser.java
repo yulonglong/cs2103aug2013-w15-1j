@@ -284,6 +284,7 @@ public class Parser {
 		userAction.setReferenceNumber(referenceNumber);
 		return userAction;
 	}
+	
 	//update function: 0 %
 	private static UpdateAction updateParser(StringTokenizer st){
 		UpdateAction userAction = new UpdateAction();
@@ -296,33 +297,44 @@ public class Parser {
 		System.out.println("Sorry, searchParser is under construction!");
 		return userAction;
 	}
-	//mark function: 0 %
+	
+	//mark function: 10 %
 	private static MarkAction markParser(StringTokenizer st){
+		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		MarkAction userAction = new MarkAction();
-		System.out.println("Sorry, markParser is under construction!");
+		String query = new String();
+		String refNum = new String();
+		String temp = new String (st.nextToken());
+		if(temp.substring(0,1).equals("#")){
+			temp = temp.substring(1);
+			int tempInt = Integer.parseInt(temp);
+			referenceNumber.add(tempInt);
+			
+			while((st.hasMoreTokens())&&(!isValidMarkPreposition(temp))){
+				temp = new String(st.nextToken());
+				refNum = new String(temp.substring(1));
+				tempInt = Integer.parseInt(refNum);
+				referenceNumber.add(tempInt);
+			}
+			String status = new String (st.nextToken());
+			userAction.setStatus(status);
+			userAction.setReferenceNumber(referenceNumber);
+		}
+		else{
+			
+			while((!isValidMarkPreposition(temp))&&(st.hasMoreTokens())){
+				query = query + temp + " ";
+				temp = st.nextToken();
+			}
+			query = query.substring(0,query.length()-1);//remove the last white space
+			String status = new String(st.nextToken());
+			userAction.setQuery(query);
+			userAction.setStatus(status);
+		}
 		return userAction;
 	}
 
-	private static boolean isValidPlacePreposition(String preposition){
-		if((preposition.equalsIgnoreCase("in"))||(preposition.equalsIgnoreCase("at"))){
-			return true;
-		}
-		return false;
-	}
 	
-	private static boolean isValidDayPreposition(String preposition){
-		if((preposition.equalsIgnoreCase("on"))||(preposition.equalsIgnoreCase(","))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isValidTimePreposition(String preposition){
-		if((preposition.equalsIgnoreCase("from"))||(preposition.equalsIgnoreCase("at"))||(preposition.equalsIgnoreCase(","))){
-			return true;
-		}
-		return false;
-	}
 	
 	private static int getTimeMinute(String time){
 		int intTimeMinute = 0;
@@ -451,6 +463,34 @@ public class Parser {
 			strResult = strResult + " " +strRemaining.nextToken();
 		}
 		return strResult;
+	}
+	
+	private static boolean isValidMarkPreposition(String preposition){
+		if(preposition.equalsIgnoreCase("as")){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidPlacePreposition(String preposition){
+		if((preposition.equalsIgnoreCase("in"))||(preposition.equalsIgnoreCase("at"))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidDayPreposition(String preposition){
+		if((preposition.equalsIgnoreCase("on"))||(preposition.equalsIgnoreCase(","))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidTimePreposition(String preposition){
+		if((preposition.equalsIgnoreCase("from"))||(preposition.equalsIgnoreCase("at"))||(preposition.equalsIgnoreCase(","))){
+			return true;
+		}
+		return false;
 	}
 	
 	private static LocalActionType determineLocalActionType(String commandTypeString) throws MalformedUserInputException{
