@@ -1,14 +1,12 @@
 package com.licensetokil.atypistcalendar.parser;
 
-public enum GoogleActionType { 
-	GCAL ("gcal"), 
-	GCAL_SYNC ("gcal sync"), 
-	GCAL_QUICK_ADD ("gcal quick add"), 
-	EXIT ("exit");
+public enum SystemActionType { 
+	EXIT ("exit"), 
+	INVALID ("invalid");
 	
 	private final String stringActionType;
 	
-	GoogleActionType(String newStringActionType) {
+	SystemActionType(String newStringActionType) {
 		stringActionType = newStringActionType;
 	}
 	

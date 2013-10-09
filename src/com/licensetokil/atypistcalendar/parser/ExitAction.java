@@ -1,10 +1,10 @@
 package com.licensetokil.atypistcalendar.parser;
 
-public class ExitAction extends LocalAction{
+public class ExitAction extends SystemAction{
 	public ExitAction(){
-		type = LocalActionType.EXIT;
+		type = SystemActionType.EXIT;
 	}
-	public LocalActionType getType(){
+	public SystemActionType getType(){
 		return type;
 	}
 }

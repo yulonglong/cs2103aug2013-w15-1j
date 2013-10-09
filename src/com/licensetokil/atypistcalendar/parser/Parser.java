@@ -10,22 +10,28 @@ public class Parser {
 		StringTokenizer st = new StringTokenizer(userInput);
 		//get the actionType by getting the first token (first word) from the user input
 		String stringUserAction = new String(st.nextToken());
-		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
+		GoogleActionType googleActionType = determineGoogleActionType(stringUserAction);
 		//if GCAL type
-		if(actionType == GoogleActionType.GCAL){
+		if(googleActionType == GoogleActionType.GCAL){
 			return gcalParser(st,userInput,stringUserAction);
 		}
 		//if not GCAL type (means Local type)
 		else{
-			LocalActionType newActionType = determineLocalActionType(stringUserAction);
-			return localParser(st,newActionType);
+			SystemActionType systemActionType = determineSystemActionType(stringUserAction);
+			if(systemActionType == SystemActionType.EXIT){
+				return new ExitAction();
+			}
+			else{
+				LocalActionType localActionType = determineLocalActionType(stringUserAction);
+				return localParser(st,localActionType);
+			}
 		}
 	}
 
 
 
 	
-	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction){
+	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction) throws MalformedUserInputException{
 		GoogleAction userAction = new GoogleAction();
 		stringUserAction = stringUserAction + " " + st.nextToken();
 		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
@@ -47,8 +53,7 @@ public class Parser {
 			}
 			else{
 				System.out.println("Error! Invalid GCAL Command!");
-				userAction.setType(GoogleActionType.INVALID);
-				return userAction;
+				throw new MalformedUserInputException("Invalid input!");
 			}
 		}
 	}
@@ -67,8 +72,6 @@ public class Parser {
 			return searchParser(st);
 		case MARK:
 			return markParser(st);
-		case EXIT:
-			return new ExitAction();
 		default:
 			throw new MalformedUserInputException("Invalid input!");
 		}
@@ -444,7 +447,7 @@ public class Parser {
 		return strResult;
 	}
 	
-	private static LocalActionType determineLocalActionType(String commandTypeString) {
+	private static LocalActionType determineLocalActionType(String commandTypeString) throws MalformedUserInputException{
 	    if (commandTypeString == null)
 			throw new Error("command type string cannot be null!");
 		if (commandTypeString.equalsIgnoreCase(LocalActionType.ADD.getString())) {
@@ -459,14 +462,12 @@ public class Parser {
 			return LocalActionType.SEARCH;
 		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.MARK.getString())) {
 			return LocalActionType.MARK;
-		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.EXIT.getString())) {
-			return LocalActionType.EXIT;
 		} else {
-			return LocalActionType.INVALID;
+			throw new MalformedUserInputException("Invalid input!");
 		}
 	}
 	
-	private static GoogleActionType determineGoogleActionType(String commandTypeString) {
+	private static GoogleActionType determineGoogleActionType(String commandTypeString) throws MalformedUserInputException {
 		if (commandTypeString == null) {
 			throw new Error("command type string cannot be null!");
 	    } else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL.getString())) {
@@ -475,10 +476,18 @@ public class Parser {
 			return GoogleActionType.GCAL_SYNC;
 		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL_QUICK_ADD.getString())) {
 			return GoogleActionType.GCAL_QUICK_ADD;
-		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.EXIT.getString())) {
-			return GoogleActionType.EXIT;
 		} else {
-			return GoogleActionType.INVALID;
+			throw new MalformedUserInputException("Invalid input!");
+		}
+	}
+	
+	private static SystemActionType determineSystemActionType(String commandTypeString) throws MalformedUserInputException {
+		if (commandTypeString == null)
+			throw new Error("command type string cannot be null!");
+		if (commandTypeString.equalsIgnoreCase(SystemActionType.EXIT.getString())) {
+			return SystemActionType.EXIT;
+		} else {
+			throw new MalformedUserInputException("Invalid input!");
 		}
 	}
 }
