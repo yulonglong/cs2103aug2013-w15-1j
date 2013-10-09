@@ -1,8 +1,7 @@
 package com.licensetokil.atypistcalendar.parser;
 
 public abstract class Action{
-	ActionType type;
+	protected LocalActionType type;
 
-	abstract ActionType getType();
-	abstract void setType (ActionType newActionType);
+	abstract LocalActionType getType();
 }
