@@ -6,7 +6,8 @@ public enum LocalActionType {
 	DISPLAY ("display"), 
 	UPDATE ("update"), 
 	SEARCH ("search"), 
-	MARK ("mark");
+	MARK ("mark"),
+	INVALID ("invalid");
 	
 	private final String stringActionType;
 	

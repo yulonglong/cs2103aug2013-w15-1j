@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 public class Parser {
 
 	public static Action parse(String userInput) throws MalformedUserInputException{
+	
 		//tokenize user input
 		StringTokenizer st = new StringTokenizer(userInput);
 		//get the actionType by getting the first token (first word) from the user input
@@ -24,7 +25,12 @@ public class Parser {
 			}
 			else{
 				LocalActionType localActionType = determineLocalActionType(stringUserAction);
-				return localParser(st,localActionType);
+				if(localActionType == LocalActionType.INVALID){
+					throw new MalformedUserInputException("Invalid Input!");
+				}
+				else{
+				    return localParser(st,localActionType);
+				}
 			}
 		}
 	}
@@ -201,7 +207,7 @@ public class Parser {
 				place = new String(st.nextToken());
 				userAction.setPlace(place);
 			}
-			else{
+			else{//if not place then return back the string
 				String tempUserInput = new String();
 				tempUserInput = getRemainingTokens(st);
 				tempUserInput = prep + " " + tempUserInput;
@@ -221,7 +227,7 @@ public class Parser {
 				}
 			}
 			
-			
+			//if there is a date field
 			if(st.hasMoreTokens()){
 				String date = new String(st.nextToken());
 				getDate(intStartDate,date);
@@ -241,29 +247,9 @@ public class Parser {
 						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndHour, intEndMinute, 0);
 					}
-					else{
-						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
-						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
-					}
 				}
-				else{
-					startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
-					endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
-				}
-				
-				userAction.setStartTime(startTimeCal);
-				userAction.setEndTime(endTimeCal);
-				
-				return userAction;
 			}	
 		}
-		
-		startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 0, 0, 0);
-		endTimeCal.set(intEndDate[2], intEndDate[1], intEndDate[0] , 0, 0, 0);
-		
-		userAction.setStartTime(startTimeCal);
-		userAction.setEndTime(endTimeCal);
-		
 		return userAction;
 	}
 	
@@ -298,6 +284,13 @@ public class Parser {
 		return userAction;
 	}
 	
+	/* Mark accepts task id (#2,#12) and using the keyword as done or as undone
+	 * accepts specific descriptions to replace task id.
+	 * "mark #1 as done"
+	 * "mark #1 #2 as done"
+	 * "mark swimming as done"
+	 * "mark group project meeting as undone"
+	*/
 	//mark function: 10 %
 	private static MarkAction markParser(StringTokenizer st){
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
@@ -309,12 +302,12 @@ public class Parser {
 			temp = temp.substring(1);
 			int tempInt = Integer.parseInt(temp);
 			referenceNumber.add(tempInt);
-			
+			temp = new String(st.nextToken());
 			while((st.hasMoreTokens())&&(!isValidMarkPreposition(temp))){
-				temp = new String(st.nextToken());
 				refNum = new String(temp.substring(1));
 				tempInt = Integer.parseInt(refNum);
 				referenceNumber.add(tempInt);
+				temp = new String(st.nextToken());
 			}
 			String status = new String (st.nextToken());
 			userAction.setStatus(status);
@@ -493,7 +486,7 @@ public class Parser {
 		return false;
 	}
 	
-	private static LocalActionType determineLocalActionType(String commandTypeString) throws MalformedUserInputException{
+	private static LocalActionType determineLocalActionType(String commandTypeString) {
 	    if (commandTypeString == null)
 			throw new Error("command type string cannot be null!");
 		if (commandTypeString.equalsIgnoreCase(LocalActionType.ADD.getString())) {
@@ -509,11 +502,11 @@ public class Parser {
 		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.MARK.getString())) {
 			return LocalActionType.MARK;
 		} else {
-			throw new MalformedUserInputException("Invalid input!");
+			return LocalActionType.INVALID;
 		}
 	}
 	
-	private static GoogleActionType determineGoogleActionType(String commandTypeString) throws MalformedUserInputException {
+	private static GoogleActionType determineGoogleActionType(String commandTypeString) {
 		if (commandTypeString == null) {
 			throw new Error("command type string cannot be null!");
 	    } else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL.getString())) {
@@ -523,17 +516,17 @@ public class Parser {
 		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL_QUICK_ADD.getString())) {
 			return GoogleActionType.GCAL_QUICK_ADD;
 		} else {
-			throw new MalformedUserInputException("Invalid input!");
+			return GoogleActionType.INVALID;
 		}
 	}
 	
-	private static SystemActionType determineSystemActionType(String commandTypeString) throws MalformedUserInputException {
+	private static SystemActionType determineSystemActionType(String commandTypeString) {
 		if (commandTypeString == null)
 			throw new Error("command type string cannot be null!");
-		if (commandTypeString.equalsIgnoreCase(SystemActionType.EXIT.getString())) {
+		else if (commandTypeString.equalsIgnoreCase(SystemActionType.EXIT.getString())) {
 			return SystemActionType.EXIT;
 		} else {
-			throw new MalformedUserInputException("Invalid input!");
+			return SystemActionType.INVALID;
 		}
 	}
 }

@@ -20,12 +20,26 @@ public class DeleteAction extends LocalAction{
 	}
 	
 	public String toString(){
-		return ("Type        : " + type + "\n" +
-				"Ref. Num	 : " + referenceNumber + "\n" +
-			    "Start Time  : " + startTime.getTime() + "\n" +
-		        "End Time    : " + endTime.getTime() + "\n" +
-		        "Query       : " + query + "\n" +
-		        "Place       : " + locationQuery + "\n");
+		String stringStartTime;
+		if (startTime==null){
+			stringStartTime = new String("null");
+		}
+		else{
+			stringStartTime= startTime.getTime().toString();
+		}
+		String stringEndTime;
+		if (endTime==null){
+			stringEndTime = new String("null");
+		}
+		else{
+			stringEndTime= endTime.getTime().toString();
+		}
+		return ("Type	: " + type + "\n" +
+				"Ref. Num	: " + referenceNumber + "\n" +
+			    "Start Time	: " + stringStartTime + "\n" +
+		        "End Time	: " + stringEndTime + "\n" +
+		        "Query	: " + query + "\n" +
+		        "Place	: " + locationQuery + "\n");
 	}
 	
 

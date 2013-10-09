@@ -17,11 +17,11 @@ public class AddAction extends LocalAction {
 	}
 	
 	public String toString(){
-		return ("Type        : " + type + "\n" +
-			    "Start Time  : " + startTime.getTime() + "\n" +
-		        "End Time    : " + endTime.getTime() + "\n" +
-		        "Description : " + description + "\n" +
-		        "Place       : " + place + "\n");
+		return ("Type	: " + type + "\n" +
+			    "Start Time	: " + startTime.getTime() + "\n" +
+		        "End Time	: " + endTime.getTime() + "\n" +
+		        "Description	: " + description + "\n" +
+		        "Place	: " + place + "\n");
 	}
 	
 

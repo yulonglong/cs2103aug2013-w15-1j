@@ -9,6 +9,8 @@ public class ATypistCalendar {
 	private static DefaultGUI gui;
 	
 	public static void main(String[] args){
+		
+		
 		Calendar calendar = Calendar.getInstance();
 		
 		gui = new DefaultGUI();
@@ -28,6 +30,12 @@ public class ATypistCalendar {
 		userInput("display in Korea on 10/12");
 		userInput("display on 1/3 from 1200 to 1300");
 		userInput("display at Bukit Batok on 1/3 from 1200 to 1300");
+		userInput("abcd");
+		userInput("mark #1 as done");
+		userInput("mark #1 #2 as done");
+		userInput("mark swimming as done");
+		userInput("mark group project meeting as undone");
+		userInput("delete #1 #2 #4");
 		
 		/*
 		userInput("add swimming on 30/12 from 1300 to 1400");
@@ -49,7 +57,8 @@ public class ATypistCalendar {
 	public static void userInput(String input) {
 		try {
 			Action ac = Parser.parse(input);
-			String reply = TasksManager.executeCommand((LocalAction)ac);
+			//String reply = TasksManager.executeCommand((LocalAction)ac);
+			String reply = ac.toString();//kester using this to debug and try his parser
 			gui.outputWithNewline(reply);
 		}
 		catch(MalformedUserInputException muie) {
