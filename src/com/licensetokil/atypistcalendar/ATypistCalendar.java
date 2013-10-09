@@ -8,7 +8,7 @@ import com.licensetokil.atypistcalendar.ui.DefaultGUI;
 public class ATypistCalendar {
 	private static DefaultGUI gui;
 	
-	public static void main(String[] args) throws MalformedUserInputException {
+	public static void main(String[] args){
 		Calendar calendar = Calendar.getInstance();
 		
 		gui = new DefaultGUI();
@@ -46,9 +46,14 @@ public class ATypistCalendar {
 		*/
 	}
 	
-	public static void userInput(String input) throws MalformedUserInputException {
-		Action ac = Parser.parse(input);
-		String reply = TasksManager.executeCommand((LocalAction)ac);
-		gui.outputWithNewline(reply);
+	public static void userInput(String input) {
+		try {
+			Action ac = Parser.parse(input);
+			String reply = TasksManager.executeCommand((LocalAction)ac);
+			gui.outputWithNewline(reply);
+		}
+		catch(MalformedUserInputException muie) {
+			System.out.println(muie.getMessage());
+		}
 	}
 }
