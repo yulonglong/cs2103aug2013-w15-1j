@@ -278,21 +278,39 @@ public class Parser {
 		return userAction;
 	}
 
-	// can only delete with reference number
+	// can delete with reference number
+	// can delete with query(task description)
 	// e.g.
 	// "delete #1 #7 #4"
+	// "delete group meeting project"
 	// can delete multiple items separated with space
 	// delete function : 10 %
 	private static DeleteAction deleteParser(StringTokenizer st) {
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		DeleteAction userAction = new DeleteAction();
-		while (st.hasMoreTokens()) {
-			String temp = new String(st.nextToken());
+		String query = new String();
+		String temp = new String(st.nextToken());
+		if (temp.substring(0, 1).equals("#")) {
 			temp = temp.substring(1);
 			int tempInt = Integer.parseInt(temp);
 			referenceNumber.add(tempInt);
+			while (st.hasMoreTokens()) {
+				temp = new String (st.nextToken());
+				temp = temp.substring(1);
+				tempInt = Integer.parseInt(temp);
+				referenceNumber.add(tempInt);
+			}
+			userAction.setReferenceNumber(referenceNumber);
 		}
-		userAction.setReferenceNumber(referenceNumber);
+		else{
+			query = query + temp + " ";
+			while (st.hasMoreTokens()) {
+				temp = st.nextToken();
+				query = query + temp + " ";
+			}
+			query = query.substring(0, query.length() - 1);// remove the last white space
+			userAction.setQuery(query);
+		}
 		return userAction;
 	}
 
@@ -338,7 +356,6 @@ public class Parser {
 			userAction.setStatus(status);
 			userAction.setReferenceNumber(referenceNumber);
 		} else {
-
 			while ((!isValidMarkPreposition(temp)) && (st.hasMoreTokens())) {
 				query = query + temp + " ";
 				temp = st.nextToken();

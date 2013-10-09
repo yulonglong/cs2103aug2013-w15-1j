@@ -39,7 +39,7 @@ public class ATypistCalendar {
 		userInput("mark swimming as done");
 		userInput("mark group project meeting as undone");
 		userInput("delete #1 #2 #4");
-		
+		userInput("delete group project meeting");
 		/*
 		userInput("add swimming on 30/12 from 1300 to 1400");
 		userInput("display");
