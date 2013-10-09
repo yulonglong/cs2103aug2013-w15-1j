@@ -1,5 +1,6 @@
 package com.licensetokil.atypistcalendar.parser;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
@@ -27,9 +28,6 @@ public class Parser {
 			}
 		}
 	}
-
-
-
 	
 	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction) throws MalformedUserInputException{
 		GoogleAction userAction = new GoogleAction();
@@ -269,10 +267,21 @@ public class Parser {
 		return userAction;
 	}
 	
-	//delete function : 0 %
+	//can only delete with reference number
+	//e.g.
+	//"delete #1 #7 #4"
+	//can delete multiple items separated with space
+	//delete function : 10 %
 	private static DeleteAction deleteParser(StringTokenizer st){
+		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		DeleteAction userAction = new DeleteAction();
-		System.out.println("Sorry, deleteParser is under construction!");
+		while(st.hasMoreTokens()){
+			String temp = new String(st.nextToken());
+			temp = temp.substring(1);
+			int tempInt = Integer.parseInt(temp);
+			referenceNumber.add(tempInt);
+		}
+		userAction.setReferenceNumber(referenceNumber);
 		return userAction;
 	}
 	//update function: 0 %
@@ -293,10 +302,7 @@ public class Parser {
 		System.out.println("Sorry, markParser is under construction!");
 		return userAction;
 	}
-	
 
-	
-	
 	private static boolean isValidPlacePreposition(String preposition){
 		if((preposition.equalsIgnoreCase("in"))||(preposition.equalsIgnoreCase("at"))){
 			return true;

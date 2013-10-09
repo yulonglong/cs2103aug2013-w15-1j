@@ -53,7 +53,7 @@ public class ATypistCalendar {
 			gui.outputWithNewline(reply);
 		}
 		catch(MalformedUserInputException muie) {
-			System.out.println(muie.getMessage());
+			gui.outputWithNewline(muie.getMessage());
 		}
 	}
 }

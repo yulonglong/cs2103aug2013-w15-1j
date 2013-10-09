@@ -3,18 +3,18 @@ package com.licensetokil.atypistcalendar.parser;
 import java.util.Calendar;
 
 public class SearchAction extends LocalAction {
-	private String description;
+	private String query;
 	private Calendar startTime;
 	private Calendar endTime;
-	private String place;
+	private String locationQuery;
 	private String status;
 	
 	public SearchAction(){
 		type = LocalActionType.SEARCH;
 		startTime = null;
 		endTime = null;
-		description = new String();
-		place = new String();
+		query = new String();
+		locationQuery = new String();
 		status = new String();
 	}
 	
@@ -23,8 +23,8 @@ public class SearchAction extends LocalAction {
 				"Status      : " + status + "\n" +
 			    "Start Time  : " + startTime.getTime() + "\n" +
 		        "End Time    : " + endTime.getTime() + "\n" +
-		        "Description : " + description + "\n" +
-		        "Place       : " + place + "\n");
+		        "Query       : " + query + "\n" +
+		        "location    : " + locationQuery + "\n");
 	}
 	
 
@@ -36,12 +36,12 @@ public class SearchAction extends LocalAction {
 		return endTime;
 	}
 
-	public String getDescription(){
-		return description;
+	public String getQuery(){
+		return query;
 	}
 
-	public String getPlace(){
-		return place;
+	public String getLocationQuery(){
+		return locationQuery;
 	}
 	
 	public String getStatus(){
@@ -60,12 +60,12 @@ public class SearchAction extends LocalAction {
 		endTime = newEndTime;
 	}
 
-	public void setDescription(String newDescription){
-		description = newDescription;
+	public void setQuery(String newQuery){
+		query = newQuery;
 	}
 
-	public void setPlace(String newPlace){
-		place = newPlace;
+	public void setLocationQuery(String newLocationQuery){
+		locationQuery = newLocationQuery;
 	}
 	
 	public void setStatus(String newStatus){

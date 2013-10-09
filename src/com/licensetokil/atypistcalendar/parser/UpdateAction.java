@@ -3,37 +3,37 @@ package com.licensetokil.atypistcalendar.parser;
 import java.util.Calendar;
 
 public class UpdateAction extends LocalAction{
-	private String description;
+	private String query;
 	private Calendar startTime;
 	private Calendar endTime;
-	private String place;
-	private String updatedDescription;
+	private String locationQuery;
+	private String updatedQuery;
 	private Calendar updatedStartTime;
 	private Calendar updatedEndTime;
-	private String updatedPlace;
+	private String updatedLocationQuery;
 	
 	public UpdateAction(){
 		type = LocalActionType.UPDATE;
 		startTime = null;
 		endTime = null;
-		description = new String();
-		place = new String();
+		query = new String();
+		locationQuery = new String();
 		updatedStartTime = null;
 		updatedEndTime = null;
-		updatedDescription = new String();
-		updatedPlace = new String();
+		updatedQuery = new String();
+		updatedLocationQuery = new String();
 	}
 	
 	public String toString(){
 		return ("Type        : " + type + "\n" +
 			    "Start Time  : " + startTime.getTime() + "\n" +
 		        "End Time    : " + endTime.getTime() + "\n" +
-		        "Description : " + description + "\n" +
-		        "Place       : " + place + "\n" +
+		        "Description : " + query + "\n" +
+		        "Place       : " + locationQuery + "\n" +
 		        "Updated Start Time  : " + updatedStartTime.getTime() + "\n" +
 		        "Updated End Time    : " + updatedEndTime.getTime() + "\n" +
-		        "Updated Description : " + updatedDescription + "\n" +
-		        "Updated Place       : " + updatedPlace + "\n");
+		        "Updated Query       : " + updatedQuery + "\n" +
+		        "Updated Place       : " + updatedLocationQuery + "\n");
 	}
 	
 
@@ -45,12 +45,12 @@ public class UpdateAction extends LocalAction{
 		return endTime;
 	}
 
-	public String getDescription(){
-		return description;
+	public String getQuery(){
+		return query;
 	}
 
-	public String getPlace(){
-		return place;
+	public String getLocationQuery(){
+		return locationQuery;
 	}
 	
 	public Calendar getUpdatedStartTime(){
@@ -62,11 +62,11 @@ public class UpdateAction extends LocalAction{
 	}
 
 	public String getUpdatedDescription(){
-		return updatedDescription;
+		return updatedQuery;
 	}
 
-	public String getUpdatedPlace(){
-		return updatedPlace;
+	public String getUpdatedLocationQuery(){
+		return updatedLocationQuery;
 	}
 	
 	public LocalActionType getType(){
@@ -81,12 +81,12 @@ public class UpdateAction extends LocalAction{
 		endTime = newEndTime;
 	}
 
-	public void setDescription(String newDescription){
-		description = newDescription;
+	public void setQuery(String newQuery){
+		query = newQuery;
 	}
 
-	public void setPlace(String newPlace){
-		place = newPlace;
+	public void setLocationQuery(String newLocationQuery){
+		locationQuery = newLocationQuery;
 	}
 	public void setUpdatedStartTime(Calendar newUpdatedStartTime){
 		updatedStartTime = newUpdatedStartTime;
@@ -96,12 +96,12 @@ public class UpdateAction extends LocalAction{
 		updatedEndTime = newUpdatedEndTime;
 	}
 
-	public void setUpdatedDescription(String newUpdatedDescription){
-		updatedDescription = newUpdatedDescription;
+	public void setUpdatedQuery(String newUpdatedQuery){
+		updatedQuery = newUpdatedQuery;
 	}
 
-	public void setUpdatedPlace(String newUpdatedPlace){
-		updatedPlace = newUpdatedPlace;
+	public void setUpdatedLocationQuery(String newUpdatedLocationQuery){
+		updatedLocationQuery = newUpdatedLocationQuery;
 	}
 	
 }
