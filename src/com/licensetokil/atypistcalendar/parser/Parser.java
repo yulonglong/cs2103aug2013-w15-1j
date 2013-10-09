@@ -5,19 +5,20 @@ import java.util.StringTokenizer;
 
 public class Parser {
 
-	public static Action parse(String userInput){
+	public static Action parse(String userInput) throws MalformedUserInputException{
 		//tokenize user input
 		StringTokenizer st = new StringTokenizer(userInput);
 		//get the actionType by getting the first token (first word) from the user input
 		String stringUserAction = new String(st.nextToken());
-		LocalActionType actionType = determineActionType(stringUserAction);
+		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
 		//if GCAL type
-		if(actionType == LocalActionType.GCAL){
+		if(actionType == GoogleActionType.GCAL){
 			return gcalParser(st,userInput,stringUserAction);
 		}
 		//if not GCAL type (means Local type)
 		else{
-			return localParser(st,actionType);
+			LocalActionType newActionType = determineLocalActionType(stringUserAction);
+			return localParser(st,newActionType);
 		}
 	}
 
@@ -27,60 +28,50 @@ public class Parser {
 	private static Action gcalParser(StringTokenizer st, String userInput, String stringUserAction){
 		GoogleAction userAction = new GoogleAction();
 		stringUserAction = stringUserAction + " " + st.nextToken();
-		LocalActionType actionType = determineActionType(stringUserAction);
+		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
 
-		if(actionType == LocalActionType.GCAL_SYNC){
+		if(actionType == GoogleActionType.GCAL_SYNC){
 			userInput = new String(getRemainingTokens(st));
 			userAction.setUserInput(userInput);
 			return userAction;
 		}
 		else{
 			stringUserAction = stringUserAction + " " + st.nextToken();
-			actionType = determineActionType(stringUserAction);
+			actionType = determineGoogleActionType(stringUserAction);
 
-			if(actionType == LocalActionType.GCAL_QUICK_ADD){
-				userAction.setType(LocalActionType.GCAL_QUICK_ADD);
+			if(actionType == GoogleActionType.GCAL_QUICK_ADD){
+				userAction.setType(GoogleActionType.GCAL_QUICK_ADD);
 				userInput = new String(getRemainingTokens(st));
 				userAction.setUserInput(userInput);
 				return userAction;
 			}
 			else{
 				System.out.println("Error! Invalid GCAL Command!");
-				userAction.setType(LocalActionType.INVALID);
+				userAction.setType(GoogleActionType.INVALID);
 				return userAction;
 			}
 		}
 	}
 	
-	private static LocalAction localParser(StringTokenizer st, LocalActionType actionType){
-		LocalAction userAction = new LocalAction();
+	private static LocalAction localParser(StringTokenizer st, LocalActionType actionType) throws MalformedUserInputException{
 		switch(actionType){
 		case ADD:
-			addParser(st,userAction);
-			break;
+			return addParser(st);
 		case DELETE:
-			deleteParser(st,userAction);
-			break;
+			return deleteParser(st);
 		case DISPLAY:
-			displayParser(st,userAction);
-			break;
+			return displayParser(st);
 		case UPDATE:
-			updateParser(st,userAction);
-			break;
+			return updateParser(st);
 		case SEARCH:
-			searchParser(st,userAction);
-			break;
+			return searchParser(st);
 		case MARK:
-			markParser(st,userAction);
-			break;
+			return markParser(st);
 		case EXIT:
-			userAction.setType(LocalActionType.EXIT);
-			break;
+			return new ExitAction();
 		default:
-			userAction.setType(LocalActionType.INVALID);
-			break;
-		} 
-		return userAction;
+			throw new MalformedUserInputException("Invalid input!");
+		}
 	}
 	
 	
@@ -98,9 +89,8 @@ public class Parser {
 	//"add swimming at BB CC on 2/1 from 1.33pm to 3.20pm"
 	
 	//add function : 25% done
-	private static boolean addParser(StringTokenizer st, LocalAction userAction){
-
-		userAction.setType(LocalActionType.ADD);
+	private static AddAction addParser(StringTokenizer st){
+		AddAction userAction = new AddAction();
 
 		Calendar startTimeCal = Calendar.getInstance();
 		Calendar endTimeCal = Calendar.getInstance();
@@ -158,7 +148,7 @@ public class Parser {
 		userAction.setDescription(description);
 		
 
-		return true;
+		return userAction;
 	}
 	
 	
@@ -181,8 +171,8 @@ public class Parser {
 	//"display in Korea on 10/12"
 	
 	//display function : 40 % done
-	private static boolean displayParser(StringTokenizer st, LocalAction userAction){
-		userAction.setType(LocalActionType.DISPLAY);
+	private static DisplayAction displayParser(StringTokenizer st){
+		DisplayAction userAction = new DisplayAction();
 
 		int[] intStartDate = new int[3];
 		int[] intEndDate = new int[3];
@@ -263,7 +253,7 @@ public class Parser {
 				userAction.setStartTime(startTimeCal);
 				userAction.setEndTime(endTimeCal);
 				
-				return true;
+				return userAction;
 			}	
 		}
 		
@@ -273,28 +263,32 @@ public class Parser {
 		userAction.setStartTime(startTimeCal);
 		userAction.setEndTime(endTimeCal);
 		
-		return true;
+		return userAction;
 	}
 	
 	//delete function : 0 %
-	private static boolean deleteParser(StringTokenizer st,  LocalAction userAction){
+	private static DeleteAction deleteParser(StringTokenizer st){
+		DeleteAction userAction = new DeleteAction();
 		System.out.println("Sorry, deleteParser is under construction!");
-		return false;
+		return userAction;
 	}
 	//update function: 0 %
-	private static boolean updateParser(StringTokenizer st,  LocalAction userAction){
+	private static UpdateAction updateParser(StringTokenizer st){
+		UpdateAction userAction = new UpdateAction();
 		System.out.println("Sorry, updateParser is under construction!");
-		return false;
+		return userAction;
 	}
 	//search function: 0 %
-	private static boolean searchParser(StringTokenizer st,  LocalAction userAction){
+	private static SearchAction searchParser(StringTokenizer st){
+		SearchAction userAction = new SearchAction();
 		System.out.println("Sorry, searchParser is under construction!");
-		return false;
+		return userAction;
 	}
 	//mark function: 0 %
-	private static boolean markParser(StringTokenizer st,  LocalAction userAction){
+	private static MarkAction markParser(StringTokenizer st){
+		MarkAction userAction = new MarkAction();
 		System.out.println("Sorry, markParser is under construction!");
-		return false;
+		return userAction;
 	}
 	
 
@@ -450,10 +444,8 @@ public class Parser {
 		return strResult;
 	}
 	
-	private static LocalActionType determineActionType(String commandTypeString) {
-		//i am so sorry Ian, i cannot use switch case, because they need constant value
-		//if i want to use my string value from the Enum, it has to use if (because the String has a non constant value)
-		if (commandTypeString == null)
+	private static LocalActionType determineLocalActionType(String commandTypeString) {
+	    if (commandTypeString == null)
 			throw new Error("command type string cannot be null!");
 		if (commandTypeString.equalsIgnoreCase(LocalActionType.ADD.getString())) {
 			return LocalActionType.ADD;
@@ -469,14 +461,24 @@ public class Parser {
 			return LocalActionType.MARK;
 		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.EXIT.getString())) {
 			return LocalActionType.EXIT;
-		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.GCAL.getString())) {
-			return LocalActionType.GCAL;
-		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.GCAL_SYNC.getString())) {
-			return LocalActionType.GCAL_SYNC;
-		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.GCAL_QUICK_ADD.getString())) {
-			return LocalActionType.GCAL_QUICK_ADD;
 		} else {
 			return LocalActionType.INVALID;
+		}
+	}
+	
+	private static GoogleActionType determineGoogleActionType(String commandTypeString) {
+		if (commandTypeString == null) {
+			throw new Error("command type string cannot be null!");
+	    } else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL.getString())) {
+			return GoogleActionType.GCAL;
+		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL_SYNC.getString())) {
+			return GoogleActionType.GCAL_SYNC;
+		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL_QUICK_ADD.getString())) {
+			return GoogleActionType.GCAL_QUICK_ADD;
+		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.EXIT.getString())) {
+			return GoogleActionType.EXIT;
+		} else {
+			return GoogleActionType.INVALID;
 		}
 	}
 }

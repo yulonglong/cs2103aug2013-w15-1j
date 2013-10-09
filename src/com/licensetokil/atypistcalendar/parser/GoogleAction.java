@@ -1,7 +1,7 @@
 package com.licensetokil.atypistcalendar.parser;
 
 public class GoogleAction extends Action{
-	private LocalActionType type;
+	private GoogleActionType type;
 	private String userInput;
 
 	public GoogleAction(){
@@ -9,7 +9,7 @@ public class GoogleAction extends Action{
 		userInput = new String();
 	}
 
-	public LocalActionType getType(){
+	public GoogleActionType getType(){
 		return type;
 	}
 
@@ -17,7 +17,7 @@ public class GoogleAction extends Action{
 		return userInput;
 	}
 
-	public void setType(LocalActionType newActionType){
+	public void setType(GoogleActionType newActionType){
 		type = newActionType;
 	}
 
