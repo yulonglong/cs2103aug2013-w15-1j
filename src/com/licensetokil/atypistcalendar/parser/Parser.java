@@ -314,10 +314,89 @@ public class Parser {
 		return userAction;
 	}
 
-	// update function: 0 %
-	private static UpdateAction updateParser(StringTokenizer st) {
+	// update function: 10 %
+	private static UpdateAction updateParser(StringTokenizer st) throws MalformedUserInputException {
 		UpdateAction userAction = new UpdateAction();
-		System.out.println("Sorry, updateParser is under construction!");
+		String query = new String();
+		String temp = new String(st.nextToken());
+		if (temp.substring(0, 1).equals("#")) {
+			temp = temp.substring(1);
+			int tempInt = Integer.parseInt(temp);
+			userAction.setReferenceNumber(tempInt);
+			
+			temp = st.nextToken();
+			while(!isValidUpdateDelimiter(temp)){
+				throw new MalformedUserInputException ("Invalid Input!");
+			}
+		}
+		else{
+			while (!isValidUpdateDelimiter(temp)) {
+				query = query + temp + " ";
+				temp = st.nextToken();
+			}
+			query = query.substring(0, query.length() - 1);// remove the last white space
+			userAction.setQuery(query);
+		}
+		
+		//after finding the delimiter ">>"
+		
+		Calendar startTimeCal = Calendar.getInstance();
+		Calendar endTimeCal = Calendar.getInstance();
+
+		String description = new String(st.nextToken());
+		userAction.setUpdatedQuery(description);
+		
+		String place = new String();
+		String prep = new String(st.nextToken());
+
+		// check if place is included in user input
+		if (isValidPlacePreposition(prep)) {
+			place = new String(st.nextToken());
+			userAction.setUpdatedLocationQuery(place);
+		} else {
+			String tempUserInput = new String();
+			tempUserInput = getRemainingTokens(st);
+			tempUserInput = prep + " " + tempUserInput;
+			st = new StringTokenizer(tempUserInput);
+		}
+
+		// check for place name, separated by space, and incorporate the proper
+		// place name
+		prep = new String(st.nextToken());
+		while (!isValidDayPreposition(prep)) {
+			place = place + " " + prep;
+			userAction.setUpdatedLocationQuery(place);
+			if (st.hasMoreTokens()) {
+				prep = new String(st.nextToken());
+			} else {
+				break;
+			}
+		}
+
+		String date = new String(st.nextToken());
+		int[] intDate = new int[3];
+		getDate(intDate, date);
+
+		prep = new String(st.nextToken());
+		String startTime = new String(st.nextToken());
+		int intStartHour = getTimeHour(startTime);
+		int intStartMinute = getTimeMinute(startTime);
+
+		prep = new String(st.nextToken());
+		String endTime = new String(st.nextToken());
+		int intEndHour = getTimeHour(endTime);
+		int intEndMinute = getTimeMinute(endTime);
+
+		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartHour,
+				intStartMinute, 0);
+		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndHour,
+				intEndMinute, 0);
+
+		userAction.setUpdatedStartTime(startTimeCal);
+		userAction.setUpdatedEndTime(endTimeCal);
+		
+
+
 		return userAction;
 	}
 
@@ -594,6 +673,13 @@ public class Parser {
 		if ((task.equalsIgnoreCase("schedules"))
 				|| (task.equalsIgnoreCase("deadlines"))
 				|| (task.equalsIgnoreCase("todos"))) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidUpdateDelimiter(String delimiter) {
+		if (delimiter.equalsIgnoreCase(">>")) {
 			return true;
 		}
 		return false;

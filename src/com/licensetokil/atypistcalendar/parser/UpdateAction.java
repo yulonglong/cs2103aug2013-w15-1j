@@ -7,6 +7,7 @@ public class UpdateAction extends LocalAction{
 	private Calendar startTime;
 	private Calendar endTime;
 	private String locationQuery;
+	private int referenceNumber;
 	private String updatedQuery;
 	private Calendar updatedStartTime;
 	private Calendar updatedEndTime;
@@ -25,15 +26,44 @@ public class UpdateAction extends LocalAction{
 	}
 	
 	public String toString(){
-		return ("Type        : " + type + "\n" +
-			    "Start Time  : " + startTime.getTime() + "\n" +
-		        "End Time    : " + endTime.getTime() + "\n" +
-		        "Description : " + query + "\n" +
-		        "Place       : " + locationQuery + "\n" +
-		        "Updated Start Time  : " + updatedStartTime.getTime() + "\n" +
-		        "Updated End Time    : " + updatedEndTime.getTime() + "\n" +
-		        "Updated Query       : " + updatedQuery + "\n" +
-		        "Updated Place       : " + updatedLocationQuery + "\n");
+		String stringStartTime;
+		if (startTime==null){
+			stringStartTime = new String("null");
+		}
+		else{
+			stringStartTime= startTime.getTime().toString();
+		}
+		String stringEndTime;
+		if (endTime==null){
+			stringEndTime = new String("null");
+		}
+		else{
+			stringEndTime= endTime.getTime().toString();
+		}
+		String stringUpdatedStartTime;
+		if (updatedStartTime==null){
+			stringUpdatedStartTime = new String("null");
+		}
+		else{
+			stringUpdatedStartTime= updatedStartTime.getTime().toString();
+		}
+		String stringUpdatedEndTime;
+		if (updatedEndTime==null){
+			stringUpdatedEndTime = new String("null");
+		}
+		else{
+			stringUpdatedEndTime= updatedEndTime.getTime().toString();
+		}
+		return ("Type	: " + type + "\n" +
+				"Ref Number	: " + referenceNumber + "\n" +
+			    "Start Time	: " + stringStartTime + "\n" +
+		        "End Time	: " + stringEndTime + "\n" +
+		        "Query	: " + query + "\n" +
+		        "Location Query	: " + locationQuery + "\n" +
+		        "Updated Start Time	: " + stringUpdatedStartTime + "\n" +
+		        "Updated End Time	: " + stringUpdatedEndTime + "\n" +
+		        "Updated Query		: " + updatedQuery + "\n" +
+		        "Updated Location Query	: " + updatedLocationQuery + "\n");
 	}
 	
 
@@ -67,6 +97,10 @@ public class UpdateAction extends LocalAction{
 
 	public String getUpdatedLocationQuery(){
 		return updatedLocationQuery;
+	}
+
+	public int getReferenceNumber(){
+		return referenceNumber;
 	}
 	
 	public LocalActionType getType(){
@@ -102,6 +136,10 @@ public class UpdateAction extends LocalAction{
 
 	public void setUpdatedLocationQuery(String newUpdatedLocationQuery){
 		updatedLocationQuery = newUpdatedLocationQuery;
+	}
+	
+	public void setReferenceNumber(int newReferenceNumber){
+		referenceNumber = newReferenceNumber;
 	}
 	
 }
