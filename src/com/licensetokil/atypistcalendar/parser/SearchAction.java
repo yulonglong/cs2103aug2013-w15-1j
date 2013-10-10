@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 public class SearchAction extends LocalAction {
 	private String query;
+	private String taskType;
 	private Calendar startTime;
 	private Calendar endTime;
 	private String locationQuery;
@@ -19,12 +20,27 @@ public class SearchAction extends LocalAction {
 	}
 	
 	public String toString(){
-		return ("Type        : " + type + "\n" +
-				"Status      : " + status + "\n" +
-			    "Start Time  : " + startTime.getTime() + "\n" +
-		        "End Time    : " + endTime.getTime() + "\n" +
-		        "Query       : " + query + "\n" +
-		        "location    : " + locationQuery + "\n");
+		String stringStartTime;
+		if (startTime==null){
+			stringStartTime = new String("null");
+		}
+		else{
+			stringStartTime= startTime.getTime().toString();
+		}
+		String stringEndTime;
+		if (endTime==null){
+			stringEndTime = new String("null");
+		}
+		else{
+			stringEndTime= endTime.getTime().toString();
+		}
+		return ("Type	: " + type + "\n" +
+				"Task Type	: " + taskType + "\n" +
+				"Status	: " + status + "\n" +
+			    "Start Time	: " + stringStartTime + "\n" +
+		        "End Time	: " + stringEndTime + "\n" +
+		        "Query	: " + query + "\n" +
+		        "location	: " + locationQuery + "\n");
 	}
 	
 
@@ -46,6 +62,10 @@ public class SearchAction extends LocalAction {
 	
 	public String getStatus(){
 		return status;
+	}
+	
+	public String getTaskType(){
+		return taskType;
 	}
 	
 	public LocalActionType getType(){
@@ -70,5 +90,9 @@ public class SearchAction extends LocalAction {
 	
 	public void setStatus(String newStatus){
 		status = newStatus;
+	}
+	
+	public void setTaskType(String newTaskType){
+		taskType = newTaskType;
 	}
 }

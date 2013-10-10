@@ -40,6 +40,8 @@ public class ATypistCalendar {
 		userInput("mark group project meeting as undone");
 		userInput("delete #1 #2 #4");
 		userInput("delete group project meeting");
+		userInput("search deadlines on 10/6");
+		userInput("search schedules on 5/3 from 3pm to 1900");
 		/*
 		userInput("add swimming on 30/12 from 1300 to 1400");
 		userInput("display");

@@ -321,10 +321,106 @@ public class Parser {
 		return userAction;
 	}
 
+	// can search with exact same format as display,
+	// but without description or query yet.
 	// search function: 0 %
 	private static SearchAction searchParser(StringTokenizer st) {
 		SearchAction userAction = new SearchAction();
-		System.out.println("Sorry, searchParser is under construction!");
+
+		int[] intStartDate = new int[3];
+		int[] intEndDate = new int[3];
+		intStartDate[2] = 2005;
+		intStartDate[1] = 0;
+		intStartDate[0] = 1;
+		intEndDate[2] = 2020;
+		intEndDate[1] = 11;
+		intEndDate[0] = 31;
+
+		Calendar startTimeCal = Calendar.getInstance();
+		Calendar endTimeCal = Calendar.getInstance();
+
+		// if command has more details after display
+		// e.g. display "deadlines on monday"
+		if (st.hasMoreTokens()) {
+
+			String place = new String();
+			String prep = new String(st.nextToken());
+
+			// check if schedules/deadlines/todos is included in user input
+			if (isValidTask(prep)) {
+				userAction.setTaskType(prep);
+			} else {// if not then return back the string
+				String tempUserInput = new String();
+				tempUserInput = getRemainingTokens(st);
+				tempUserInput = prep + " " + tempUserInput;
+				st = new StringTokenizer(tempUserInput);
+			}
+			
+			// string place retrieval BEGIN
+			if (st.hasMoreTokens()) {
+				prep = new String(st.nextToken());
+				// check if place is included in user input
+				if (isValidPlacePreposition(prep)) {
+					place = new String(st.nextToken());
+					userAction.setLocationQuery(place);
+				} else {// if not place then return back the string
+					String tempUserInput = new String();
+					tempUserInput = getRemainingTokens(st);
+					tempUserInput = prep + " " + tempUserInput;
+					st = new StringTokenizer(tempUserInput);
+				}
+				// check for place name, separated by space, and incorporate the
+				// proper place name
+				prep = new String(st.nextToken());
+				while (!isValidDayPreposition(prep)) {
+					place = place + " " + prep;
+					userAction.setLocationQuery(place);
+					if (st.hasMoreTokens()) {
+						prep = new String(st.nextToken());
+					} else {
+						break;
+					}
+				}
+			}
+			
+			// string place retrieval END
+			
+			// if there is a date field
+			if (st.hasMoreTokens()) {
+				String date = new String(st.nextToken());
+				getDate(intStartDate, date);
+
+				if (st.hasMoreTokens()) {
+					prep = new String(st.nextToken());
+					if (isValidTimePreposition(prep)) {
+						String startTime = new String(st.nextToken());
+						int intStartHour = getTimeHour(startTime);
+						int intStartMinute = getTimeMinute(startTime);
+
+						prep = new String(st.nextToken());
+						String endTime = new String(st.nextToken());
+						int intEndHour = getTimeHour(endTime);
+						int intEndMinute = getTimeMinute(endTime);
+
+						startTimeCal.set(intStartDate[2], intStartDate[1],
+								intStartDate[0], intStartHour, intStartMinute,
+								0);
+						endTimeCal.set(intStartDate[2], intStartDate[1],
+								intStartDate[0], intEndHour, intEndMinute, 0);
+						
+						userAction.setStartTime(startTimeCal);
+						userAction.setEndTime(endTimeCal);
+					}
+				}
+				else{
+				startTimeCal.set(intStartDate[2], intStartDate[1],
+						intStartDate[0], 0, 0, 0);
+
+				userAction.setStartTime(startTimeCal);
+				}
+				
+			}
+		}
 		return userAction;
 	}
 
