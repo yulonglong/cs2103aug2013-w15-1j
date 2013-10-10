@@ -284,7 +284,7 @@ public class Parser {
 	// "delete #1 #7 #4"
 	// "delete group meeting project"
 	// can delete multiple items separated with space
-	// delete function : 10 %
+	// delete function : 100 %
 	private static DeleteAction deleteParser(StringTokenizer st) {
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		DeleteAction userAction = new DeleteAction();
@@ -430,7 +430,7 @@ public class Parser {
 	 * "mark #1 #2 as done" "mark swimming as done"
 	 * "mark group project meeting as undone"
 	 */
-	// mark function: 10 %
+	// mark function: 100 %
 	private static MarkAction markParser(StringTokenizer st) {
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		MarkAction userAction = new MarkAction();
