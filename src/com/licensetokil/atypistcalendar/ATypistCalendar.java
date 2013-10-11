@@ -46,6 +46,8 @@ public class ATypistCalendar {
 		userInput("delete group project meeting");
 		userInput("search deadlines on 10/6");
 		userInput("search schedules on 5/3 from 3pm to 1900");
+		userInput("update swimming >> basketball on 2/1 from 1.33pm to 3.20pm");
+		userInput("update #3 >> badminton on 2/1 from 1200 to 1300");
 		/*
 		userInput("add swimming on 30/12 from 1300 to 1400");
 		userInput("display");
