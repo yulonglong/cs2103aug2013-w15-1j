@@ -6,7 +6,7 @@ public enum SystemActionType {
 	
 	private final String stringActionType;
 	
-	SystemActionType(String newStringActionType) {
+	private SystemActionType(String newStringActionType) {
 		stringActionType = newStringActionType;
 	}
 	

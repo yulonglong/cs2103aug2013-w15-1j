@@ -11,7 +11,7 @@ public enum LocalActionType {
 	
 	private final String stringActionType;
 	
-	LocalActionType(String newStringActionType) {
+	private LocalActionType(String newStringActionType) {
 		stringActionType = newStringActionType;
 	}
 	
