@@ -162,22 +162,22 @@ public class Parser {
 	// explanation will be the same as add function above
 
 	// approved format:
-	// "display" will return display, startTime 1/1/2005 and endTime 31/12/2020
+	// "display" will return display, startTime today's date and time, and endTime 31/12/2099
 	// "display <place preposition> <Place>" is now available
-	// "display at Bukit Batok"
-	// "display in Computing Hall"
+	// "display all at Bukit Batok"
+	// "display all in Computing Hall"
 	// "display <day prep> <date>  <timeframe>" is now available (however
 	// timeframe is strict)
 	// "display on 1/3 from 1200 to 1300"
 	// it can also be combined with place
-	// "display at Bukit Batok on 1/3 from 1200 to 1300"
+	// "display all at Bukit Batok on 1/3 from 1200 to 1300"
 	// it accepts input without timeframe
 	// "display <day prep> <date>"
-	// "display on 10/6"
+	// "display all on 10/6"
 	// can be combined with place
-	// "display in Korea on 10/12"
+	// "display all in Korea on 10/12"
 
-	// display function : 40 % done
+	// display function : 70 % done
 	private static DisplayAction displayParser(StringTokenizer st) {
 		DisplayAction userAction = new DisplayAction();
 
@@ -186,7 +186,7 @@ public class Parser {
 		intStartDate[2] = 2005;
 		intStartDate[1] = 0;
 		intStartDate[0] = 1;
-		intEndDate[2] = 2020;
+		intEndDate[2] = 2099;
 		intEndDate[1] = 11;
 		intEndDate[0] = 31;
 
@@ -197,19 +197,44 @@ public class Parser {
 		// e.g. display "deadlines on monday"
 		if (st.hasMoreTokens()) {
 
-			String place = new String();
 			String prep = new String(st.nextToken());
-
-			// check if schedules/deadlines/todos is included in user input
-			if (isValidTask(prep)) {
-				userAction.setTaskType(prep);
-			} else {// if not then return back the string
+			
+			if (isStringAll(prep)){
+				userAction.setDescription("all");
+				if(!st.hasMoreTokens()){
+					endTimeCal.set(intEndDate[2], intEndDate[1],
+							intEndDate[0], 23, 59, 59);
+					
+					userAction.setStartTime(startTimeCal);
+					userAction.setEndTime(endTimeCal);
+					return userAction;
+				}
+			}
+			else {// if not then return back the string
 				String tempUserInput = new String();
 				tempUserInput = getRemainingTokens(st);
 				tempUserInput = prep + " " + tempUserInput;
 				st = new StringTokenizer(tempUserInput);
 			}
 			
+			
+			
+			prep = new String(st.nextToken());
+			// check if schedules/deadlines/todos is included in user input
+			if (isValidTask(prep)) {
+				userAction.setTaskType(prep);
+			}
+			else if(isValidStatus(prep)){
+				userAction.setStatus(prep);
+			}
+			else {// if not then return back the string
+				String tempUserInput = new String();
+				tempUserInput = getRemainingTokens(st);
+				tempUserInput = prep + " " + tempUserInput;
+				st = new StringTokenizer(tempUserInput);
+			}
+			
+			String place = new String();
 			// string place retrieval BEGIN
 			if (st.hasMoreTokens()) {
 				prep = new String(st.nextToken());
@@ -269,11 +294,30 @@ public class Parser {
 				else{
 				startTimeCal.set(intStartDate[2], intStartDate[1],
 						intStartDate[0], 0, 0, 0);
-
+				endTimeCal.set(intStartDate[2], intStartDate[1],
+						intStartDate[0], 23, 59, 59);
+				
 				userAction.setStartTime(startTimeCal);
+				userAction.setEndTime(endTimeCal);
 				}
 				
 			}
+			else{
+				endTimeCal.set(intEndDate[2], intEndDate[1],
+						intEndDate[0], 23, 59, 59);
+				
+				userAction.setStartTime(startTimeCal);
+				userAction.setEndTime(endTimeCal);
+			}
+			
+		}
+		else{
+			endTimeCal.set(intEndDate[2], intEndDate[1],
+					intEndDate[0], 23, 59, 59);
+			
+			userAction.setStartTime(startTimeCal);
+			userAction.setEndTime(endTimeCal);
+			userAction.setDescription("all");
 		}
 		return userAction;
 	}
@@ -589,11 +633,27 @@ public class Parser {
 		}
 		return strResult;
 	}
+	
+	private static boolean isStringAll(String task){
+		if (task.equalsIgnoreCase("all")){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidStatus(String status){
+		if ((status.equalsIgnoreCase("done"))
+				|| (status.equalsIgnoreCase("undone"))) {
+			return true;
+		}
+		return false;
+	}
 
 	private static boolean isValidTask(String task) {
 		if ((task.equalsIgnoreCase("schedules"))
 				|| (task.equalsIgnoreCase("deadlines"))
-				|| (task.equalsIgnoreCase("todos"))) {
+				|| (task.equalsIgnoreCase("todos"))
+				|| (task.equalsIgnoreCase("all"))) {
 			return true;
 		}
 		return false;

@@ -25,14 +25,18 @@ public class ATypistCalendar {
 		userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
 		userInput("add swimming at BB CC on 2/1 from 1.33pm to 3.20pm");
 		userInput("display");
-		userInput("display at Bukit Batok");
-		userInput("display on 10/6");
-		userInput("display in Korea on 10/12");
-		userInput("display on 1/3 from 1200 to 1300");
-		userInput("display at Bukit Batok on 1/3 from 1200 to 1300");
+		userInput("display schedules at Bukit Batok");
+		userInput("display all on 10/6");
+		userInput("display all in Korea on 10/12");
+		userInput("display all on 1/3 from 1200 to 1300");
+		userInput("display all at Bukit Batok on 1/3 from 1200 to 1300");
 		userInput("display deadlines on 10/6");
 		userInput("display schedules on 5/3 from 3pm to 1900");
 		userInput("display todos");
+		userInput("display schedules");
+		userInput("display undone");
+		userInput("display done");
+		
 		userInput("abcd");
 		userInput("mark #1 as done");
 		userInput("mark #1 #2 as done");
