@@ -3,10 +3,6 @@ package com.licensetokil.atypistcalendar.parser;
 import java.util.Calendar;
 
 public class UpdateAction extends LocalAction{
-	private String query;
-	private Calendar startTime;
-	private Calendar endTime;
-	private String locationQuery;
 	private int referenceNumber;
 	private String updatedQuery;
 	private Calendar updatedStartTime;
@@ -15,10 +11,6 @@ public class UpdateAction extends LocalAction{
 	
 	public UpdateAction(){
 		type = LocalActionType.UPDATE;
-		startTime = null;
-		endTime = null;
-		query = new String();
-		locationQuery = new String();
 		updatedStartTime = null;
 		updatedEndTime = null;
 		updatedQuery = new String();
@@ -26,20 +18,7 @@ public class UpdateAction extends LocalAction{
 	}
 	
 	public String toString(){
-		String stringStartTime;
-		if (startTime==null){
-			stringStartTime = new String("null");
-		}
-		else{
-			stringStartTime= startTime.getTime().toString();
-		}
-		String stringEndTime;
-		if (endTime==null){
-			stringEndTime = new String("null");
-		}
-		else{
-			stringEndTime= endTime.getTime().toString();
-		}
+		
 		String stringUpdatedStartTime;
 		if (updatedStartTime==null){
 			stringUpdatedStartTime = new String("null");
@@ -56,31 +35,10 @@ public class UpdateAction extends LocalAction{
 		}
 		return ("Type	: " + type + "\n" +
 				"Ref Number	: " + referenceNumber + "\n" +
-			    "Start Time	: " + stringStartTime + "\n" +
-		        "End Time	: " + stringEndTime + "\n" +
-		        "Query	: " + query + "\n" +
-		        "Location Query	: " + locationQuery + "\n" +
 		        "Updated Start Time	: " + stringUpdatedStartTime + "\n" +
 		        "Updated End Time	: " + stringUpdatedEndTime + "\n" +
 		        "Updated Query		: " + updatedQuery + "\n" +
 		        "Updated Location Query	: " + updatedLocationQuery + "\n");
-	}
-	
-
-	public Calendar getStartTime(){
-		return startTime;
-	}
-
-	public Calendar getEndTime(){
-		return endTime;
-	}
-
-	public String getQuery(){
-		return query;
-	}
-
-	public String getLocationQuery(){
-		return locationQuery;
 	}
 	
 	public Calendar getUpdatedStartTime(){
@@ -107,21 +65,6 @@ public class UpdateAction extends LocalAction{
 		return type;
 	}
 
-	public void setStartTime(Calendar newStartTime){
-		startTime = newStartTime;
-	}
-
-	public void setEndTime(Calendar newEndTime){
-		endTime = newEndTime;
-	}
-
-	public void setQuery(String newQuery){
-		query = newQuery;
-	}
-
-	public void setLocationQuery(String newLocationQuery){
-		locationQuery = newLocationQuery;
-	}
 	public void setUpdatedStartTime(Calendar newUpdatedStartTime){
 		updatedStartTime = newUpdatedStartTime;
 	}
