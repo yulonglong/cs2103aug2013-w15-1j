@@ -3,5 +3,5 @@ package com.licensetokil.atypistcalendar.parser;
 public abstract class LocalAction extends Action{
 	protected LocalActionType type;
 	
-	abstract LocalActionType getType();
+	abstract public LocalActionType getType();
 }

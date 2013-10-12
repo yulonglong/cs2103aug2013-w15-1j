@@ -7,7 +7,7 @@ public class DisplayAction extends LocalAction {
 	private String taskType;
 	private Calendar startTime;
 	private Calendar endTime;
-	private String place;
+	//private String place;
 	private String status;
 	
 	public DisplayAction(){
@@ -16,7 +16,7 @@ public class DisplayAction extends LocalAction {
 		startTime = null;
 		endTime = null;
 		description = new String();
-		place = new String();
+		//place = new String();
 		status = new String();
 	}
 	
@@ -40,8 +40,8 @@ public class DisplayAction extends LocalAction {
 				"Status	: " + status + "\n" +
 			    "Start Time	: " + stringStartTime + "\n" +
 		        "End Time	: " + stringEndTime + "\n" +
-		        "Description	: " + description + "\n" +
-		        "Place	: " + place + "\n");
+		        "Description	: " + description + "\n");// +
+		        //"Place	: " + place + "\n");
 	}
 	
 
@@ -57,9 +57,9 @@ public class DisplayAction extends LocalAction {
 		return description;
 	}
 
-	public String getPlace(){
-		return place;
-	}
+//	public String getPlace(){
+//		return place;
+//	}
 	
 	public LocalActionType getType(){
 		return type;
@@ -85,9 +85,9 @@ public class DisplayAction extends LocalAction {
 		description = newDescription;
 	}
 
-	public void setPlace(String newPlace){
-		place = newPlace;
-	}
+//	public void setPlace(String newPlace){
+//		place = newPlace;
+//	}
 	
 	public void setStatus(String newStatus){
 		status = newStatus;

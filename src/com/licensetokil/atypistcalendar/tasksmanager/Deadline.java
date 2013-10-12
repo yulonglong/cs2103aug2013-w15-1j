@@ -9,12 +9,15 @@ public class Deadline extends Task {
 	private Calendar endTime;
 	private String description;
 	private String place;
+	private String status;
 
-	public Deadline(Calendar endTime, String description, String place) {
+	public Deadline(int uniqueID, Calendar endTime, String description, String place, String status) {
 		this.taskType = "deadline";
 		this.endTime = endTime;
 		this.description = description;
 		this.place = place;
+		this.uniqueID = uniqueID;
+		this.status = status;
 	}
 
 	public int getUniqueID() {
@@ -35,6 +38,10 @@ public class Deadline extends Task {
 
 	public String getPlace() {
 		return place;
+	}
+	
+	public String getStatus(){
+		return status;
 	}
 
 	public String toString() {
