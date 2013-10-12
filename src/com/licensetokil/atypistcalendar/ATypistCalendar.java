@@ -20,10 +20,12 @@ public class ATypistCalendar {
 		gui.outputWithNewline("Current time:");
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
+		
 		userInput("add swimming on 30/12 from 1300 to 1400");
 		userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
 		userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
 		userInput("add swimming at BB CC on 2/1 from 1.33pm to 3.20pm");
+		
 		userInput("display");
 		userInput("display schedules at Bukit Batok");
 		userInput("display all on 10/6");
@@ -38,21 +40,17 @@ public class ATypistCalendar {
 		userInput("display done");
 		
 		userInput("abcd");
+		
 		userInput("mark #1 as done");
 		userInput("mark #1 #2 as done");
-		userInput("mark swimming as done");
-		userInput("mark group project meeting as undone");
+		
 		userInput("delete #1 #2 #4");
-		userInput("delete group project meeting");
-		userInput("search deadlines on 10/6");
-		userInput("search schedules on 5/3 from 3pm to 1900");
-		userInput("update swimming >> basketball on 2/1 from 1.33pm to 3.20pm");
+		
+		userInput("search swimming on 10/6");
+		userInput("search badminton on 5/3 from 3pm to 1900");
+		
 		userInput("update #3 >> badminton on 2/1 from 1200 to 1300");
-		/*
-		userInput("add swimming on 30/12 from 1300 to 1400");
-		userInput("display");
-		userInput("display deadlines");
-		*/
+		
 		
 		/*
 		Scanner sc = new Scanner(System.in);

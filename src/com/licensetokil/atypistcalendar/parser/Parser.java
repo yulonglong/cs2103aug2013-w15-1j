@@ -326,61 +326,42 @@ public class Parser {
 	// can delete with query(task description)
 	// e.g.
 	// "delete #1 #7 #4"
-	// "delete group meeting project"
 	// can delete multiple items separated with space
 	// delete function : 100 %
 	private static DeleteAction deleteParser(StringTokenizer st) {
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		DeleteAction userAction = new DeleteAction();
-		String query = new String();
 		String temp = new String(st.nextToken());
-		if (temp.substring(0, 1).equals("#")) {
+		temp = temp.substring(1);
+		int tempInt = Integer.parseInt(temp);
+		referenceNumber.add(tempInt);
+		while (st.hasMoreTokens()) {
+			temp = new String (st.nextToken());
 			temp = temp.substring(1);
-			int tempInt = Integer.parseInt(temp);
+			tempInt = Integer.parseInt(temp);
 			referenceNumber.add(tempInt);
-			while (st.hasMoreTokens()) {
-				temp = new String (st.nextToken());
-				temp = temp.substring(1);
-				tempInt = Integer.parseInt(temp);
-				referenceNumber.add(tempInt);
-			}
-			userAction.setReferenceNumber(referenceNumber);
 		}
-		else{
-			query = query + temp + " ";
-			while (st.hasMoreTokens()) {
-				temp = st.nextToken();
-				query = query + temp + " ";
-			}
-			query = query.substring(0, query.length() - 1);// remove the last white space
-			userAction.setQuery(query);
-		}
+		userAction.setReferenceNumber(referenceNumber);
+		
+	
 		return userAction;
 	}
 
 	// update function: 10 %
 	private static UpdateAction updateParser(StringTokenizer st) throws MalformedUserInputException {
 		UpdateAction userAction = new UpdateAction();
-		String query = new String();
 		String temp = new String(st.nextToken());
-		if (temp.substring(0, 1).equals("#")) {
-			temp = temp.substring(1);
-			int tempInt = Integer.parseInt(temp);
-			userAction.setReferenceNumber(tempInt);
-			
-			temp = st.nextToken();
-			while(!isValidUpdateDelimiter(temp)){
-				throw new MalformedUserInputException ("Invalid Input!");
-			}
+
+		temp = temp.substring(1);
+		int tempInt = Integer.parseInt(temp);
+		userAction.setReferenceNumber(tempInt);
+		
+		temp = st.nextToken();
+		while(!isValidUpdateDelimiter(temp)){
+			throw new MalformedUserInputException ("Invalid Input!");
 		}
-		else{
-			while (!isValidUpdateDelimiter(temp)) {
-				query = query + temp + " ";
-				temp = st.nextToken();
-			}
-			query = query.substring(0, query.length() - 1);// remove the last white space
-			userAction.setQuery(query);
-		}
+		
+		
 		
 		//after finding the delimiter ">>"
 		
@@ -455,7 +436,7 @@ public class Parser {
 		intStartDate[2] = 2005;
 		intStartDate[1] = 0;
 		intStartDate[0] = 1;
-		intEndDate[2] = 2020;
+		intEndDate[2] = 2099;
 		intEndDate[1] = 11;
 		intEndDate[0] = 31;
 
@@ -466,26 +447,19 @@ public class Parser {
 		// e.g. display "deadlines on monday"
 		if (st.hasMoreTokens()) {
 
-			String place = new String();
-			String prep = new String(st.nextToken());
-
-			// check if schedules/deadlines/todos is included in user input
-			if (isValidTask(prep)) {
-				userAction.setTaskType(prep);
-			} else {// if not then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
-			}
+			String prep = new String(st.nextToken());		
+			userAction.setQuery(prep);
 			
+			prep = new String(st.nextToken());
+			
+			String place = new String();
 			// string place retrieval BEGIN
 			if (st.hasMoreTokens()) {
 				prep = new String(st.nextToken());
 				// check if place is included in user input
 				if (isValidPlacePreposition(prep)) {
 					place = new String(st.nextToken());
-					userAction.setLocationQuery(place);
+					//userAction.setPlace(place);
 				} else {// if not place then return back the string
 					String tempUserInput = new String();
 					tempUserInput = getRemainingTokens(st);
@@ -497,7 +471,7 @@ public class Parser {
 				prep = new String(st.nextToken());
 				while (!isValidDayPreposition(prep)) {
 					place = place + " " + prep;
-					userAction.setLocationQuery(place);
+					//userAction.setPlace(place);
 					if (st.hasMoreTokens()) {
 						prep = new String(st.nextToken());
 					} else {
@@ -538,53 +512,59 @@ public class Parser {
 				else{
 				startTimeCal.set(intStartDate[2], intStartDate[1],
 						intStartDate[0], 0, 0, 0);
-
+				endTimeCal.set(intStartDate[2], intStartDate[1],
+						intStartDate[0], 23, 59, 59);
+				
 				userAction.setStartTime(startTimeCal);
+				userAction.setEndTime(endTimeCal);
 				}
 				
 			}
+			else{
+				endTimeCal.set(intEndDate[2], intEndDate[1],
+						intEndDate[0], 23, 59, 59);
+				
+				userAction.setStartTime(startTimeCal);
+				userAction.setEndTime(endTimeCal);
+			}
+			
+		}
+		else{
+			endTimeCal.set(intEndDate[2], intEndDate[1],
+					intEndDate[0], 23, 59, 59);
+			
+			userAction.setStartTime(startTimeCal);
+			userAction.setEndTime(endTimeCal);
 		}
 		return userAction;
 	}
 
 	/*
-	 * Mark accepts task id (#2,#12) and using the keyword as done or as undone
+	 * Mark accepts task id (#2,#12) 
 	 * accepts specific descriptions to replace task id. "mark #1 as done"
-	 * "mark #1 #2 as done" "mark swimming as done"
-	 * "mark group project meeting as undone"
+	 * "mark #1 #2 as done"
 	 */
 	// mark function: 100 %
 	private static MarkAction markParser(StringTokenizer st) {
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		MarkAction userAction = new MarkAction();
-		String query = new String();
 		String refNum = new String();
 		String temp = new String(st.nextToken());
-		if (temp.substring(0, 1).equals("#")) {
-			temp = temp.substring(1);
-			int tempInt = Integer.parseInt(temp);
+		
+		temp = temp.substring(1);
+		int tempInt = Integer.parseInt(temp);
+		referenceNumber.add(tempInt);
+		temp = new String(st.nextToken());
+		while ((st.hasMoreTokens()) &&(!isValidMarkPreposition(temp))){
+			refNum = new String(temp.substring(1));
+			tempInt = Integer.parseInt(refNum);
 			referenceNumber.add(tempInt);
 			temp = new String(st.nextToken());
-			while ((st.hasMoreTokens()) && (!isValidMarkPreposition(temp))) {
-				refNum = new String(temp.substring(1));
-				tempInt = Integer.parseInt(refNum);
-				referenceNumber.add(tempInt);
-				temp = new String(st.nextToken());
-			}
-			String status = new String(st.nextToken());
-			userAction.setStatus(status);
-			userAction.setReferenceNumber(referenceNumber);
-		} else {
-			while ((!isValidMarkPreposition(temp)) && (st.hasMoreTokens())) {
-				query = query + temp + " ";
-				temp = st.nextToken();
-			}
-			query = query.substring(0, query.length() - 1);// remove the last
-															// white space
-			String status = new String(st.nextToken());
-			userAction.setQuery(query);
-			userAction.setStatus(status);
 		}
+		String status = new String(st.nextToken());
+		userAction.setStatus(status);
+		userAction.setReferenceNumber(referenceNumber);
+		
 		return userAction;
 	}
 
