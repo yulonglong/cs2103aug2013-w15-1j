@@ -215,7 +215,7 @@ public class TasksManager {
 		
 	}
 
-	public void update(UpdateAction ac) {
+	public static String update(UpdateAction ac) {
 		
 		Task t = table.get(ac.getReferenceNumber());
 		
@@ -223,10 +223,25 @@ public class TasksManager {
 			((Schedule) t).setStartTime(ac.getUpdatedStartTime());
 			((Schedule) t).setEndTime(ac.getUpdatedEndTime());
 			((Schedule) t).setPlace(ac.getUpdatedLocationQuery());
-			((Schedule) t).setDescription(ac.getUpdatedQuery());
-			
-			
+			((Schedule) t).setDescription(ac.getUpdatedQuery());		
 		}
+		
+		else if(t instanceof Deadline){
+			((Deadline) t).setEndTime(ac.getUpdatedEndTime());
+			((Deadline) t).setPlace(ac.getUpdatedLocationQuery());
+			((Deadline) t).setDescription(ac.getUpdatedQuery());	
+		}
+		
+		else if(t instanceof Todo){
+			((Todo) t).setPlace(ac.getUpdatedLocationQuery());
+			((Todo) t).setDescription(ac.getUpdatedQuery());	
+		}
+		
+		else{
+			return "Update unsuccessful";
+		}
+		
+		return "Update Successful";
 	}
 
 	public static String search(SearchAction ac) {
@@ -298,8 +313,26 @@ public class TasksManager {
 		return output;
 	}
 
-	public void mark(Task t) {
-
+	public static String mark(MarkAction ac) {
+		String numbers = "";
+		for(Integer num: ac.getReferenceNumber()){
+			Task t = table.get(num);
+			numbers = numbers + num + " ";
+			
+			if(t instanceof Deadline){
+				((Deadline) t).setStatus(ac.getStatus());
+			}
+			
+			else if(t instanceof Todo){
+				((Todo) t).setStatus(ac.getStatus());
+			}
+			
+			else{
+				return "Mark Unsuccessful";
+			}
+		}
+		
+		return "Marked " + numbers + "as " + ac.getStatus();
 	}
 
 	public static String executeCommand(AddAction ac) {
@@ -319,7 +352,11 @@ public class TasksManager {
 		return delete(ac);
 	}
 	
-	public static void executeCommand(UpdateAction ac){
-		
+	public static String executeCommand(UpdateAction ac){
+		return update(ac);
+	}
+	
+	public static String executeCommand(MarkAction ac){
+		return mark(ac);
 	}
 }

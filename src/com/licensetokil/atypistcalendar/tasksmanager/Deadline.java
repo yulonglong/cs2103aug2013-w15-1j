@@ -43,6 +43,22 @@ public class Deadline extends Task {
 	public String getStatus(){
 		return status;
 	}
+	
+	public void setEndTime(Calendar st){
+		this.endTime = st;
+	}
+	
+	public void setDescription(String d){
+		this.description = d;
+	}
+	
+	public void setPlace(String p){
+		this.place = p;
+	}
+	
+	public void setStatus(String s){
+		this.status = s;
+	}
 
 	public String toString() {
 		return "Deadline@" + uniqueID + "@" + endTime.toString() + "@"
