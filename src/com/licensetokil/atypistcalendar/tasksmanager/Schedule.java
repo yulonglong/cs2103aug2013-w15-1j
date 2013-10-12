@@ -43,6 +43,22 @@ public class Schedule extends Task {
 	public String getPlace() {
 		return place;
 	}
+	
+	public void setStartTime(Calendar st){
+		this.startTime = st;
+	}
+	
+	public void setEndTime(Calendar st){
+		this.endTime = st;
+	}
+	
+	public void setDescription(String d){
+		this.description = d;
+	}
+	
+	public void setPlace(String p){
+		this.place = p;
+	}
 
 	public String toString() {
 		return "Schedule@" + uniqueID + "@" + startTime.getTime() + "@"

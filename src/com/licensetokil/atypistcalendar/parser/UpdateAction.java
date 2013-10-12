@@ -91,7 +91,7 @@ public class UpdateAction extends LocalAction{
 		return updatedEndTime;
 	}
 
-	public String getUpdatedDescription(){
+	public String getUpdatedQuery(){
 		return updatedQuery;
 	}
 

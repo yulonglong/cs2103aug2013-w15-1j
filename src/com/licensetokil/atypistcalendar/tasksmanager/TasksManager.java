@@ -15,7 +15,10 @@ public class TasksManager {
 	private static ArrayList<Deadline> dl = new ArrayList<Deadline>();
 	private static ArrayList<Todo> toDo = new ArrayList<Todo>();
 	
+	private static Hashtable<Integer, Task> table = new Hashtable<Integer, Task>();
+	
 	private static int counter = 0;
+	private static int count = 1;
 
 	public void setAction(LocalAction action) {
 		this.action = action;
@@ -81,9 +84,10 @@ public class TasksManager {
 		sch.clear();
 		dl.clear();
 		toDo.clear();
+		table.clear();
 		
 		String output = new String("");
-		int count = 1;
+		count = 1;
 		
 		switch(ac.getDescription()){
 		
@@ -155,6 +159,7 @@ public class TasksManager {
 						+ "Starting Time: " + s.getStartTime() + "\n"
 						+ "Ending Time: " + s.getEndTime() + "\n"
 						+ "Place " + s.getPlace();
+				table.put(count, s);
 			}
 			count++;
 		}
@@ -165,6 +170,7 @@ public class TasksManager {
 				output = output + count + ". " + "Event: " + d.getDescription() + "\n" 
 						+ "Due by: " + d.getEndTime() + "\n"
 						+ "Place " + d.getPlace();
+				table.put(count, d);
 			}
 			count++;
 		}
@@ -173,6 +179,7 @@ public class TasksManager {
 			output = output + "Todos: \n";
 			for(Todo td: toDo){
 				output = output + count + ". " + "Event: " + td.getDescription() + "\n"; 
+				table.put(count, td);
 			}
 			count++;
 		}
@@ -180,23 +187,56 @@ public class TasksManager {
 		return output;
 	}
 	
-	public void delete(DeleteAction ac) {
+	public static String delete(DeleteAction ac) {
 		
+		for(Integer arr: ac.getReferenceNumber()){
+			Task t = table.get(arr);
+			
+			if(t instanceof Schedule){
+				schedule.remove(t);
+				sch.remove(t);
+			}
+			
+			else if(t instanceof Deadline){
+				deadline.remove(t);
+				dl.remove(t);
+			}
+			
+			else if(t instanceof Todo){
+				todo.remove(t);
+				toDo.remove(t);
+			}
+			else{
+				return "error";
+			}				
+		}
 		
+		return "delete successful";
 		
 	}
 
-	public void update(Task t) {
-
+	public void update(UpdateAction ac) {
+		
+		Task t = table.get(ac.getReferenceNumber());
+		
+		if(t instanceof Schedule){
+			((Schedule) t).setStartTime(ac.getUpdatedStartTime());
+			((Schedule) t).setEndTime(ac.getUpdatedEndTime());
+			((Schedule) t).setPlace(ac.getUpdatedLocationQuery());
+			((Schedule) t).setDescription(ac.getUpdatedQuery());
+			
+			
+		}
 	}
 
 	public static String search(SearchAction ac) {
 		sch.clear();
 		dl.clear();
 		toDo.clear();
+		table.clear();
 		
 		String output = new String("");
-		int count = 1;
+		count = 1;
 		
 		for(Schedule s: schedule){
 			if(s.getDescription().contains(ac.getQuery())){
@@ -230,6 +270,7 @@ public class TasksManager {
 						+ "Starting Time: " + s.getStartTime() + "\n"
 						+ "Ending Time: " + s.getEndTime() + "\n"
 						+ "Place " + s.getPlace();
+				table.put(count, s);
 			}
 			count++;
 		}
@@ -240,6 +281,7 @@ public class TasksManager {
 				output = output + count + ". " + "Event: " + d.getDescription() + "\n" 
 						+ "Due by: " + d.getEndTime() + "\n"
 						+ "Place " + d.getPlace();
+				table.put(count, d);
 			}
 			count++;
 		}
@@ -248,6 +290,7 @@ public class TasksManager {
 			output = output + "Todos: \n";
 			for(Todo td: toDo){
 				output = output + count + ". " + "Event: " + td.getDescription() + "\n"; 
+				table.put(count, td);
 			}
 			count++;
 		}
@@ -272,7 +315,11 @@ public class TasksManager {
 		return search(ac);
 	}
 	
-	public static void executeCommand(DeleteAction ac){
+	public static String executeCommand(DeleteAction ac){
+		return delete(ac);
+	}
+	
+	public static void executeCommand(UpdateAction ac){
 		
 	}
 }
