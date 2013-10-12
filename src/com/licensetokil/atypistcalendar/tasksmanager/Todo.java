@@ -8,11 +8,14 @@ public class Todo extends Task {
 	private String place;
 	private final Calendar startTime = null;
 	private final Calendar endTime = null;
+	private String status;
 
-	public Todo(String description, String place) {
+	public Todo(int uniqueID, String description, String place, String status) {
+		this.uniqueID = uniqueID;
 		this.taskType = "todo";
 		this.description = description;
 		this.place = place;
+		this.status = status;
 	}
 
 	public int getUniqueID() {
@@ -29,6 +32,10 @@ public class Todo extends Task {
 
 	public String getPlace() {
 		return place;
+	}
+	
+	public String getStatus(){
+		return status;
 	}
 
 	public String toString() {

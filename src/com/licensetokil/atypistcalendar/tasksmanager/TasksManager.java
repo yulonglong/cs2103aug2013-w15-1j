@@ -33,22 +33,21 @@ public class TasksManager {
 		return todo;
 	}
 
-	public static Task classify(LocalAction action) {
-		if (action.getStartTime() == null) {
-			if (action.getEndTime() == null) {
-				Todo td = new Todo(action.getDescription(), action.getPlace());
-				return td;
-			} else {
-				Deadline dl = new Deadline(action.getEndTime(),
-						action.getDescription(), action.getPlace());
-				return dl;
+	public static Task classify(AddAction action) {
+		Task t;
+		if(action.getStartTime()==null){
+			if(action.getEndTime()==null){
+				t = new Todo(++counter, action.getDescription(), action.getPlace(), "");
 			}
-		} else {
-			Schedule sch = new Schedule(counter++, action.getStartTime(),
-					action.getEndTime(), action.getDescription(),
-					action.getPlace());
-			return sch;
+			else{
+				t = new Deadline(++counter, action.getEndTime(), action.getDescription(), action.getPlace(), "");
+			}
 		}
+		else{
+			t = new Schedule(++counter, action.getStartTime(), action.getEndTime(), action.getDescription(), action.getPlace());
+		}
+		
+		return t;
 	}
 
 	public static String add(Task t) {
@@ -74,48 +73,112 @@ public class TasksManager {
 
 	}
 
-	public static String display(Task t) {
-		String message = "";
-		if(t.getDescription().equals("")){
+	public static String display(DisplayAction ac) {
+		ArrayList<Schedule> sch = new ArrayList<Schedule>();
+		ArrayList<Deadline> dl = new ArrayList<Deadline>();
+		ArrayList<Todo> toDo = new ArrayList<Todo>();
+		String output = new String("");
+		int count = 1;
+		
+		switch(ac.getDescription()){
+		
+		case "schedules": 
 			for(Schedule s: schedule){
-				message = message + s.toString().replaceAll("@", " ") + "\n";
+				if(checkTimeRange(s, ac)){
+					sch.add(s);
+				}
+			} break;
+		case "deadlines":
+			for (Deadline d: deadline){
+				if(ac.getStatus().equals("")){
+					if(checkTimeRange(d, ac)){
+						dl.add(d);
+					}
+				}
+				else{
+					if(checkTimeRange(d, ac) && d.getStatus().equals(ac.getStatus())){
+						dl.add(d);
+					}
+				}
+			} break;
+		case "todos":
+			for (Todo td: todo){
+				if(td.getStatus().equals("")){
+					toDo.add(td);
+				}
+				else{
+					if(td.getStatus().equals(ac.getStatus())){
+						toDo.add(td);
+					}
+				}
+			} break;
+		case "all":
+			for (Schedule s: schedule){
+				if(checkTimeRange(s, ac)){
+					sch.add(s);
+				}
 			}
+			for (Deadline d: deadline){
+				if(checkTimeRange(d, ac)){
+					dl.add(d);
+				}
+			} 
+			if(ac.getEndTime().get(Calendar.YEAR)==2099){
+				for(Todo td: todo){
+					toDo.add(td);
+				}
+			}break;
+			
+		case "": 
 			for(Deadline d: deadline){
-				message = message + d.toString().replaceAll("@", " ") + "\n";
+				if(checkTimeRange(d, ac) && d.getStatus().equals(ac.getStatus())){
+					dl.add(d);
+				}
 			}
-			for(Todo td: todo){
-				message = message + td.toString().replaceAll("@", " ") + "\n";
+			if(ac.getEndTime().get(Calendar.YEAR)==2099){
+				for(Todo td: todo){
+					toDo.add(td);
+				}
 			}
-			return message;
+			 break;
 		}
 		
-		else if(t.getDescription().equalsIgnoreCase("schedules")){
-			for(Schedule s: schedule){
-				message = message + s.toString().replaceAll("@", " ") + "\n";
+		if(!sch.isEmpty()){
+			output = "Schedules: \n";
+			for(Schedule s: sch){
+				output = output + count + ". " + "Event: " + s.getDescription() + "\n" 
+						+ "Starting Time: " + s.getStartTime() + "\n"
+						+ "Ending Time: " + s.getEndTime() + "\n"
+						+ "Place " + s.getPlace();
 			}
-			return message;
 		}
 		
-		else if(t.getDescription().equalsIgnoreCase("deadlines")){
-			for(Deadline d: deadline){
-				message = message + d.toString().replaceAll("@", " ") + "\n";
+		if(!dl.isEmpty()){
+			output = output + "Deadlines: \n";
+			for(Deadline d: dl){
+				output = output + count + ". " + "Event: " + d.getDescription() + "\n" 
+						+ "Due by: " + d.getEndTime() + "\n"
+						+ "Place " + d.getPlace();
 			}
-			return message;
 		}
 		
-		else if(t.getDescription().equalsIgnoreCase("todos")){
-			for(Todo td: todo){
-				message = message + td.toString().replaceAll("@", " ") + "\n";
+		if(!toDo.isEmpty()){
+			output = output + "Todos: \n";
+			for(Todo td: toDo){
+				output = output + count + ". " + "Event: " + td.getDescription() + "\n"; 
 			}
-			return message;
 		}
-		else
-			return "error";	
-
+		
+		return output;
 	}
+	
+	public static boolean checkTimeRange(Task t, DisplayAction ac){
+		return (t.getStartTime().after(ac.getStartTime()) && t.getEndTime().before(ac.getEndTime()));
+	}
+	
 
 	public void delete(Task t) {
-
+		
 	}
 
 	public void update(Task t) {
@@ -130,32 +193,12 @@ public class TasksManager {
 
 	}
 
-	public static String executeCommand(LocalAction ac) {
-		Task t = classify(ac);
-
-		try {
-			switch (ac.getType()) {
-			case ADD:
-
-				return add(t);			
-				//break;
-			case DISPLAY:
-				return display(t);
-				//break;
-			case DELETE:
-			case UPDATE:
-			case SEARCH:
-			case MARK:
-			case EXIT:
-			case GCAL:
-			case GCAL_SYNC:
-			case GCAL_QUICK_ADD:
-			case INVALID:
-			}
-			//return COMMAND_SUCCESSFUL;
-		} catch (Exception e) {
-			//return COMMAND_UNSUCCESSFUL;
-		}
-		return "error";
+	public static String executeCommand(AddAction ac) {
+		Task t = classify(ac);	
+		return add(t);
+	}
+	
+	public static String executeCommand(DisplayAction ac){
+		return display(ac);
 	}
 }
