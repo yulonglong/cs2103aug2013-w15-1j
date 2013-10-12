@@ -17,7 +17,7 @@ public class Parser {
 		GoogleActionType googleActionType = determineGoogleActionType(stringUserAction);
 		// if GCAL type
 		if (googleActionType == GoogleActionType.GCAL) {
-			return gcalParser(st, userInput, stringUserAction);
+			return gcalParser(st);
 		}
 		// if not GCAL type (means Local type)
 		else {
@@ -35,8 +35,9 @@ public class Parser {
 		}
 	}
 
-	private static Action gcalParser(StringTokenizer st, String userInput,
-			String stringUserAction) throws MalformedUserInputException {
+	private static Action gcalParser(StringTokenizer st) throws MalformedUserInputException {
+		String userInput = new String();
+		String stringUserAction = new String("gcal");
 		GoogleAction userAction = new GoogleAction();
 		stringUserAction = stringUserAction + " " + st.nextToken();
 		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
