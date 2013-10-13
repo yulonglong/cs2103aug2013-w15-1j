@@ -6,8 +6,6 @@ public class Todo extends Task {
 	private int uniqueID;
 	private String description;
 	private String place;
-	private final Calendar startTime = null;
-	private final Calendar endTime = null;
 	private String status;
 
 	public Todo(int uniqueID, String description, String place, String status) {
