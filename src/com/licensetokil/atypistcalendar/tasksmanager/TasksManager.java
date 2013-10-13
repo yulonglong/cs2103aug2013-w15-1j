@@ -15,6 +15,12 @@ public class TasksManager {
 	private static ArrayList<Deadline> dl = new ArrayList<Deadline>();
 	private static ArrayList<Todo> toDo = new ArrayList<Todo>();
 	
+	private static ArrayList<Task> markUndoList;
+	private static Task updateOriginalTask;
+	private static Task updateUndoTask;
+	
+	private static LocalAction lastAction;
+	
 	private static Hashtable<Integer, Task> table = new Hashtable<Integer, Task>();
 	
 	private static int counter = 0;
@@ -40,7 +46,7 @@ public class TasksManager {
 		return todo;
 	}
 
-	public static Task classify(AddAction action) {
+	private static Task classify(AddAction action) {
 		Task t;
 		if(action.getStartTime()==null){
 			if(action.getEndTime()==null){
@@ -57,16 +63,16 @@ public class TasksManager {
 		return t;
 	}
 
-	public static String add(Task t) {
+	private static String add(Task t) {
 		
 		if(t.getTaskType().equals("schedule")){
 			schedule.add((Schedule)t);
-			return "added " + t.getDescription() +" on " + t.getStartTime().getTime() + " to " + t.getEndTime().getTime() +" successfully";
+			return "added " + t.getDescription() +" on " + ((Schedule)t).getStartTime().getTime() + " to " + ((Schedule)t).getEndTime().getTime() +" successfully";
 		}
 		
 		else if(t.getTaskType().equals("deadline")){
 			deadline.add((Deadline)t);
-			return "added " + t.getDescription() + " by " + t.getEndTime().getTime() + " successfully";
+			return "added " + ((Deadline)t).getDescription() + " by " + ((Deadline)t).getEndTime().getTime() + " successfully";
 		}
 		
 		else if(t.getTaskType().equals("todo")){
@@ -79,8 +85,15 @@ public class TasksManager {
 		}
 
 	}
+	
+	private static void addUndo() {
+		Task t = classify((AddAction) lastAction);
+		schedule.remove(t);
+		deadline.remove(t);
+		todo.remove(t);
+	}
 
-	public static String display(DisplayAction ac) {
+	private static String display(DisplayAction ac) {
 		sch.clear();
 		dl.clear();
 		toDo.clear();
@@ -187,7 +200,7 @@ public class TasksManager {
 		return output;
 	}
 	
-	public static String delete(DeleteAction ac) {
+	private static String delete(DeleteAction ac) {
 		
 		for(Integer arr: ac.getReferenceNumber()){
 			Task t = table.get(arr);
@@ -215,9 +228,10 @@ public class TasksManager {
 		
 	}
 
-	public static String update(UpdateAction ac) {
+	private static String update(UpdateAction ac) {
 		
 		Task t = table.get(ac.getReferenceNumber());
+		updateOriginalTask = t;
 		
 		if(t instanceof Schedule){
 			((Schedule) t).setStartTime(ac.getUpdatedStartTime());
@@ -241,10 +255,20 @@ public class TasksManager {
 			return "Update unsuccessful";
 		}
 		
+		updateUndoTask = t;
+		
 		return "Update Successful";
 	}
+	
+	private static void updateUndo(){
+		int index;
+		if(updateUndoTask instanceof Schedule){
+			index = schedule.indexOf((Schedule)updateUndoTask);
+			schedule.set(index, (Schedule)updateOriginalTask);
+		}
+	}
 
-	public static String search(SearchAction ac) {
+	private static String search(SearchAction ac) {
 		sch.clear();
 		dl.clear();
 		toDo.clear();
@@ -313,10 +337,13 @@ public class TasksManager {
 		return output;
 	}
 
-	public static String mark(MarkAction ac) {
+	private static String mark(MarkAction ac) {
 		String numbers = "";
+		markUndoList = new ArrayList<Task>();
+		
 		for(Integer num: ac.getReferenceNumber()){
 			Task t = table.get(num);
+			markUndoList.add(t);
 			numbers = numbers + num + " ";
 			
 			if(t instanceof Deadline){
@@ -334,9 +361,29 @@ public class TasksManager {
 		
 		return "Marked " + numbers + "as " + ac.getStatus();
 	}
+	
+	public static void markUndo(){
+		String status = ((MarkAction) lastAction).getStatus();
+		String newStatus;
+		if(status.equals("done")){
+			newStatus = "undone";
+		}
+		else{
+			newStatus = "done";
+		}
+		for(Task t: markUndoList){
+			if(t instanceof Deadline){
+				((Deadline) t).setStatus(newStatus);
+			}
+			else{
+				((Todo) t).setStatus(newStatus);
+			}
+		}
+	}
 
 	public static String executeCommand(AddAction ac) {
-		Task t = classify(ac);	
+		Task t = classify(ac);
+		lastAction = ac;
 		return add(t);
 	}
 	
@@ -349,14 +396,17 @@ public class TasksManager {
 	}
 	
 	public static String executeCommand(DeleteAction ac){
+		lastAction = ac;
 		return delete(ac);
 	}
 	
 	public static String executeCommand(UpdateAction ac){
+		lastAction = ac;
 		return update(ac);
 	}
 	
 	public static String executeCommand(MarkAction ac){
+		lastAction = ac;
 		return mark(ac);
 	}
 }
