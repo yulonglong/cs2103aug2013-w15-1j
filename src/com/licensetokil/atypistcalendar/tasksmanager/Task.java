@@ -14,4 +14,8 @@ abstract class Task {
 		return description;
 	}
 	
+	public int getUniqueID(){
+		return uniqueID;
+	}
+	
 }

@@ -15,6 +15,8 @@ public class TasksManager {
 	private static ArrayList<Deadline> dl = new ArrayList<Deadline>();
 	private static ArrayList<Todo> toDo = new ArrayList<Todo>();
 	
+	private static ArrayList<Task> deletedTasks = new ArrayList<Task>();
+	
 	private static ArrayList<Task> markUndoList;
 	private static Task updateOriginalTask;
 	private static Task updateUndoTask;
@@ -25,6 +27,7 @@ public class TasksManager {
 	
 	private static int counter = 0;
 	private static int count = 1;
+	private static int ID;
 
 	public void setAction(LocalAction action) {
 		this.action = action;
@@ -204,6 +207,7 @@ public class TasksManager {
 		
 		for(Integer arr: ac.getReferenceNumber()){
 			Task t = table.get(arr);
+			deletedTasks.add(t);
 			
 			if(t instanceof Schedule){
 				schedule.remove(t);
@@ -227,11 +231,26 @@ public class TasksManager {
 		return "delete successful";
 		
 	}
+	
+	private static void deleteUndo(){
+		for(Task t: deletedTasks){
+			if(t instanceof Schedule){
+				schedule.add((Schedule)t);
+			}
+			else if(t instanceof Deadline){
+				deadline.add((Deadline)t);
+			}
+			else if(t instanceof Todo){
+				todo.add((Todo)t);
+			}
+		}
+	}
 
 	private static String update(UpdateAction ac) {
 		
 		Task t = table.get(ac.getReferenceNumber());
 		updateOriginalTask = t;
+		ID = updateOriginalTask.getUniqueID();
 		
 		if(t instanceof Schedule){
 			((Schedule) t).setStartTime(ac.getUpdatedStartTime());
@@ -261,10 +280,20 @@ public class TasksManager {
 	}
 	
 	private static void updateUndo(){
-		int index;
-		if(updateUndoTask instanceof Schedule){
-			index = schedule.indexOf((Schedule)updateUndoTask);
-			schedule.set(index, (Schedule)updateOriginalTask);
+		for(Schedule s: schedule){
+			if(s.getUniqueID() == ID){
+				s = (Schedule)updateOriginalTask;
+			}
+		}
+		for(Deadline d: deadline){
+			if(d.getUniqueID() == ID){
+				d = (Deadline)updateOriginalTask;
+			}
+		}
+		for(Todo td: todo){
+			if(td.getUniqueID() == ID){
+				td = (Todo)updateOriginalTask;
+			}
 		}
 	}
 
@@ -408,5 +437,22 @@ public class TasksManager {
 	public static String executeCommand(MarkAction ac){
 		lastAction = ac;
 		return mark(ac);
+	}
+	
+	public static String executeUndo(LocalAction ac){
+		if(ac instanceof AddAction){
+			addUndo();
+		}
+		else if(ac instanceof UpdateAction){
+			updateUndo();
+		}
+		else if(ac instanceof DeleteAction){
+			deleteUndo();
+		}
+		else if(ac instanceof MarkAction){
+			markUndo();
+		}
+		
+		return "Undo Successful";
 	}
 }
