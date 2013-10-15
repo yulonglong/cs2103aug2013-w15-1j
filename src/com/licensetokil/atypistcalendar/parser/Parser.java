@@ -223,7 +223,7 @@ public class Parser {
 			prep = new String(st.nextToken());
 			// check if schedules/deadlines/todos is included in user input
 			if (isValidTask(prep)) {
-				userAction.setTaskType(prep);
+				userAction.setDescription(prep);
 			}
 			else if(isValidStatus(prep)){
 				userAction.setStatus(prep);

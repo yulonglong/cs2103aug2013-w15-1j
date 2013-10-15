@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 public class DisplayAction extends LocalAction {
 	private String description;
-	private String taskType;
 	private Calendar startTime;
 	private Calendar endTime;
 	private String place;
@@ -12,7 +11,6 @@ public class DisplayAction extends LocalAction {
 	
 	public DisplayAction(){
 		type = LocalActionType.DISPLAY;
-		taskType = new String();
 		startTime = null;
 		endTime = null;
 		description = new String();
@@ -36,12 +34,11 @@ public class DisplayAction extends LocalAction {
 			stringEndTime= endTime.getTime().toString();
 		}
 		return ("Type	: " + type + "\n" +
-				"Task Type	: " + taskType + "\n" +
 				"Status	: " + status + "\n" +
 			    "Start Time	: " + stringStartTime + "\n" +
 		        "End Time	: " + stringEndTime + "\n" +
-		        "Description	: " + description + "\n");// +
-		        //"Place	: " + place + "\n");
+		        "Description	: " + description + "\n" +
+		        "Place	: " + place + "\n");
 	}
 	
 
@@ -68,10 +65,6 @@ public class DisplayAction extends LocalAction {
 	public String getStatus(){
 		return status;
 	}
-	
-	public String getTaskType(){
-		return taskType;
-	}
 
 	public void setStartTime(Calendar newStartTime){
 		startTime = newStartTime;
@@ -91,9 +84,5 @@ public class DisplayAction extends LocalAction {
 	
 	public void setStatus(String newStatus){
 		status = newStatus;
-	}
-	
-	public void setTaskType(String newTaskType){
-		taskType = newTaskType;
 	}
 }
