@@ -160,21 +160,30 @@ public class Parser {
 					int intStartHour = getTimeHour(startTime);
 					int intStartMinute = getTimeMinute(startTime);
 
-					prep = new String(st.nextToken());
-					String endTime = new String(st.nextToken());
-					int intEndHour = getTimeHour(endTime);
-					int intEndMinute = getTimeMinute(endTime);
-					startTimeCal = Calendar.getInstance();
-					endTimeCal = Calendar.getInstance();
-
-					startTimeCal.set(intStartDate[2], intStartDate[1],
-							intStartDate[0], intStartHour, intStartMinute,
-							0);
-					endTimeCal.set(intStartDate[2], intStartDate[1],
-							intStartDate[0], intEndHour, intEndMinute, 0);
-					
-					userAction.setStartTime(startTimeCal);
-					userAction.setEndTime(endTimeCal);
+					if(st.hasMoreTokens()){
+						prep = new String(st.nextToken());
+						String endTime = new String(st.nextToken());
+						int intEndHour = getTimeHour(endTime);
+						int intEndMinute = getTimeMinute(endTime);
+						startTimeCal = Calendar.getInstance();
+						endTimeCal = Calendar.getInstance();
+	
+						startTimeCal.set(intStartDate[2], intStartDate[1],
+								intStartDate[0], intStartHour, intStartMinute,
+								0);
+						endTimeCal.set(intStartDate[2], intStartDate[1],
+								intStartDate[0], intEndHour, intEndMinute, 0);
+						
+						userAction.setStartTime(startTimeCal);
+						userAction.setEndTime(endTimeCal);
+					}
+					else{
+						endTimeCal = Calendar.getInstance();
+						endTimeCal.set(intStartDate[2], intStartDate[1],
+								intStartDate[0], intStartHour, intStartMinute,
+								0);
+						userAction.setEndTime(endTimeCal);
+					}
 				}
 			}
 			else{
