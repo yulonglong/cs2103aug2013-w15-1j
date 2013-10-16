@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import java.util.logging.Logger;
 
 import com.licensetokil.atypistcalendar.ATypistCalendar;
 
@@ -11,13 +12,19 @@ public class DefaultGUI extends JFrame {
 	private JScrollPane jScrollPane1;
 	private JTextArea jTextArea1;
 	private JTextField jTextField1;
+	
+	private static Logger logger = Logger.getLogger("TasksManager");
 
 	public DefaultGUI() {
+		logger.info("Creating new instance of DefaultGUI");
 		initComponents();
+		logger.info("New instance of DefaultGUI created");
 	}
 
 	private void initComponents() {
-
+		
+		logger.info("Initialising components");
+		
 		jScrollPane1 = new javax.swing.JScrollPane();
 		jTextArea1 = new javax.swing.JTextArea();
 		jTextField1 = new javax.swing.JTextField();
@@ -64,14 +71,25 @@ public class DefaultGUI extends JFrame {
 		pack();
 	}
 
-	private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {                                        
+	private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {
+		logger.info("jTextField1 key released");
 		if(evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+			logger.info("jTextField1 key released = [Enter]");
+			
+			if(jTextField1.getText().equals("")) {
+				logger.warning("jTextField1 is empty, returning.");
+				return;
+			}
+			
+			logger.warning("jTextField1 calling userInput of Logic");
 			ATypistCalendar.userInput(jTextField1.getText());
 			jTextField1.setText("");
 		}
 	}
 	
 	public void outputWithNewline(String text) {
+		logger.info("Output to user: " + text);
+		
 		jTextArea1.append(text + "\n");
 		jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
 		jTextField1.requestFocus();
