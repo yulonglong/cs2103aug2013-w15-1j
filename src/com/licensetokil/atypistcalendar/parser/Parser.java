@@ -115,8 +115,24 @@ public class Parser {
 		Calendar startTimeCal = null;
 		Calendar endTimeCal = null;
 
+		String tempDescription = new String();
 		String description = new String(st.nextToken());
 		userAction.setDescription(description);
+		
+		while(st.hasMoreTokens()){
+			tempDescription = new String(st.nextToken());
+			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
+				description = description + " " + tempDescription;
+				userAction.setDescription(description);
+			}
+			else{
+				String tempUserInput = new String();
+				tempUserInput = getRemainingTokens(st);
+				tempUserInput = tempDescription + " " + tempUserInput;
+				st = new StringTokenizer(tempUserInput);
+				break;
+			}
+		}
 		if(!st.hasMoreTokens()){
 			return userAction;
 		}
