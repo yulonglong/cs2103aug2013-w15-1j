@@ -73,7 +73,12 @@ public class TasksManager {
 
 		logger.log(Level.INFO, "adding task into the memory");
 
+		assert t.getTaskType().equals("schedule") ||
+			t.getTaskType().equals("deadline") ||
+			t.getTaskType().equals("todo");
+		
 		try {
+			
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
 				return "Added " + t.getDescription() + " on "
@@ -120,6 +125,12 @@ public class TasksManager {
 		String output = new String("");
 		count = 1;
 
+		assert ac.getDescription().equals("schedules")||
+			ac.getDescription().equals("deadlines") ||
+			ac.getDescription().equals("todos") ||
+			ac.getDescription().equals("all") ||
+			ac.getDescription().equals("");
+		
 		switch (ac.getDescription()) {
 
 		case "schedules":
@@ -426,6 +437,10 @@ public class TasksManager {
 	public static void markUndo() {
 		String status = ((MarkAction) lastAction).getStatus();
 		String newStatus;
+		
+		assert status.equals("done") ||
+			status.equals("undone");
+		
 		if (status.equals("done")) {
 			newStatus = "undone";
 		} else {
