@@ -202,11 +202,11 @@ public class TasksManager {
 						+ "\n";
 
 				if (!s.getPlace().equals("")) {
-					output = output + "Place: " + s.getPlace();
+					output = output + "Place: " + s.getPlace() + "\n";
 				}
 				table.put(count, s);
+				count++;
 			}
-			count++;
 		}
 
 		if (!dl.isEmpty()) {
@@ -214,10 +214,10 @@ public class TasksManager {
 			for (Deadline d : dl) {
 				output = output + count + ". " + "Event: " + d.getDescription()
 						+ "\n" + "Due by: " + d.getEndTime() + "\n" + "Place "
-						+ d.getPlace();
+						+ d.getPlace() + "\n";
 				table.put(count, d);
+				count++;
 			}
-			count++;
 		}
 
 		if (!toDo.isEmpty()) {
@@ -226,11 +226,11 @@ public class TasksManager {
 				output = output + count + ". " + "Event: "
 						+ td.getDescription() + "\n";
 				table.put(count, td);
+				count++;
 			}
-			count++;
 		}
 
-		return output + (" description: ");
+		return output;
 	}
 
 	private static String delete(DeleteAction ac) {
@@ -443,6 +443,7 @@ public class TasksManager {
 	public static String executeCommand(AddAction ac) {
 		Task t = classify(ac);
 		lastAction = ac;
+		System.out.println(ac.toString());
 		return add(t);
 	}
 

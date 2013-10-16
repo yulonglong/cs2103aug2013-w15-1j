@@ -24,7 +24,7 @@ public class ATypistCalendar {
 		/*userInput("add swimming on 30/12 from 1300 to 1400");
 		userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
 		userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
-		userInput("add swimming at BB CC on 2/1 from 1.33pm to 3.20pm");
+		userInput("add swimming at BB CC on 2/11 from 1.33pm to 3.20pm");
 		
 		userInput("display");
 		userInput("display schedules at Bukit Batok");
