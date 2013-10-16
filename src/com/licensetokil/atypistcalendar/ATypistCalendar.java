@@ -21,7 +21,7 @@ public class ATypistCalendar {
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
 		
-		userInput("add swimming on 30/12 from 1300 to 1400");
+		/*userInput("add swimming on 30/12 from 1300 to 1400");
 		userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
 		userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
 		userInput("add swimming at BB CC on 2/1 from 1.33pm to 3.20pm");
@@ -49,7 +49,7 @@ public class ATypistCalendar {
 		userInput("search swimming on 10/6");
 		userInput("search badminton on 5/3 from 3pm to 1900");
 		
-		userInput("update #3 >> badminton on 2/1 from 1200 to 1300");
+		userInput("update #3 >> badminton on 2/1 from 1200 to 1300");*/
 		
 		
 		/*
@@ -61,13 +61,43 @@ public class ATypistCalendar {
 			System.out.println(tm.executeCommand((Parser.LocalAction)action));
 		}
 		*/
+
 	}
 	
 	public static void userInput(String input) {
 		try {
 			Action ac = Parser.parse(input);
-			//String reply = TasksManager.executeCommand((LocalAction)ac);
-			String reply = ac.toString();//kester using this to debug and try his parser
+			String reply;
+			
+			if(ac.getClass().getName().contains("AddAction")){
+				reply = TasksManager.executeCommand((AddAction)ac);
+			}
+			
+			else if(ac.getClass().getName().contains("DeleteAction")){
+				reply = TasksManager.executeCommand((DeleteAction)ac);
+			}
+			
+			else if(ac.getClass().getName().contains("DisplayAction")){
+				reply = TasksManager.executeCommand((DisplayAction)ac);
+			}
+			
+			else if(ac.getClass().getName().contains("UpdateAction")){
+				reply = TasksManager.executeCommand((UpdateAction)ac);
+			}
+			
+			else if(ac.getClass().getName().contains("MarkAction")){
+				reply = TasksManager.executeCommand((MarkAction)ac);
+			}
+			
+			else if(ac.getClass().getName().contains("SearchAction")){
+				reply = TasksManager.executeCommand((SearchAction)ac);
+			}
+			
+			else{
+				reply = ac.getClass().getName();
+			}
+
+			//String reply = ac.toString();//kester using this to debug and try his parser
 			gui.outputWithNewline(reply);
 		}
 		catch(MalformedUserInputException muie) {
