@@ -17,9 +17,23 @@ public class AddAction extends LocalAction {
 	}
 	
 	public String toString(){
+		String stringStartTime;
+		if (startTime==null){
+			stringStartTime = new String("null");
+		}
+		else{
+			stringStartTime= startTime.getTime().toString();
+		}
+		String stringEndTime;
+		if (endTime==null){
+			stringEndTime = new String("null");
+		}
+		else{
+			stringEndTime= endTime.getTime().toString();
+		}
 		return ("Type	: " + type + "\n" +
-			    "Start Time	: " + startTime.getTime() + "\n" +
-		        "End Time	: " + endTime.getTime() + "\n" +
+			    "Start Time	: " + stringStartTime + "\n" +
+		        "End Time	: " + stringEndTime + "\n" +
 		        "Description	: " + description + "\n" +
 		        "Place	: " + place + "\n");
 	}
