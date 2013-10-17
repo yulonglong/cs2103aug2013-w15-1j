@@ -101,19 +101,10 @@ public class Parser {
 	// add function : 25% done
 	private static AddAction addParser(StringTokenizer st) {
 		AddAction userAction = new AddAction();
+		Calendar[] calendarArray = new Calendar[2];
+		calendarArray[0] = null;
+		calendarArray[1] = null;
 		
-
-		int[] intStartDate = new int[3];
-		int[] intEndDate = new int[3];
-		intStartDate[2] = 2005;
-		intStartDate[1] = 0;
-		intStartDate[0] = 1;
-		intEndDate[2] = 2099;
-		intEndDate[1] = 11;
-		intEndDate[0] = 31;
-
-		Calendar startTimeCal = null;
-		Calendar endTimeCal = null;
 
 		String tempDescription = new String();
 		String description = new String(st.nextToken());
@@ -126,10 +117,7 @@ public class Parser {
 				userAction.setDescription(description);
 			}
 			else{
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = tempDescription + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,tempDescription);
 				break;
 			}
 		}
@@ -144,10 +132,7 @@ public class Parser {
 			place = new String(st.nextToken());
 			userAction.setPlace(place);
 		} else {
-			String tempUserInput = new String();
-			tempUserInput = getRemainingTokens(st);
-			tempUserInput = prep + " " + tempUserInput;
-			st = new StringTokenizer(tempUserInput);
+			st = addStringToTokenizer(st,prep);
 		}
 
 		// check for place name, separated by space, and incorporate the proper
@@ -165,61 +150,10 @@ public class Parser {
 
 
 		// if there is a date field
-		if (st.hasMoreTokens()) {
-			String date = new String(st.nextToken());
-			getDate(intStartDate, date);
-
-			if (st.hasMoreTokens()) {
-				prep = new String(st.nextToken());
-				if (isValidTimePreposition(prep)) {
-					String startTime = new String(st.nextToken());
-					int intStartHour = getTimeHour(startTime);
-					int intStartMinute = getTimeMinute(startTime);
-
-					if(st.hasMoreTokens()){
-						prep = new String(st.nextToken());
-						String endTime = new String(st.nextToken());
-						int intEndHour = getTimeHour(endTime);
-						int intEndMinute = getTimeMinute(endTime);
-						startTimeCal = Calendar.getInstance();
-						endTimeCal = Calendar.getInstance();
-	
-						startTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intStartHour, intStartMinute,
-								0);
-						endTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intEndHour, intEndMinute, 0);
-						
-						userAction.setStartTime(startTimeCal);
-						userAction.setEndTime(endTimeCal);
-					}
-					else{
-						endTimeCal = Calendar.getInstance();
-						endTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intStartHour, intStartMinute,
-								0);
-						userAction.setEndTime(endTimeCal);
-					}
-				}
-			}
-			else{
-			endTimeCal = Calendar.getInstance();
-			endTimeCal.set(intStartDate[2], intStartDate[1],
-					intStartDate[0], 23, 59, 59);
-			
-			userAction.setStartTime(startTimeCal);
-			userAction.setEndTime(endTimeCal);
-			}
-			
-		}
-		else{
-			endTimeCal = Calendar.getInstance();
-			endTimeCal.set(intEndDate[2], intEndDate[1],
-					intEndDate[0], 23, 59, 59);
-			
-			userAction.setStartTime(startTimeCal);
-			userAction.setEndTime(endTimeCal);
-		}
+		getDate(calendarArray,st);
+		userAction.setStartTime(calendarArray[0]);
+		userAction.setEndTime(calendarArray[1]);
+		
 	return userAction;
 	}
 
@@ -246,17 +180,10 @@ public class Parser {
 	private static DisplayAction displayParser(StringTokenizer st) {
 		DisplayAction userAction = new DisplayAction();
 
-		int[] intStartDate = new int[3];
-		int[] intEndDate = new int[3];
-		intStartDate[2] = 2005;
-		intStartDate[1] = 0;
-		intStartDate[0] = 1;
-		intEndDate[2] = 2099;
-		intEndDate[1] = 11;
-		intEndDate[0] = 31;
-
-		Calendar startTimeCal = Calendar.getInstance();
-		Calendar endTimeCal = Calendar.getInstance();
+		
+		Calendar[] calendarArray = new Calendar[2];
+		calendarArray[0] = Calendar.getInstance();
+		calendarArray[1] = null;
 
 		// if command has more details after display
 		// e.g. display "deadlines on monday"
@@ -267,11 +194,10 @@ public class Parser {
 			if (isStringAll(prep)){
 				userAction.setDescription("all");
 				if(!st.hasMoreTokens()){
-					endTimeCal.set(intEndDate[2], intEndDate[1],
-							intEndDate[0], 23, 59, 59);
+					calendarArray[1].set(2099, 11, 31, 23, 59, 59);
 					
-					userAction.setStartTime(startTimeCal);
-					userAction.setEndTime(endTimeCal);
+					userAction.setStartTime(calendarArray[0]);
+					userAction.setEndTime(calendarArray[1]);
 					return userAction;
 				}
 			}
@@ -330,58 +256,16 @@ public class Parser {
 			// string place retrieval END
 			
 			// if there is a date field
-			if (st.hasMoreTokens()) {
-				String date = new String(st.nextToken());
-				getDate(intStartDate, date);
-
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-					if (isValidTimePreposition(prep)) {
-						String startTime = new String(st.nextToken());
-						int intStartHour = getTimeHour(startTime);
-						int intStartMinute = getTimeMinute(startTime);
-
-						prep = new String(st.nextToken());
-						String endTime = new String(st.nextToken());
-						int intEndHour = getTimeHour(endTime);
-						int intEndMinute = getTimeMinute(endTime);
-
-						startTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intStartHour, intStartMinute,
-								0);
-						endTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intEndHour, intEndMinute, 0);
-						
-						userAction.setStartTime(startTimeCal);
-						userAction.setEndTime(endTimeCal);
-					}
-				}
-				else{
-				startTimeCal.set(intStartDate[2], intStartDate[1],
-						intStartDate[0], 0, 0, 0);
-				endTimeCal.set(intStartDate[2], intStartDate[1],
-						intStartDate[0], 23, 59, 59);
-				
-				userAction.setStartTime(startTimeCal);
-				userAction.setEndTime(endTimeCal);
-				}
-				
-			}
-			else{
-				endTimeCal.set(intEndDate[2], intEndDate[1],
-						intEndDate[0], 23, 59, 59);
-				
-				userAction.setStartTime(startTimeCal);
-				userAction.setEndTime(endTimeCal);
-			}
-			
+			getDate(calendarArray,st);
+			userAction.setStartTime(calendarArray[0]);
+			userAction.setEndTime(calendarArray[1]);
 		}
 		else{
-			endTimeCal.set(intEndDate[2], intEndDate[1],
-					intEndDate[0], 23, 59, 59);
+			calendarArray[1] = Calendar.getInstance();
+			calendarArray[1].set(2099, 11, 31, 23, 59, 59);
 			
-			userAction.setStartTime(startTimeCal);
-			userAction.setEndTime(endTimeCal);
+			userAction.setStartTime(calendarArray[0]);
+			userAction.setEndTime(calendarArray[1]);
 			userAction.setDescription("all");
 		}
 		return userAction;
@@ -416,6 +300,10 @@ public class Parser {
 	private static UpdateAction updateParser(StringTokenizer st) throws MalformedUserInputException {
 		UpdateAction userAction = new UpdateAction();
 		String temp = new String(st.nextToken());
+		
+		Calendar[] calendarArray = new Calendar[2];
+		calendarArray[0] = Calendar.getInstance();
+		calendarArray[1] = null;
 
 		temp = temp.substring(1);
 		int tempInt = Integer.parseInt(temp);
@@ -429,9 +317,6 @@ public class Parser {
 		
 		
 		//after finding the delimiter ">>"
-		
-		Calendar startTimeCal = Calendar.getInstance();
-		Calendar endTimeCal = Calendar.getInstance();
 
 		String description = new String(st.nextToken());
 		userAction.setUpdatedQuery(description);
@@ -463,27 +348,10 @@ public class Parser {
 			}
 		}
 
-		String date = new String(st.nextToken());
-		int[] intDate = new int[3];
-		getDate(intDate, date);
-
-		prep = new String(st.nextToken());
-		String startTime = new String(st.nextToken());
-		int intStartHour = getTimeHour(startTime);
-		int intStartMinute = getTimeMinute(startTime);
-
-		prep = new String(st.nextToken());
-		String endTime = new String(st.nextToken());
-		int intEndHour = getTimeHour(endTime);
-		int intEndMinute = getTimeMinute(endTime);
-
-		startTimeCal.set(intDate[2], intDate[1], intDate[0], intStartHour,
-				intStartMinute, 0);
-		endTimeCal.set(intDate[2], intDate[1], intDate[0], intEndHour,
-				intEndMinute, 0);
-
-		userAction.setUpdatedStartTime(startTimeCal);
-		userAction.setUpdatedEndTime(endTimeCal);
+	
+		getDate(calendarArray,st);
+		userAction.setUpdatedStartTime(calendarArray[0]);
+		userAction.setUpdatedEndTime(calendarArray[1]);
 		
 
 
@@ -495,16 +363,11 @@ public class Parser {
 	// search function: 0 %
 	private static SearchAction searchParser(StringTokenizer st) {
 		SearchAction userAction = new SearchAction();
-
-		int[] intStartDate = new int[3];
-		int[] intEndDate = new int[3];
-		intStartDate[2] = 2005;
-		intStartDate[1] = 0;
-		intStartDate[0] = 1;
-		intEndDate[2] = 2099;
-		intEndDate[1] = 11;
-		intEndDate[0] = 31;
-
+		
+		Calendar[] calendarArray = new Calendar[2];
+		calendarArray[0] = null;
+		calendarArray[1] = null;
+		
 		Calendar startTimeCal = Calendar.getInstance();
 		Calendar endTimeCal = Calendar.getInstance();
 
@@ -546,57 +409,14 @@ public class Parser {
 			}
 			
 			// string place retrieval END
+			getDate(calendarArray,st);
+			userAction.setStartTime(calendarArray[0]);
+			userAction.setEndTime(calendarArray[1]);
 			
-			// if there is a date field
-			if (st.hasMoreTokens()) {
-				String date = new String(st.nextToken());
-				getDate(intStartDate, date);
-
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-					if (isValidTimePreposition(prep)) {
-						String startTime = new String(st.nextToken());
-						int intStartHour = getTimeHour(startTime);
-						int intStartMinute = getTimeMinute(startTime);
-
-						prep = new String(st.nextToken());
-						String endTime = new String(st.nextToken());
-						int intEndHour = getTimeHour(endTime);
-						int intEndMinute = getTimeMinute(endTime);
-
-						startTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intStartHour, intStartMinute,
-								0);
-						endTimeCal.set(intStartDate[2], intStartDate[1],
-								intStartDate[0], intEndHour, intEndMinute, 0);
-						
-						userAction.setStartTime(startTimeCal);
-						userAction.setEndTime(endTimeCal);
-					}
-				}
-				else{
-				startTimeCal.set(intStartDate[2], intStartDate[1],
-						intStartDate[0], 0, 0, 0);
-				endTimeCal.set(intStartDate[2], intStartDate[1],
-						intStartDate[0], 23, 59, 59);
-				
-				userAction.setStartTime(startTimeCal);
-				userAction.setEndTime(endTimeCal);
-				}
-				
-			}
-			else{
-				endTimeCal.set(intEndDate[2], intEndDate[1],
-						intEndDate[0], 23, 59, 59);
-				
-				userAction.setStartTime(startTimeCal);
-				userAction.setEndTime(endTimeCal);
-			}
 			
 		}
 		else{
-			endTimeCal.set(intEndDate[2], intEndDate[1],
-					intEndDate[0], 23, 59, 59);
+			endTimeCal.set(2099, 11, 31, 23, 59, 59);
 			
 			userAction.setStartTime(startTimeCal);
 			userAction.setEndTime(endTimeCal);
@@ -719,34 +539,88 @@ public class Parser {
 	// pass a user string of date in any format
 	// and return date in integer format
 	// using intDate array integer to store date as integers.
-	// intDate[0] is daydate,
-	// intDate[1] is month
-	// intDate[2] is year
-	private static void getDate(int[] intDate, String date) {
-		int stringDateLength = date.length();
+	// calendarArray[0] is startTime
+	// calendarArray[1] is endTime
+	private static void getDate(Calendar[] calendarArray, StringTokenizer st) {
+		Calendar startTimeCal = calendarArray[0];
+		Calendar endTimeCal = calendarArray[1];
+		int[] intStartDate = new int[3];
+		int[] intEndDate = new int[3];
+		intStartDate[2] = 2005;
+		intStartDate[1] = 0;
+		intStartDate[0] = 1;
+		intEndDate[2] = 2099;
+		intEndDate[1] = 11;
+		intEndDate[0] = 31;
 
-		int indexOfDelimiter = 0;
+		// if there is a date field
+		if (st.hasMoreTokens()) {
+			String date = new String(st.nextToken());
 
-		// get the index of delimiter
-		for (int i = 0; (i < stringDateLength) && (indexOfDelimiter == 0); i++) {
-			if (!Character.isDigit(date.charAt(i))) {
-				indexOfDelimiter = i;
+			//get the date start
+			int stringDateLength = date.length();
+
+			int indexOfDelimiter = 0;
+
+			// get the index of delimiter
+			for (int i = 0; (i < stringDateLength) && (indexOfDelimiter == 0); i++) {
+				if (!Character.isDigit(date.charAt(i))) {
+					indexOfDelimiter = i;
+				}
 			}
+
+			String strday = new String();
+			strday = date.substring(0, indexOfDelimiter);
+			intStartDate[0] = Integer.parseInt(strday);
+
+			String strmonth = new String();
+			strmonth = date.substring(indexOfDelimiter + 1);
+			intStartDate[1] = Integer.parseInt(strmonth);
+
+			intStartDate[1]--; // Calendar in java, stores month starting from 0
+							// (january) to 11 (december)
+
+			intStartDate[2] = 2013;
+			//get date end
+
+			if (st.hasMoreTokens()) {
+				String prep = new String(st.nextToken());
+				if (isValidTimePreposition(prep)) {
+					String startTime = new String(st.nextToken());
+					int intStartHour = getTimeHour(startTime);
+					int intStartMinute = getTimeMinute(startTime);
+
+					if(st.hasMoreTokens()){
+						prep = new String(st.nextToken());
+						String endTime = new String(st.nextToken());
+						int intEndHour = getTimeHour(endTime);
+						int intEndMinute = getTimeMinute(endTime);
+						startTimeCal = Calendar.getInstance();
+						endTimeCal = Calendar.getInstance();
+	
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndHour, intEndMinute, 0);
+				
+					}
+					else{
+						endTimeCal = Calendar.getInstance();
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+					}
+				}
+			}
+			else{
+				endTimeCal = Calendar.getInstance();
+				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
+			}
+			
 		}
-
-		String strday = new String();
-		strday = date.substring(0, indexOfDelimiter);
-		intDate[0] = Integer.parseInt(strday);
-
-		String strmonth = new String();
-		strmonth = date.substring(indexOfDelimiter + 1);
-		intDate[1] = Integer.parseInt(strmonth);
-
-		intDate[1]--; // Calendar in java, stores month starting from 0
-						// (january) to 11 (december)
-
-		intDate[2] = 2013;
-
+		else{
+			endTimeCal = Calendar.getInstance();
+			endTimeCal.set(intEndDate[2], intEndDate[1], intEndDate[0], 23, 59, 59);
+		}
+		
+		calendarArray[0] = startTimeCal;
+		calendarArray[1] = endTimeCal;
 		return;
 	}
 
@@ -756,6 +630,13 @@ public class Parser {
 			strResult = strResult + " " + strRemaining.nextToken();
 		}
 		return strResult;
+	}
+	
+	private static StringTokenizer addStringToTokenizer(StringTokenizer st, String tempString){
+		String tempUserInput = new String();
+		tempUserInput = getRemainingTokens(st);
+		tempUserInput = tempString + " " + tempUserInput;
+		return new StringTokenizer(tempUserInput);
 	}
 	
 	private static boolean isStringAll(String task){
