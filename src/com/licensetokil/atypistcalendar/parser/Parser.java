@@ -151,7 +151,7 @@ public class Parser {
 
 
 		// if there is a date field
-		getDate(calendarArray,st);
+		getDate(calendarArray,prep,st);
 		userAction.setStartTime(calendarArray[0]);
 		userAction.setEndTime(calendarArray[1]);
 		
@@ -257,7 +257,7 @@ public class Parser {
 			// string place retrieval END
 			
 			// if there is a date field
-			getDate(calendarArray,st);
+			getDate(calendarArray,prep,st);
 			userAction.setStartTime(calendarArray[0]);
 			userAction.setEndTime(calendarArray[1]);
 		}
@@ -318,9 +318,24 @@ public class Parser {
 		
 		
 		//after finding the delimiter ">>"
-
+		String tempDescription = new String();
 		String description = new String(st.nextToken());
 		userAction.setUpdatedQuery(description);
+		
+		while(st.hasMoreTokens()){
+			tempDescription = new String(st.nextToken());
+			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
+				description = description + " " + tempDescription;
+				userAction.setUpdatedQuery(description);
+			}
+			else{
+				st = addStringToTokenizer(st,tempDescription);
+				break;
+			}
+		}
+		if(!st.hasMoreTokens()){
+			return userAction;
+		}
 		
 		String place = new String();
 		String prep = new String(st.nextToken());
@@ -349,7 +364,7 @@ public class Parser {
 			}
 		}
 
-		getDate(calendarArray,st);
+		getDate(calendarArray,prep,st);
 		userAction.setUpdatedStartTime(calendarArray[0]);
 		userAction.setUpdatedEndTime(calendarArray[1]);
 
@@ -404,7 +419,7 @@ public class Parser {
 		}
 		
 		// string place retrieval END
-		getDate(calendarArray,st);
+		getDate(calendarArray,prep,st);
 		userAction.setStartTime(calendarArray[0]);
 		userAction.setEndTime(calendarArray[1]);
 		
@@ -557,7 +572,7 @@ public class Parser {
 	// using calendarArray to store date as integers.
 	// calendarArray[0] is startTime
 	// calendarArray[1] is endTime
-	private static void getDate(Calendar[] calendarArray, StringTokenizer st) {
+	private static void getDate(Calendar[] calendarArray, String preposition, StringTokenizer st) {
 		Calendar startTimeCal = calendarArray[0];
 		Calendar endTimeCal = calendarArray[1];
 		int[] intStartDate = new int[3];
@@ -572,11 +587,10 @@ public class Parser {
 		// if there is a date field
 		if (st.hasMoreTokens()) {
 			String date = new String(st.nextToken());
-
 			//get the date start
 			int stringDateLength = date.length();
-
 			int indexOfDelimiter = 0;
+			int indexOfDelimiter2 = 0;
 
 			// get the index of delimiter
 			for (int i = 0; (i < stringDateLength) && (indexOfDelimiter == 0); i++) {
@@ -589,14 +603,42 @@ public class Parser {
 			strday = date.substring(0, indexOfDelimiter);
 			intStartDate[0] = Integer.parseInt(strday);
 
+			
+
+			for (int i = indexOfDelimiter+1; (i < stringDateLength); i++) {
+				if (!Character.isDigit(date.charAt(i))) {
+					indexOfDelimiter2 = i;
+				}
+			}
+			
 			String strmonth = new String();
-			strmonth = date.substring(indexOfDelimiter + 1);
-			intStartDate[1] = Integer.parseInt(strmonth);
-
-			intStartDate[1]--; // Calendar in java, stores month starting from 0
-							// (january) to 11 (december)
-
-			intStartDate[2] = 2013;
+			String stryear = new String();
+			//if there is a year format
+			if(indexOfDelimiter2 != 0){
+				strmonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
+				
+				intStartDate[1] = Integer.parseInt(strmonth);
+				intStartDate[1]--; // Calendar in java, stores month starting from 0
+								   // (january) to 11 (december)
+				
+				stryear = date.substring(indexOfDelimiter2 + 1);
+				if(stryear.length()==2){
+					stryear = "20" + stryear;
+				}
+				intStartDate[2] = Integer.parseInt(stryear);
+			}
+			//if there is no year (assume it is the current year);
+			else{
+				strmonth = date.substring(indexOfDelimiter + 1);
+				
+				intStartDate[1] = Integer.parseInt(strmonth);
+				intStartDate[1]--; // Calendar in java, stores month starting from 0
+								   // (january) to 11 (december)
+				
+				intStartDate[2] = Calendar.getInstance().get(Calendar.YEAR);
+			}
+			
+			
 			//get date end
 
 			if (st.hasMoreTokens()) {
@@ -618,28 +660,57 @@ public class Parser {
 
 					if(st.hasMoreTokens()){
 						prep = new String(st.nextToken());
-						String endTime = new String(st.nextToken());
-						if(st.hasMoreTokens()){
-							temp = new String(st.nextToken());
-							if(isValidTimeSuffix(temp)){
-								endTime = endTime + temp;
+						//if it is a duration time format
+						if(isValidTimeDurationPreposition(prep)){
+							String stringTime = new String();
+							int intHourDuration = 0;
+							int intMinuteDuration = 0;
+							while(st.hasMoreTokens()){
+								stringTime = new String(st.nextToken());
+								String timeUnit = new String(st.nextToken());
+								if(isStringHour(timeUnit)){
+									intHourDuration = Integer.parseInt(stringTime);
+								}
+								if(isStringMinute(timeUnit)){
+									intMinuteDuration = Integer.parseInt(stringTime);
+								}
 							}
-							else{
-								st = addStringToTokenizer(st,temp);
-							}
+							startTimeCal = Calendar.getInstance();
+							endTimeCal = Calendar.getInstance();
+		
+							startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+							endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour+intHourDuration, intStartMinute+intMinuteDuration, 0);
 						}
-						int intEndHour = getTimeHour(endTime);
-						int intEndMinute = getTimeMinute(endTime);
-						startTimeCal = Calendar.getInstance();
-						endTimeCal = Calendar.getInstance();
-	
-						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
-						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndHour, intEndMinute, 0);
-				
+						//if it is another time format
+						else{
+							String endTime = new String(st.nextToken());
+							if(st.hasMoreTokens()){
+								temp = new String(st.nextToken());
+								if(isValidTimeSuffix(temp)){
+									endTime = endTime + temp;
+								}
+								else{
+									st = addStringToTokenizer(st,temp);
+								}
+							}
+							int intEndHour = getTimeHour(endTime);
+							int intEndMinute = getTimeMinute(endTime);
+							startTimeCal = Calendar.getInstance();
+							endTimeCal = Calendar.getInstance();
+		
+							startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+							endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intEndHour, intEndMinute, 0);
+						}
 					}
-					else{
+					else if(isValidDeadlinePreposition(preposition)){
 						endTimeCal = Calendar.getInstance();
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+					}
+					else{
+						startTimeCal = Calendar.getInstance();
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+						endTimeCal = Calendar.getInstance();
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour+1, intStartMinute, 0);
 					}
 				}
 			}
@@ -692,6 +763,26 @@ public class Parser {
 		return false;
 	}
 	
+	private static boolean isStringMinute(String timeUnit){
+		if ((timeUnit.equalsIgnoreCase("minute"))
+			||(timeUnit.equalsIgnoreCase("minutes"))
+			||(timeUnit.equalsIgnoreCase("min"))
+			||(timeUnit.equalsIgnoreCase("mins"))) {
+				return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringHour(String timeUnit){
+		if ((timeUnit.equalsIgnoreCase("hour"))
+			||(timeUnit.equalsIgnoreCase("hours"))
+			||(timeUnit.equalsIgnoreCase("hr"))
+			||(timeUnit.equalsIgnoreCase("hrs"))) {
+				return true;
+		}
+		return false;
+	}
+	
 	private static boolean isStringAll(String task){
 		if (task.equalsIgnoreCase("all")){
 			return true;
@@ -738,11 +829,25 @@ public class Parser {
 		}
 		return false;
 	}
+	
+	private static boolean isValidDeadlinePreposition(String preposition){
+		if (preposition.equalsIgnoreCase("by")){
+			return true;
+		}
+		return false;
+	}
 
 	private static boolean isValidDayPreposition(String preposition) {
 		if ((preposition.equalsIgnoreCase("on"))
 				|| (preposition.equalsIgnoreCase("by"))
 				|| (preposition.equalsIgnoreCase(","))) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidTimeDurationPreposition(String preposition){
+		if(preposition.equalsIgnoreCase("for")){
 			return true;
 		}
 		return false;

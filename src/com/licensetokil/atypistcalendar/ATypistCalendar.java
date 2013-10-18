@@ -28,6 +28,7 @@ public class ATypistCalendar {
 		 userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
 		 userInput("add swimming at BB CC on 2/11 from 1.33pm to 3.20 p.m.");
 		 userInput("add light joggin at Science Park 2 on 4/4 from 11.33 to 2");
+		 userInput("add light joggin at Science Park 2 on 4/4/14 at 5 for 1 hr 20 mins");
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
@@ -51,8 +52,8 @@ public class ATypistCalendar {
 		 userInput("search swimming on 10/6");
 		 userInput("search badminton on 5/3 from 3pm to 1900");
 		 
-		 userInput("update #3 >> badminton on 2/1 from 1200 to 1300");
-		*/ 
+		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
+		 */
 
 		/*
 		 * Scanner sc = new Scanner(System.in); //TasksManager tm = new
