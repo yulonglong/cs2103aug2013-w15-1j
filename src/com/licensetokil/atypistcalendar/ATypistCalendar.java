@@ -29,6 +29,8 @@ public class ATypistCalendar {
 		 userInput("add swimming at BB CC on 2/11 from 1.33pm to 3.20 p.m.");
 		 userInput("add light joggin at Science Park 2 on 4/4 from 11.33 to 2");
 		 userInput("add light joggin at Science Park 2 on 4/4/14 at 5 for 1 hr 20 mins");
+		 userInput("add strolling tgt at park 1 on 1/7");
+		 userInput("add dota funfair at pgp R1 on mon at 5");
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
@@ -49,7 +51,7 @@ public class ATypistCalendar {
 		 
 		 userInput("delete #1 #2 #4");
 		 
-		 userInput("search swimming on 10/6");
+		 userInput("search swimming tgt at bt batok on 10/6");
 		 userInput("search badminton on 5/3 from 3pm to 1900");
 		 
 		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
