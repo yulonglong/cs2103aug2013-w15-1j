@@ -2,6 +2,7 @@ package com.licensetokil.atypistcalendar;
 
 import java.util.Calendar;
 
+import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.DefaultGUI;
@@ -15,6 +16,8 @@ public class ATypistCalendar {
 
 		gui = new DefaultGUI();
 		gui.setVisible(true);
+		
+		GoogleCalendarManager.getInstance().authenticateUser();
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n");
 		gui.outputWithNewline("Current time:");

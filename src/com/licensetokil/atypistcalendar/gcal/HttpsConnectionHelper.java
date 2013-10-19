@@ -9,11 +9,11 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+
+// TODO handle non 200 replies
 
 public class HttpsConnectionHelper {
 	public static String sendByPostReturningReplyAsString(String url, Map<String, String> parameters) throws IOException {
@@ -28,8 +28,6 @@ public class HttpsConnectionHelper {
 			String currentKey = parametersKeyIterator.next();
 			parametersAsString += currentKey + "=" + parameters.get(currentKey) + "&";
 		}
-		//parametersAsString = parametersAsString.substring(0, parametersAsString.length() - 1);
-		System.out.println(parametersAsString);
 
 		httpsConnection.setDoOutput(true);
 		DataOutputStream dataOutputStream = new DataOutputStream(httpsConnection.getOutputStream());
@@ -50,7 +48,7 @@ public class HttpsConnectionHelper {
 	}
 	
 	public static JsonObject sendByPostReturningReplyAsJsonObject(String url, Map<String, String> parameters)
-			throws IOException, IllegalStateException, JsonParseException, JsonIOException, JsonSyntaxException {
+			throws IOException, IllegalStateException, JsonParseException {
 		String serverReply = sendByPostReturningReplyAsString(url, parameters);
 		JsonParser jsonParser = new JsonParser();
 		return jsonParser.parse(serverReply).getAsJsonObject();

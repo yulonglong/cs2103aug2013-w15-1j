@@ -1,5 +1,7 @@
 package com.licensetokil.atypistcalendar.gcal;
 
+import java.awt.Dialog;
+
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
@@ -24,13 +26,15 @@ class AuthenticationDialog extends JDialog {
 			}
 		});
 
+		this.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		this.setTitle("Google Calendar Authentication");
 		this.setSize(800, 600);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		this.setVisible(true);
-		this.getContentPane().add(webBrowser);
+		this.add(webBrowser);
 		
 		this.navigateToURL("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=" + AuthenticationManager.GOOGLE_API_CLIENT_ID + "&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=https://www.googleapis.com/auth/calendar");
+		
+		this.setVisible(true);
 	}
 
 	private void navigateToURL(final String target) {
@@ -44,10 +48,10 @@ class AuthenticationDialog extends JDialog {
 	private void webBrowserLocationChanged(WebBrowserNavigationEvent event) {
 		if(webBrowser.getResourceLocation().indexOf("https://accounts.google.com/o/oauth2/approval") != -1) {
 			String[] googleReplyDelimited = webBrowser.getPageTitle().split("=");
-			this.dispose();
 			NativeInterface.close();
+			this.dispose();
 			if(googleReplyDelimited[0].equals("Success code")) {
-				AuthenticationManager.getInstance().authenticateUserSuccessful(googleReplyDelimited[1]);
+				AuthenticationManager.getInstance().authenticateUserSuccess(googleReplyDelimited[1]);
 			}
 			else {
 				AuthenticationManager.getInstance().authenticateUserFailed();

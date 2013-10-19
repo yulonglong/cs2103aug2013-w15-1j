@@ -1,5 +1,19 @@
 package com.licensetokil.atypistcalendar.gcal;
 
 public class GoogleCalendarManager {
-	//GCalSecurityManager securityManager = GCalSecurityManager.getInstance();
+	private static GoogleCalendarManager instance = null;
+	
+	private GoogleCalendarManager() {
+	}
+	
+	static public GoogleCalendarManager getInstance() {
+		if(instance == null) {
+			instance = new GoogleCalendarManager();
+		}
+		return instance;
+	}
+	
+	public void authenticateUser() {
+		AuthenticationManager.getInstance().authenticateUser();
+	}
 }
