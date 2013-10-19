@@ -30,7 +30,7 @@ class AuthenticationDialog extends JDialog {
 		this.setVisible(true);
 		this.getContentPane().add(webBrowser);
 		
-		this.navigateToURL("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=933956973767-2e8udf2em20mgl6djjesu5ggpot4um19.apps.googleusercontent.com&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=https://www.googleapis.com/auth/calendar");
+		this.navigateToURL("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=" + AuthenticationManager.GOOGLE_API_CLIENT_ID + "&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=https://www.googleapis.com/auth/calendar");
 	}
 
 	private void navigateToURL(final String target) {
@@ -48,8 +48,7 @@ class AuthenticationDialog extends JDialog {
 			NativeInterface.close();
 			if(googleReplyDelimited[0].equals("Success code")) {
 				//success flow
-				String googleAuthorizationCode = googleReplyDelimited[1];
-				System.out.println(googleAuthorizationCode);
+				AuthenticationManager.getInstance().setAuthenticationToken(googleReplyDelimited[1]);
 			}
 			else {
 				//denied flow
