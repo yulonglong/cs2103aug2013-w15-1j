@@ -3,24 +3,15 @@ package com.licensetokil.atypistcalendar.gcal;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
+import chrriis.dj.nativeswing.NSOption;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserNavigationEvent;
-import chrriis.dj.nativeswing.NSOption;
-
-public class TestWB {
-	public static void main(String[] args) {
-		NativeInterface.open();
-
-		AuthenticationDialog tt = new AuthenticationDialog();
-		tt.navigate("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=933956973767-2e8udf2em20mgl6djjesu5ggpot4um19.apps.googleusercontent.com&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=https://www.googleapis.com/auth/calendar");
-
-		NativeInterface.runEventPump();
-	}
-}
 
 class AuthenticationDialog extends JDialog {
+	private static final long serialVersionUID = 1L;
+	
 	private JWebBrowser webBrowser;
 	
 	public AuthenticationDialog() {
@@ -38,9 +29,11 @@ class AuthenticationDialog extends JDialog {
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setVisible(true);
 		this.getContentPane().add(webBrowser);
+		
+		this.navigateToURL("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=933956973767-2e8udf2em20mgl6djjesu5ggpot4um19.apps.googleusercontent.com&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=https://www.googleapis.com/auth/calendar");
 	}
 
-	public void navigate(final String target) {
+	private void navigateToURL(final String target) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				webBrowser.navigate(target);
