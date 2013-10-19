@@ -5,6 +5,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.licensetokil.atypistcalendar.ATypistCalendar;
 
@@ -13,9 +14,12 @@ public class DefaultGUI extends JFrame {
 	private JTextArea jTextArea1;
 	private JTextField jTextField1;
 	
-	private static Logger logger = Logger.getLogger("TasksManager");
+	private static Logger p = Logger.getLogger("atc");
+	private static Logger logger = Logger.getLogger("atc.DefaultUI");
 
 	public DefaultGUI() {
+		System.out.println(logger.getParent().getName());
+		logger.setLevel(Level.OFF);
 		logger.info("Creating new instance of DefaultGUI");
 		initComponents();
 		logger.info("New instance of DefaultGUI created");
