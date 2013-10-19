@@ -47,12 +47,10 @@ class AuthenticationDialog extends JDialog {
 			this.dispose();
 			NativeInterface.close();
 			if(googleReplyDelimited[0].equals("Success code")) {
-				//success flow
-				AuthenticationManager.getInstance().setAuthenticationToken(googleReplyDelimited[1]);
+				AuthenticationManager.getInstance().authenticateUserSuccessful(googleReplyDelimited[1]);
 			}
 			else {
-				//denied flow
-				System.out.println("Denied");
+				AuthenticationManager.getInstance().authenticateUserFailed();
 			}
 		}
 	}

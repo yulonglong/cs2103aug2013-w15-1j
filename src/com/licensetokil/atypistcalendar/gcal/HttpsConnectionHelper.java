@@ -9,6 +9,12 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+
 public class HttpsConnectionHelper {
 	public static String sendByPostReturningReplyAsString(String url, Map<String, String> parameters) throws IOException {
 		URL urlObject = new URL(url);
@@ -31,15 +37,22 @@ public class HttpsConnectionHelper {
 		dataOutputStream.flush();
 		dataOutputStream.close();
 
-		BufferedInputStream bufferedInputStream = new BufferedInputStream(httpsConnection.getInputStream(), 10000);
-		StringBuilder returnStringBuilder = new StringBuilder(10000);
+		BufferedInputStream serverReplyBufferedInputStream = new BufferedInputStream(httpsConnection.getInputStream(), 10000);
+		StringBuilder serverReplyStringBuilder = new StringBuilder(10000);
 
-		int characterFromInputStream = bufferedInputStream.read();
+		int characterFromInputStream = serverReplyBufferedInputStream.read();
 		while (characterFromInputStream != -1) {
-			returnStringBuilder.append((char)characterFromInputStream);
-			characterFromInputStream = bufferedInputStream.read();
+			serverReplyStringBuilder.append((char)characterFromInputStream);
+			characterFromInputStream = serverReplyBufferedInputStream.read();
 		}
-		bufferedInputStream.close();
-		return returnStringBuilder.toString();
+		serverReplyBufferedInputStream.close();
+		return serverReplyStringBuilder.toString();
+	}
+	
+	public static JsonObject sendByPostReturningReplyAsJsonObject(String url, Map<String, String> parameters)
+			throws IOException, IllegalStateException, JsonParseException, JsonIOException, JsonSyntaxException {
+		String serverReply = sendByPostReturningReplyAsString(url, parameters);
+		JsonParser jsonParser = new JsonParser();
+		return jsonParser.parse(serverReply).getAsJsonObject();
 	}
 }
