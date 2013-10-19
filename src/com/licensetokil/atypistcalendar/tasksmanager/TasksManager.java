@@ -1,7 +1,7 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import com.licensetokil.atypistcalendar.parser.*;
-import java.util.logging.*;
+import java.io.*;
 import java.util.*;
 
 public class TasksManager {
@@ -28,7 +28,7 @@ public class TasksManager {
 	private static int count = 1;
 	private static int ID;
 
-	private static Logger logger = Logger.getLogger("TasksManager");
+	private static File file = new File("ATC");
 
 	public void setAction(LocalAction action) {
 		this.action = action;
@@ -71,16 +71,13 @@ public class TasksManager {
 
 	private static String add(Task t) {
 
-		logger.log(Level.INFO, "adding task into the memory");
-
-		assert t.getTaskType().equals("schedule") ||
-			t.getTaskType().equals("deadline") ||
-			t.getTaskType().equals("todo");
-		
 		try {
-			
+			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
+				w.write(((Schedule) t).toString());
+				w.close();
 				return "Added " + t.getDescription() + " on "
 						+ ((Schedule) t).getStartTime().getTime() + " to "
 						+ ((Schedule) t).getEndTime().getTime()
@@ -89,6 +86,8 @@ public class TasksManager {
 
 			else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
+				w.write(((Deadline) t).toString());
+				w.close();
 				return "Added " + ((Deadline) t).getDescription() + " by "
 						+ ((Deadline) t).getEndTime().getTime()
 						+ " successfully";
@@ -96,14 +95,17 @@ public class TasksManager {
 
 			else if (t.getTaskType().equals("todo")) {
 				todo.add((Todo) t);
+				w.write(((Todo) t).toString());
+				w.close();
 				return "Added " + t.getDescription() + " successfully";
 			}
 
 			else {
+				w.close();
 				return "Add unsuccessful";
 			}
+
 		} catch (Exception e) {
-			logger.log(Level.WARNING, "Detected error ", e);
 			return e.getMessage();
 		}
 
@@ -125,12 +127,12 @@ public class TasksManager {
 		String output = new String("");
 		count = 1;
 
-		assert ac.getDescription().equals("schedules")||
-			ac.getDescription().equals("deadlines") ||
-			ac.getDescription().equals("todos") ||
-			ac.getDescription().equals("all") ||
-			ac.getDescription().equals("");
-		
+		assert ac.getDescription().equals("schedules")
+				|| ac.getDescription().equals("deadlines")
+				|| ac.getDescription().equals("todos")
+				|| ac.getDescription().equals("all")
+				|| ac.getDescription().equals("");
+
 		switch (ac.getDescription()) {
 
 		case "schedules":
@@ -246,26 +248,46 @@ public class TasksManager {
 
 	private static String delete(DeleteAction ac) {
 
-		for (Integer arr : ac.getReferenceNumber()) {
-			Task t = table.get(arr);
-			deletedTasks.add(t);
+		try {
+			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedReader r = new BufferedReader(new FileReader(file));
+			String currLine;
 
-			if (t instanceof Schedule) {
-				schedule.remove(t);
-				sch.remove(t);
-			}
+			for (Integer arr : ac.getReferenceNumber()) {
+				Task t = table.get(arr);
+				deletedTasks.add(t);
 
-			else if (t instanceof Deadline) {
-				deadline.remove(t);
-				dl.remove(t);
-			}
+				while ((currLine = r.readLine()) != null) {
+					if (!t.toString().equals(currLine)) {
+						w.write("");
+					}
+				}
 
-			else if (t instanceof Todo) {
-				todo.remove(t);
-				toDo.remove(t);
-			} else {
-				return "error";
+				if (t instanceof Schedule) {
+					schedule.remove(t);
+					sch.remove(t);
+				}
+
+				else if (t instanceof Deadline) {
+					deadline.remove(t);
+					dl.remove(t);
+				}
+
+				else if (t instanceof Todo) {
+					todo.remove(t);
+					toDo.remove(t);
+				} else {
+					w.close();
+					r.close();
+					return "error";
+				}
+
+				w.close();
+				r.close();
+
 			}
+		} catch (Exception e) {
+
 		}
 
 		return "Deleted " + ac.getReferenceNumber() + " successfully";
@@ -288,28 +310,54 @@ public class TasksManager {
 
 		Task t = table.get(ac.getReferenceNumber());
 		updateOriginalTask = t;
+		String updatedTask;
+		String originalTask;
+		String currLine;
 		ID = updateOriginalTask.getUniqueID();
 
-		if (t instanceof Schedule) {
-			((Schedule) t).setStartTime(ac.getUpdatedStartTime());
-			((Schedule) t).setEndTime(ac.getUpdatedEndTime());
-			((Schedule) t).setPlace(ac.getUpdatedLocationQuery());
-			((Schedule) t).setDescription(ac.getUpdatedQuery());
+		try {
+			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedReader r = new BufferedReader(new FileReader(file));
+			originalTask = t.toString();
+
+			if (t instanceof Schedule) {
+				((Schedule) t).setStartTime(ac.getUpdatedStartTime());
+				((Schedule) t).setEndTime(ac.getUpdatedEndTime());
+				((Schedule) t).setPlace(ac.getUpdatedLocationQuery());
+				((Schedule) t).setDescription(ac.getUpdatedQuery());
+			}
+
+			else if (t instanceof Deadline) {
+				((Deadline) t).setEndTime(ac.getUpdatedEndTime());
+				((Deadline) t).setPlace(ac.getUpdatedLocationQuery());
+				((Deadline) t).setDescription(ac.getUpdatedQuery());
+			}
+
+			else if (t instanceof Todo) {
+				((Todo) t).setPlace(ac.getUpdatedLocationQuery());
+				((Todo) t).setDescription(ac.getUpdatedQuery());
+			}
+
+			else {
+				w.close();
+				r.close();
+				return "Update unsuccessful";
+			}
+
+			updatedTask = t.toString();
+
+			while ((currLine = r.readLine()) != null) {
+				if (currLine.equals(originalTask)) {
+					w.write(updatedTask);
+				}
+			}
+
+			w.close();
+			r.close();
 		}
 
-		else if (t instanceof Deadline) {
-			((Deadline) t).setEndTime(ac.getUpdatedEndTime());
-			((Deadline) t).setPlace(ac.getUpdatedLocationQuery());
-			((Deadline) t).setDescription(ac.getUpdatedQuery());
-		}
+		catch (Exception e) {
 
-		else if (t instanceof Todo) {
-			((Todo) t).setPlace(ac.getUpdatedLocationQuery());
-			((Todo) t).setDescription(ac.getUpdatedQuery());
-		}
-
-		else {
-			return "Update unsuccessful";
 		}
 
 		return "Update Successful";
@@ -412,23 +460,48 @@ public class TasksManager {
 	private static String mark(MarkAction ac) {
 		String numbers = "";
 		markUndoList = new ArrayList<Task>();
+		String originalTask;
+		String updatedTask;
+		String currLine;
 
-		for (Integer num : ac.getReferenceNumber()) {
-			Task t = table.get(num);
-			markUndoList.add(t);
-			numbers = numbers + num + " ";
+		try {
+			
+			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedReader r = new BufferedReader(new FileReader(file));
+			
+			for (Integer num : ac.getReferenceNumber()) {
+				Task t = table.get(num);
+				originalTask = t.toString();
+				markUndoList.add(t);
+				numbers = numbers + num + " ";
 
-			if (t instanceof Deadline) {
-				((Deadline) t).setStatus(ac.getStatus());
+				if (t instanceof Deadline) {
+					((Deadline) t).setStatus(ac.getStatus());
+				}
+
+				else if (t instanceof Todo) {
+					((Todo) t).setStatus(ac.getStatus());
+				}
+
+				else {
+					w.close();
+					r.close();
+					return "Mark Unsuccessful";
+				}
+				
+				updatedTask = t.toString();
+				
+				while((currLine = r.readLine())!=null){
+					if(currLine == originalTask){
+						w.write(updatedTask);
+					}
+				}
+				
+				w.close();
+				r.close();
 			}
+		} catch (Exception e) {
 
-			else if (t instanceof Todo) {
-				((Todo) t).setStatus(ac.getStatus());
-			}
-
-			else {
-				return "Mark Unsuccessful";
-			}
 		}
 
 		return "Marked " + numbers + "as " + ac.getStatus();
@@ -437,10 +510,9 @@ public class TasksManager {
 	public static void markUndo() {
 		String status = ((MarkAction) lastAction).getStatus();
 		String newStatus;
-		
-		assert status.equals("done") ||
-			status.equals("undone");
-		
+
+		assert status.equals("done") || status.equals("undone");
+
 		if (status.equals("done")) {
 			newStatus = "undone";
 		} else {
