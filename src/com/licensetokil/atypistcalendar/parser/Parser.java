@@ -822,7 +822,7 @@ public class Parser {
 					}
 				}
 			}
-			else if(actionType.getString().equalsIgnoreCase("add")){
+			else if((actionType.getString().equalsIgnoreCase("add"))&&(!isValidDeadlinePreposition(preposition))){
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,8,0);
 				}
