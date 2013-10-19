@@ -28,7 +28,7 @@ public class ParserJUnitTest {
 			System.out.println(muie);
 		}
 		
-		assertEquals(newAddAction,(AddAction)ac);
+		assertEquals(newAddAction.toString(),(AddAction)ac);
 		
 		fail("Not yet implemented");
 	}

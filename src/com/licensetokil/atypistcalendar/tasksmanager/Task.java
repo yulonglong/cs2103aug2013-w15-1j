@@ -18,4 +18,8 @@ abstract class Task {
 		return uniqueID;
 	}
 	
+	public String toString(){
+		return "";
+	}
+	
 }

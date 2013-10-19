@@ -1,4 +1,4 @@
-package com.licensetokil.atypistcalendar.parser;
+	package com.licensetokil.atypistcalendar.parser;
 
 public enum LocalActionType {
 	ADD ("add"), 
