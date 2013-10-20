@@ -99,7 +99,7 @@ public class Parser {
 	// "add swimming at BB CC on 2/1 from 1.33pm to 3.20pm"
 
 	//<time> format is fully functional
-	// add function : 90% done
+	// add function : 100% done
 	private static AddAction addParser(StringTokenizer st) {
 		AddAction userAction = new AddAction();
 		Calendar[] calendarArray = new Calendar[2];
@@ -676,7 +676,20 @@ public class Parser {
 		
 		int intEventDayOfWeek = -1;
 		intEventDayOfWeek = getDayOfWeek(eventDay);
-		if(intCurrentDayOfWeek==intEventDayOfWeek){
+		
+		if(isStringToday(eventDay)){
+			intStartDate[0] = currentDate.get(Calendar.DATE);
+			intStartDate[1] = currentDate.get(Calendar.MONTH);
+			intStartDate[2] = currentDate.get(Calendar.YEAR);
+			return;
+		}
+		else if (isStringTomorrow(eventDay)){
+			intStartDate[0] = currentDate.get(Calendar.DATE)+1;
+			intStartDate[1] = currentDate.get(Calendar.MONTH);
+			intStartDate[2] = currentDate.get(Calendar.YEAR);
+			return;
+		}
+		else if(intCurrentDayOfWeek==intEventDayOfWeek){
 			if(intEventTimeHours==intCurrentTimeHours){
 				if(intEventTimeMinutes<=intCurrentTimeMinutes){
 					intStartDate[0] = currentDate.get(Calendar.DATE)+7;
@@ -793,10 +806,14 @@ public class Parser {
 		intEndDate[2] = 2099;
 		intEndDate[1] = 11;
 		intEndDate[0] = 31;
+		String date = new String();
+		if((isStringToday(preposition))||(isStringTomorrow(preposition))){
+			st = addStringToTokenizer(st,preposition);
+		}
 
 		// if there is a date field
 		if (st.hasMoreTokens()) {
-			String date = new String(st.nextToken());
+			date = new String(st.nextToken());
 			
 			String stringMonth = new String();
 			
@@ -949,24 +966,6 @@ public class Parser {
 		return new StringTokenizer(tempUserInput);
 	}
 	
-	private static boolean isPm(String suffix){
-		if((suffix.equalsIgnoreCase("pm"))
-				||(suffix.equalsIgnoreCase("p.m."))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isValidTimeSuffix(String suffix){
-		if((suffix.equalsIgnoreCase("pm"))
-			||(suffix.equalsIgnoreCase("p.m."))
-			||(suffix.equalsIgnoreCase("am"))
-			||(suffix.equalsIgnoreCase("a.m."))){
-			return true;
-		}
-		return false;
-	}
-	
 	private static boolean isStringMinute(String timeUnit){
 		if ((timeUnit.equalsIgnoreCase("minute"))
 			||(timeUnit.equalsIgnoreCase("minutes"))
@@ -989,6 +988,40 @@ public class Parser {
 	
 	private static boolean isStringAll(String task){
 		if (task.equalsIgnoreCase("all")){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringToday(String day){
+		if((day.equalsIgnoreCase("today"))
+			||(day.equalsIgnoreCase("tdy"))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringTomorrow(String day){
+		if((day.equalsIgnoreCase("tomorrow"))
+			||(day.equalsIgnoreCase("tmr"))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isPm(String suffix){
+		if((suffix.equalsIgnoreCase("pm"))
+				||(suffix.equalsIgnoreCase("p.m."))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidTimeSuffix(String suffix){
+		if((suffix.equalsIgnoreCase("pm"))
+			||(suffix.equalsIgnoreCase("p.m."))
+			||(suffix.equalsIgnoreCase("am"))
+			||(suffix.equalsIgnoreCase("a.m."))){
 			return true;
 		}
 		return false;
@@ -1044,7 +1077,9 @@ public class Parser {
 	private static boolean isValidDayPreposition(String preposition) {
 		if ((preposition.equalsIgnoreCase("on"))
 				|| (preposition.equalsIgnoreCase("by"))
-				|| (preposition.equalsIgnoreCase(","))) {
+				|| (preposition.equalsIgnoreCase(","))
+				|| (isStringToday(preposition))
+				|| (isStringTomorrow(preposition))){
 			return true;
 		}
 		return false;

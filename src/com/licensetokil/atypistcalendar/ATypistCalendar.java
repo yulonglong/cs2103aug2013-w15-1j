@@ -29,6 +29,8 @@ public class ATypistCalendar {
 		 userInput("add swimming at BB CC on 2/11 from 1.33pm to 3.20 p.m.");
 		 userInput("add light joggin at Science Park 2 on 4/4 from 11.33 to 2");
 		 userInput("add light joggin at Science Park 2 on 4/4/14 at 5 for 1 hr 20 mins");
+		 userInput("add light cyclin at Park 2 tmr");
+		 userInput("add light cyclin at Park 2 today at 7 for 12 mins");
 		 userInput("add strolling tgt at park 1 on 1/7");
 		 userInput("add dota funfair at pgp R1 on mon at 5");
 		 userInput("add school event at NUS 12 on 14 dec at 5");
