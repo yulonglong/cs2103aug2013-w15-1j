@@ -10,7 +10,7 @@ public class ParserJUnitTest {
 
 	@Test
 	public void test() {
-		//;
+		
 		AddAction newAddAction = new AddAction();
 		newAddAction.setDescription("swimming");
 		newAddAction.setPlace("Community Club");
@@ -21,6 +21,7 @@ public class ParserJUnitTest {
 		newAddAction.setStartTime(startTime);
 		newAddAction.setEndTime(endTime);
 		Action ac = null;
+		Action expected = newAddAction;
 		try{
 			ac = Parser.parse("add swimming at Community Club on 21/11 from 1400 to 1500");
 		}
@@ -28,9 +29,7 @@ public class ParserJUnitTest {
 			System.out.println(muie);
 		}
 		
-		assertEquals(newAddAction.toString(),(AddAction)ac);
-		
-		fail("Not yet implemented");
+		assertEquals(expected.toString(),ac.toString());
 	}
 
 }

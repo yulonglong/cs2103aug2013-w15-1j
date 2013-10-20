@@ -1,4 +1,4 @@
-	package com.licensetokil.atypistcalendar.parser;
+package com.licensetokil.atypistcalendar.parser;
 
 public enum LocalActionType {
 	ADD ("add"), 
@@ -15,7 +15,8 @@ public enum LocalActionType {
 		stringActionType = newStringActionType;
 	}
 	
-	 public String getString(){
+	public String getString(){
 		return stringActionType;
 	}
+	 
 }
