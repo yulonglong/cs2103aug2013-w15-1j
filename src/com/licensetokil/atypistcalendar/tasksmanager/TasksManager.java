@@ -200,9 +200,12 @@ public class TasksManager {
 			}
 			if (ac.getEndTime().get(Calendar.YEAR) == 2099) {
 				for (Todo td : todo) {
-					toDo.add(td);
+					if(td.getStatus().equals(ac.getStatus())){
+						toDo.add(td);
+					}
 				}
 			}
+			System.out.println(ac.toString());
 			break;
 		}
 
@@ -226,7 +229,7 @@ public class TasksManager {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
 				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime() + "\n" + "Place "
+						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n" + "Place "
 						+ d.getPlace() + "\n";
 				table.put(count, d);
 				count++;
@@ -237,7 +240,8 @@ public class TasksManager {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
 				output = output + count + ". " + "Event: "
-						+ td.getDescription() + "\n";
+						+ td.getDescription() + "\n"
+						+ "Status: " + td.getStatus() + "\n";
 				table.put(count, td);
 				count++;
 			}
