@@ -576,6 +576,61 @@ public class Parser {
 		}
 	}
 	
+	private static int getDayOfMonth(String month){
+		if((month.equalsIgnoreCase("january"))
+			||(month.equalsIgnoreCase("jan"))){
+			return 1;
+		}
+		else if((month.equalsIgnoreCase("february"))
+			||(month.equalsIgnoreCase("feb"))){
+			return 2;
+		}
+		else if((month.equalsIgnoreCase("march"))
+				||(month.equalsIgnoreCase("mar"))){
+			return 3;
+		}
+		else if((month.equalsIgnoreCase("april"))
+				||(month.equalsIgnoreCase("apr"))){
+			return 4;
+		}
+		else if((month.equalsIgnoreCase("may"))
+				||(month.equalsIgnoreCase("may"))){
+			return 5;
+		}
+		else if((month.equalsIgnoreCase("june"))
+				||(month.equalsIgnoreCase("jun"))){
+			return 6;
+		}
+		else if((month.equalsIgnoreCase("july"))
+				||(month.equalsIgnoreCase("jul"))){
+			return 7;
+		}
+		else if((month.equalsIgnoreCase("august"))
+				||(month.equalsIgnoreCase("aug"))){
+			return 8;
+		}
+		else if((month.equalsIgnoreCase("september"))
+				||(month.equalsIgnoreCase("sep"))){
+			return 9;
+		}
+		else if((month.equalsIgnoreCase("october"))
+				||(month.equalsIgnoreCase("oct"))){
+			return 10;
+		}
+		else if((month.equalsIgnoreCase("november"))
+				||(month.equalsIgnoreCase("nov"))){
+			return 11;
+		}
+		else if((month.equalsIgnoreCase("december"))
+				||(month.equalsIgnoreCase("dec"))){
+			return 12;
+		}
+		else{
+			return -1;
+		}
+		
+	}
+	
 	private static int getDayOfWeek(String day){
 		if((day.equalsIgnoreCase("sunday"))
 		||(day.equalsIgnoreCase("sun"))){
@@ -742,8 +797,28 @@ public class Parser {
 		// if there is a date field
 		if (st.hasMoreTokens()) {
 			String date = new String(st.nextToken());
-			if(Character.isDigit(date.charAt(0))){
-				getDate(intStartDate,date);
+			
+			String stringMonth = new String();
+			
+			if(st.hasMoreTokens()){
+				stringMonth = new String(st.nextToken());
+				Integer intMonth = getDayOfMonth(stringMonth);
+				if(intMonth>0){
+					date = date + "/" + intMonth.toString();
+					
+					if(st.hasMoreTokens()){
+						String stringYear = new String(st.nextToken());
+						if(Character.isDigit(stringYear.charAt(0))){
+							date = date + "/" + stringYear;
+						}
+						else{
+							st = addStringToTokenizer(st,stringYear);
+						}
+					}
+				}
+				else{
+					st = addStringToTokenizer(st,stringMonth);
+				}
 			}
 			if (st.hasMoreTokens()) {
 				String prep = new String(st.nextToken());
@@ -764,6 +839,9 @@ public class Parser {
 
 					if(!Character.isDigit(date.charAt(0))){
 						getDateFromDay(intStartDate,date,intStartHour,intStartMinute);
+					}
+					else{
+						getDate(intStartDate,date);
 					}
 					
 					if(st.hasMoreTokens()){
@@ -826,6 +904,9 @@ public class Parser {
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,8,0);
 				}
+				else{
+					getDate(intStartDate,date);
+				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 8, 0, 0);
 				endTimeCal = Calendar.getInstance();
@@ -834,6 +915,9 @@ public class Parser {
 			else{
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,0,0);
+				}
+				else{
+					getDate(intStartDate,date);
 				}
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);

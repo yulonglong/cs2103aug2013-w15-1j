@@ -22,7 +22,7 @@ public class ATypistCalendar {
 		gui.outputWithNewline("");
 
 		
-		/*
+		
 		 userInput("add swimming on 30/12 from 1300 to 1400");
 		 userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
 		 userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
@@ -31,6 +31,7 @@ public class ATypistCalendar {
 		 userInput("add light joggin at Science Park 2 on 4/4/14 at 5 for 1 hr 20 mins");
 		 userInput("add strolling tgt at park 1 on 1/7");
 		 userInput("add dota funfair at pgp R1 on mon at 5");
+		 userInput("add school event at NUS 12 on 14 dec at 5");
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
@@ -55,7 +56,7 @@ public class ATypistCalendar {
 		 userInput("search badminton on 5/3 from 3pm to 1900");
 		 
 		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
-		 */
+		 
 
 		/*
 		 * Scanner sc = new Scanner(System.in); //TasksManager tm = new
@@ -87,12 +88,12 @@ public class ATypistCalendar {
 				}
 
 				else if (ac.getClass().getName().contains("UpdateAction")) {
-					reply = TasksManager.executeCommand((UpdateAction) ac);
+					//reply = TasksManager.executeCommand((UpdateAction) ac);
 				}
 
 				else if (ac.getClass().getName().contains("MarkAction")) {
 					reply = TasksManager.executeCommand((MarkAction) ac);
-				}
+				}	
 
 				else if (ac.getClass().getName().contains("SearchAction")) {
 					reply = TasksManager.executeCommand((SearchAction) ac);
@@ -106,7 +107,7 @@ public class ATypistCalendar {
 			else {
 				reply = TasksManager.executeUndo((LocalAction) ac);
 			}
-			//reply = ac.toString();//kester using this to debug and try
+			reply = ac.toString();//kester using this to debug and try
 			// his parser
 			gui.outputWithNewline(reply);
 		} catch (MalformedUserInputException muie) {
