@@ -229,7 +229,7 @@ public class TasksManager {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
 				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime() + "\n" + "Place "
+						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n" + "Place "
 						+ d.getPlace() + "\n";
 				table.put(count, d);
 				count++;
