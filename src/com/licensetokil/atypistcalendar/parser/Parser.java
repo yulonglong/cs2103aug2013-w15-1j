@@ -99,7 +99,7 @@ public class Parser {
 	// "add swimming at BB CC on 2/1 from 1.33pm to 3.20pm"
 
 	//<time> format is fully functional
-	// add function : 90% done
+	// add function : 100% done
 	private static AddAction addParser(StringTokenizer st) {
 		AddAction userAction = new AddAction();
 		Calendar[] calendarArray = new Calendar[2];
@@ -576,6 +576,61 @@ public class Parser {
 		}
 	}
 	
+	private static int getDayOfMonth(String month){
+		if((month.equalsIgnoreCase("january"))
+			||(month.equalsIgnoreCase("jan"))){
+			return 1;
+		}
+		else if((month.equalsIgnoreCase("february"))
+			||(month.equalsIgnoreCase("feb"))){
+			return 2;
+		}
+		else if((month.equalsIgnoreCase("march"))
+				||(month.equalsIgnoreCase("mar"))){
+			return 3;
+		}
+		else if((month.equalsIgnoreCase("april"))
+				||(month.equalsIgnoreCase("apr"))){
+			return 4;
+		}
+		else if((month.equalsIgnoreCase("may"))
+				||(month.equalsIgnoreCase("may"))){
+			return 5;
+		}
+		else if((month.equalsIgnoreCase("june"))
+				||(month.equalsIgnoreCase("jun"))){
+			return 6;
+		}
+		else if((month.equalsIgnoreCase("july"))
+				||(month.equalsIgnoreCase("jul"))){
+			return 7;
+		}
+		else if((month.equalsIgnoreCase("august"))
+				||(month.equalsIgnoreCase("aug"))){
+			return 8;
+		}
+		else if((month.equalsIgnoreCase("september"))
+				||(month.equalsIgnoreCase("sep"))){
+			return 9;
+		}
+		else if((month.equalsIgnoreCase("october"))
+				||(month.equalsIgnoreCase("oct"))){
+			return 10;
+		}
+		else if((month.equalsIgnoreCase("november"))
+				||(month.equalsIgnoreCase("nov"))){
+			return 11;
+		}
+		else if((month.equalsIgnoreCase("december"))
+				||(month.equalsIgnoreCase("dec"))){
+			return 12;
+		}
+		else{
+			return -1;
+		}
+		
+	}
+	
 	private static int getDayOfWeek(String day){
 		if((day.equalsIgnoreCase("sunday"))
 		||(day.equalsIgnoreCase("sun"))){
@@ -621,7 +676,20 @@ public class Parser {
 		
 		int intEventDayOfWeek = -1;
 		intEventDayOfWeek = getDayOfWeek(eventDay);
-		if(intCurrentDayOfWeek==intEventDayOfWeek){
+		
+		if(isStringToday(eventDay)){
+			intStartDate[0] = currentDate.get(Calendar.DATE);
+			intStartDate[1] = currentDate.get(Calendar.MONTH);
+			intStartDate[2] = currentDate.get(Calendar.YEAR);
+			return;
+		}
+		else if (isStringTomorrow(eventDay)){
+			intStartDate[0] = currentDate.get(Calendar.DATE)+1;
+			intStartDate[1] = currentDate.get(Calendar.MONTH);
+			intStartDate[2] = currentDate.get(Calendar.YEAR);
+			return;
+		}
+		else if(intCurrentDayOfWeek==intEventDayOfWeek){
 			if(intEventTimeHours==intCurrentTimeHours){
 				if(intEventTimeMinutes<=intCurrentTimeMinutes){
 					intStartDate[0] = currentDate.get(Calendar.DATE)+7;
@@ -738,12 +806,36 @@ public class Parser {
 		intEndDate[2] = 2099;
 		intEndDate[1] = 11;
 		intEndDate[0] = 31;
+		String date = new String();
+		if((isStringToday(preposition))||(isStringTomorrow(preposition))){
+			st = addStringToTokenizer(st,preposition);
+		}
 
 		// if there is a date field
 		if (st.hasMoreTokens()) {
-			String date = new String(st.nextToken());
-			if(Character.isDigit(date.charAt(0))){
-				getDate(intStartDate,date);
+			date = new String(st.nextToken());
+			
+			String stringMonth = new String();
+			
+			if(st.hasMoreTokens()){
+				stringMonth = new String(st.nextToken());
+				Integer intMonth = getDayOfMonth(stringMonth);
+				if(intMonth>0){
+					date = date + "/" + intMonth.toString();
+					
+					if(st.hasMoreTokens()){
+						String stringYear = new String(st.nextToken());
+						if(Character.isDigit(stringYear.charAt(0))){
+							date = date + "/" + stringYear;
+						}
+						else{
+							st = addStringToTokenizer(st,stringYear);
+						}
+					}
+				}
+				else{
+					st = addStringToTokenizer(st,stringMonth);
+				}
 			}
 			if (st.hasMoreTokens()) {
 				String prep = new String(st.nextToken());
@@ -764,6 +856,9 @@ public class Parser {
 
 					if(!Character.isDigit(date.charAt(0))){
 						getDateFromDay(intStartDate,date,intStartHour,intStartMinute);
+					}
+					else{
+						getDate(intStartDate,date);
 					}
 					
 					if(st.hasMoreTokens()){
@@ -826,6 +921,9 @@ public class Parser {
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,8,0);
 				}
+				else{
+					getDate(intStartDate,date);
+				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 8, 0, 0);
 				endTimeCal = Calendar.getInstance();
@@ -834,6 +932,9 @@ public class Parser {
 			else{
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,0,0);
+				}
+				else{
+					getDate(intStartDate,date);
 				}
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
@@ -865,24 +966,6 @@ public class Parser {
 		return new StringTokenizer(tempUserInput);
 	}
 	
-	private static boolean isPm(String suffix){
-		if((suffix.equalsIgnoreCase("pm"))
-				||(suffix.equalsIgnoreCase("p.m."))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isValidTimeSuffix(String suffix){
-		if((suffix.equalsIgnoreCase("pm"))
-			||(suffix.equalsIgnoreCase("p.m."))
-			||(suffix.equalsIgnoreCase("am"))
-			||(suffix.equalsIgnoreCase("a.m."))){
-			return true;
-		}
-		return false;
-	}
-	
 	private static boolean isStringMinute(String timeUnit){
 		if ((timeUnit.equalsIgnoreCase("minute"))
 			||(timeUnit.equalsIgnoreCase("minutes"))
@@ -905,6 +988,40 @@ public class Parser {
 	
 	private static boolean isStringAll(String task){
 		if (task.equalsIgnoreCase("all")){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringToday(String day){
+		if((day.equalsIgnoreCase("today"))
+			||(day.equalsIgnoreCase("tdy"))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringTomorrow(String day){
+		if((day.equalsIgnoreCase("tomorrow"))
+			||(day.equalsIgnoreCase("tmr"))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isPm(String suffix){
+		if((suffix.equalsIgnoreCase("pm"))
+				||(suffix.equalsIgnoreCase("p.m."))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidTimeSuffix(String suffix){
+		if((suffix.equalsIgnoreCase("pm"))
+			||(suffix.equalsIgnoreCase("p.m."))
+			||(suffix.equalsIgnoreCase("am"))
+			||(suffix.equalsIgnoreCase("a.m."))){
 			return true;
 		}
 		return false;
@@ -960,7 +1077,9 @@ public class Parser {
 	private static boolean isValidDayPreposition(String preposition) {
 		if ((preposition.equalsIgnoreCase("on"))
 				|| (preposition.equalsIgnoreCase("by"))
-				|| (preposition.equalsIgnoreCase(","))) {
+				|| (preposition.equalsIgnoreCase(","))
+				|| (isStringToday(preposition))
+				|| (isStringTomorrow(preposition))){
 			return true;
 		}
 		return false;
