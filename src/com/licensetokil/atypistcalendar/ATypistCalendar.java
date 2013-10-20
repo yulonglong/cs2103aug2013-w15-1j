@@ -22,7 +22,7 @@ public class ATypistCalendar {
 		gui.outputWithNewline("");
 
 		
-		
+		/*
 		 userInput("add swimming on 30/12 from 1300 to 1400");
 		 userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
 		 userInput("add swimming at Bukit Batok Community Club Swimming Pool on 22/11 from 1500 to 1600");
@@ -56,7 +56,7 @@ public class ATypistCalendar {
 		 userInput("search badminton on 5/3 from 3pm to 1900");
 		 
 		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
-		 
+		 */
 
 		/*
 		 * Scanner sc = new Scanner(System.in); //TasksManager tm = new
@@ -88,7 +88,7 @@ public class ATypistCalendar {
 				}
 
 				else if (ac.getClass().getName().contains("UpdateAction")) {
-					//reply = TasksManager.executeCommand((UpdateAction) ac);
+					reply = TasksManager.executeCommand((UpdateAction) ac);
 				}
 
 				else if (ac.getClass().getName().contains("MarkAction")) {
@@ -107,7 +107,7 @@ public class ATypistCalendar {
 			else {
 				reply = TasksManager.executeUndo((LocalAction) ac);
 			}
-			reply = ac.toString();//kester using this to debug and try
+			//reply = ac.toString();//kester using this to debug and try
 			// his parser
 			gui.outputWithNewline(reply);
 		} catch (MalformedUserInputException muie) {
