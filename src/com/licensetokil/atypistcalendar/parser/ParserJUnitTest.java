@@ -649,6 +649,61 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		//display undone todos
+		//todos description
+		//undone status
+		//no time, assuming current time until the end of the world 31/12/2099 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("todos");
+		newDc.setStatus("undone");
+		startTime = Calendar.getInstance();
+		endTime = Calendar.getInstance();
+		endTime.set(2099,11,31, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display undone todos");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display done
+		//done status
+		//no time, assuming current time until the end of the world 31/12/2099 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setStatus("done");
+		startTime = Calendar.getInstance();
+		endTime = Calendar.getInstance();
+		endTime.set(2099,11,31, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display done");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());		
+		
+		
 		
 	}
 

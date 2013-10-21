@@ -193,11 +193,12 @@ public class Parser {
 		calendarArray[1] = null;
 
 		// if command has more details after display
-		// e.g. display "deadlines on monday"
+		// e.g. display "deadlines undone todos"
 		if (st.hasMoreTokens()) {
 
 			String prep = new String(st.nextToken());
 			
+			//check if the description is all
 			if (isStringAll(prep)){
 				userAction.setDescription("all");
 				if(!st.hasMoreTokens()){
@@ -210,27 +211,48 @@ public class Parser {
 				}
 			}
 			else {// if not then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,prep);
 			}
 			
 			
 			
 			prep = new String(st.nextToken());
-			// check if schedules/deadlines/todos is included in user input
+			// check if done/undone/schedules/deadlines/todos is included in user input
+			if(isValidStatus(prep)){
+				userAction.setStatus(prep);
+			}
+			else if (isValidTask(prep)) {
+				userAction.setDescription(prep);
+			}
+			else {// if not then return back the string
+				st = addStringToTokenizer(st,prep);
+			}
+			//if no more elements
+			if(!st.hasMoreTokens()){
+				calendarArray[1] = Calendar.getInstance();
+				calendarArray[1].set(2099, 11, 31, 23, 59, 59);
+				
+				userAction.setStartTime(calendarArray[0]);
+				userAction.setEndTime(calendarArray[1]);
+				return userAction;
+			}
+			
+			//check if schedules/deadlines/todos is included in user input
+			prep = new String(st.nextToken());
 			if (isValidTask(prep)) {
 				userAction.setDescription(prep);
 			}
-			else if(isValidStatus(prep)){
-				userAction.setStatus(prep);
-			}
 			else {// if not then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,prep);
+			}
+			
+			if(!st.hasMoreTokens()){
+				calendarArray[1] = Calendar.getInstance();
+				calendarArray[1].set(2099, 11, 31, 23, 59, 59);
+				
+				userAction.setStartTime(calendarArray[0]);
+				userAction.setEndTime(calendarArray[1]);
+				return userAction;
 			}
 			
 			String place = new String();
