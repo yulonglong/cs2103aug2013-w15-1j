@@ -407,6 +407,10 @@ public class Parser {
 			}
 		}
 		if(!st.hasMoreTokens()){
+			userAction.setStartTime(calendarArray[0]);
+			calendarArray[1] = Calendar.getInstance();
+			calendarArray[1].set(2099,11,31,23,59,0);
+			userAction.setEndTime(calendarArray[1]);
 			return userAction;
 		}
 		
@@ -427,14 +431,16 @@ public class Parser {
 			}
 			// check for place name, separated by space, and incorporate the
 			// proper place name
-			prep = new String(st.nextToken());
-			while (!isValidDayPreposition(prep)) {
-				place = place + " " + prep;
-				userAction.setLocationQuery(place);
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-				} else {
-					break;
+			if(st.hasMoreTokens()){
+				prep = new String(st.nextToken());
+				while (!isValidDayPreposition(prep)) {
+					place = place + " " + prep;
+					userAction.setLocationQuery(place);
+					if (st.hasMoreTokens()) {
+						prep = new String(st.nextToken());
+					} else {
+						break;
+					}
 				}
 			}
 		}
