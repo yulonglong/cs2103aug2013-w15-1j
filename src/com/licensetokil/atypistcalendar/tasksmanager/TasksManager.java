@@ -72,7 +72,7 @@ public class TasksManager {
 
 		try {
 			BufferedWriter w = new BufferedWriter(new FileWriter(file));
-			String output;
+			String output = "";
 
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
@@ -81,6 +81,7 @@ public class TasksManager {
 						+ ((Schedule) t).getStartTime().getTime()
 						+ "\nEnding Time: "
 						+ ((Schedule) t).getEndTime().getTime() + "\n";
+				
 			}
 
 			else if (t.getTaskType().equals("deadline")) {
@@ -95,17 +96,17 @@ public class TasksManager {
 				output = "Added\n" + "Event: " + t.getDescription() + "\n";
 			}
 
-			else {
-				output = "Add unsuccessful\n";
-			}
-
 			w.write(t.toString());
 			w.close();
+			
+			if (!t.getPlace().equals("")) {
+				output = output + "Place: " + t.getPlace() + "\n";
+			}
 
 			return output;
 
 		} catch (Exception e) {
-			return e.getMessage();
+			return "Add was unsuccessful. Please try again";
 		}
 
 	}
@@ -202,6 +203,11 @@ public class TasksManager {
 			break;
 		}
 
+		return outputString(output);
+	}
+
+	private static String outputString(String output) {
+
 		if (!sch.isEmpty()) {
 			output = "Schedules: \n";
 			for (Schedule s : sch) {
@@ -223,8 +229,8 @@ public class TasksManager {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
 				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime().getTime()
-						+ "\n" + "Status: " + d.getStatus() + "\n";
+						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n"
+						+ "Status: " + d.getStatus() + "\n";
 
 				if (!d.getPlace().equals("")) {
 					output = output + "Place: " + d.getPlace() + "\n";
@@ -242,7 +248,7 @@ public class TasksManager {
 				output = output + count + ". " + "Event: "
 						+ td.getDescription() + "\n" + "Status: "
 						+ td.getStatus() + "\n";
-				
+
 				if (!td.getPlace().equals("")) {
 					output = output + "Place: " + td.getPlace() + "\n";
 				}
@@ -315,9 +321,9 @@ public class TasksManager {
 	private static String update(UpdateAction ac) {
 
 		Task t = table.get(ac.getReferenceNumber());
-		
+
 		updateOriginalTask = t;
-		
+
 		String updatedTask;
 		String originalTask;
 		String currLine;
@@ -338,7 +344,7 @@ public class TasksManager {
 
 			t.setPlace(ac.getUpdatedLocationQuery());
 			t.setDescription(ac.getUpdatedQuery());
-			
+
 			updatedTask = t.toString();
 
 			while ((currLine = r.readLine()) != null) {
@@ -355,7 +361,7 @@ public class TasksManager {
 			return "Update was unsuccessful. Please try again";
 		}
 
-		return "Updated " + ac.getReferenceNumber() + " Successfully";
+		return "Updated " + ac.getReferenceNumber() + " Successfully\n";
 	}
 
 	private static void updateUndo() {
@@ -403,53 +409,19 @@ public class TasksManager {
 			}
 		}
 
-		if (ac.getEndTime().get(Calendar.YEAR) == 2099) {
-			for (Todo td : todo) {
-				if (td.getDescription().contains(ac.getQuery())) {
-					toDo.add(td);
-				}
+		for (Todo td : todo) {
+			if (td.getDescription().contains(ac.getQuery())) {
+				toDo.add(td);
 			}
 		}
 
 		output = "Search Matches: \n\n";
-		if (!sch.isEmpty()) {
-			output = output + "Schedules: \n";
-			for (Schedule s : sch) {
-				output = output + count + ". " + "Event: " + s.getDescription()
-						+ "\n" + "Starting Time: " + s.getStartTime().getTime()
-						+ "\n" + "Ending Time: " + s.getEndTime().getTime()
-						+ "\n";
-
-				if (!s.getPlace().equals("")) {
-					output = output + "Place: " + s.getPlace();
-				}
-				table.put(count, s);
-			}
-			count++;
+		
+		if(todo.isEmpty() && deadline.isEmpty() && schedule.isEmpty()){
+			output = output + "None";
 		}
 
-		if (!dl.isEmpty()) {
-			output = output + "Deadlines: \n";
-			for (Deadline d : dl) {
-				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime() + "\n" + "Place "
-						+ d.getPlace();
-				table.put(count, d);
-			}
-			count++;
-		}
-
-		if (!toDo.isEmpty()) {
-			output = output + "Todos: \n";
-			for (Todo td : toDo) {
-				output = output + count + ". " + "Event: "
-						+ td.getDescription() + "\n";
-				table.put(count, td);
-			}
-			count++;
-		}
-
-		return output;
+		return outputString(output);
 	}
 
 	private static String mark(MarkAction ac) {
@@ -534,6 +506,7 @@ public class TasksManager {
 	}
 
 	public static String executeCommand(SearchAction ac) {
+		System.out.println(ac.toString());
 		return search(ac);
 	}
 
