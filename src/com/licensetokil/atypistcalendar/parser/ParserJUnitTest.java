@@ -11,24 +11,34 @@ public class ParserJUnitTest {
 	@Test
 	public void test() {
 		int dayDifference = 0;
-		
+		AddAction newAc = new AddAction();
+		DisplayAction newDc = new DisplayAction();
+		Action ac = null;
+		Action expectedAc = null;
+		Calendar startTime = null;
+		Calendar endTime = null;
 		//add swimming at Community Club on 21/11 from 1400 to 1500
 		//one word description
 		//multiple words place
 		//dd/mm date format
 		//24 hours hours time format
 		//from, and to preposition
-		AddAction newAc = new AddAction();
-		Action ac = null;
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
 		newAc.setDescription("swimming");
 		newAc.setPlace("Community Club");
-		Calendar startTime = Calendar.getInstance();
+		startTime = Calendar.getInstance();
 		startTime.set(2013, 10, 21, 14, 0, 0);
-		Calendar endTime = Calendar.getInstance();
+		endTime = Calendar.getInstance();
 		endTime.set(2013, 10, 21, 15, 0, 0);
 		newAc.setStartTime(startTime);
 		newAc.setEndTime(endTime);
-		Action expectedAc = newAc;
+		expectedAc = newAc;
 		try{
 			ac = Parser.parse("add swimming at Community Club on 21/11 from 1400 to 1500");
 		}
@@ -354,6 +364,74 @@ public class ParserJUnitTest {
 		}
 		
 		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//DISPLAY TESTING ....................................................
+		
+		//display
+		//single command word display
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("all");
+		startTime = Calendar.getInstance();
+		endTime = Calendar.getInstance();
+		endTime.set(2099,11,31,23,59,59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display all
+		//display all will give same result as display
+		try{
+			ac = Parser.parse("display all");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display all in Korea on 10/6
+		//single command word display
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("all");
+		newDc.setPlace("Korea");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR),5,10,0,0,0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR),5,10,23,59,59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display all in Korea on 10/6");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		
 	}
 
 }

@@ -201,6 +201,7 @@ public class Parser {
 			if (isStringAll(prep)){
 				userAction.setDescription("all");
 				if(!st.hasMoreTokens()){
+					calendarArray[1] = Calendar.getInstance();
 					calendarArray[1].set(2099, 11, 31, 23, 59, 59);
 					
 					userAction.setStartTime(calendarArray[0]);
@@ -942,6 +943,18 @@ public class Parser {
 				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 8, 0, 0);
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 9 ,0, 0);
+			}
+			else if((actionType.getString().equalsIgnoreCase("display"))){
+				if(!Character.isDigit(date.charAt(0))){
+					getDateFromDay(intStartDate,date,0,0);
+				}
+				else{
+					getDate(intStartDate,date);
+				}
+				startTimeCal = Calendar.getInstance();
+				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0],0,0,0);
+				endTimeCal = Calendar.getInstance();
+				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
 			}
 			else{
 				if(!Character.isDigit(date.charAt(0))){
