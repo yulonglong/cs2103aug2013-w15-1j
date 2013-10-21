@@ -312,11 +312,13 @@ public class TasksManager {
 	private static String update(UpdateAction ac) {
 
 		Task t = table.get(ac.getReferenceNumber());
+		
 		updateOriginalTask = t;
+		ID = updateOriginalTask.getUniqueID();
+		
 		String updatedTask;
 		String originalTask;
 		String currLine;
-		ID = updateOriginalTask.getUniqueID();
 
 		try {
 			BufferedWriter w = new BufferedWriter(new FileWriter(file));
@@ -341,12 +343,6 @@ public class TasksManager {
 				((Todo) t).setDescription(ac.getUpdatedQuery());
 			}
 
-			else {
-				w.close();
-				r.close();
-				return "Update unsuccessful";
-			}
-
 			updatedTask = t.toString();
 
 			while ((currLine = r.readLine()) != null) {
@@ -360,10 +356,10 @@ public class TasksManager {
 		}
 
 		catch (Exception e) {
-
+			return "Update was unsuccessful. Please try again";
 		}
 
-		return "Update Successful";
+		return "Updated " + ac.getReferenceNumber() + " Successfully";
 	}
 
 	private static void updateUndo() {
