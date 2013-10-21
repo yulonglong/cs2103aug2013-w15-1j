@@ -77,24 +77,24 @@ public class TasksManager {
 
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
-				output = "Added \n" + "Event: " + t.getDescription() + "\n Starting Time: "
-						+ ((Schedule) t).getStartTime().getTime() + "\n Ending Time: "
-						+ ((Schedule) t).getEndTime().getTime();
+				output = "Added:\n" + "Event: " + t.getDescription() + "\nStarting Time: "
+						+ ((Schedule) t).getStartTime().getTime() + "\nEnding Time: "
+						+ ((Schedule) t).getEndTime().getTime() + "\n";
 			}
 
 			else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
-				output = "Added \n" + "Event: " + ((Deadline) t).getDescription() + "\n Due by: "
-						+ ((Deadline) t).getEndTime().getTime();
+				output = "Added\n" + "Event: " + ((Deadline) t).getDescription() + "\nDue by: "
+						+ ((Deadline) t).getEndTime().getTime() + "\n";
 			}
 
 			else if (t.getTaskType().equals("todo")) {
 				todo.add((Todo) t);
-				output =  "Added \n" + "Event: " + t.getDescription();
+				output =  "Added\n" + "Event: " + t.getDescription() + "\n";
 			}
 
 			else {
-				output = "Add unsuccessful";
+				output = "Add unsuccessful\n";
 			}
 			
 			w.write(t.toString());
@@ -214,17 +214,24 @@ public class TasksManager {
 				table.put(count, s);
 				count++;
 			}
+			output = output + "\n";
 		}
 
 		if (!dl.isEmpty()) {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
 				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n" + "Place "
-						+ d.getPlace() + "\n";
+						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n"
+						+ "\n" + "Status: " + d.getStatus() + "\n";
+				
+				if (!d.getPlace().equals("")) {
+					output = output + "Place: " + d.getPlace() + "\n";
+				}
 				table.put(count, d);
 				count++;
 			}
+			
+			output = output + "\n";
 		}
 
 		if (!toDo.isEmpty()) {
@@ -236,6 +243,8 @@ public class TasksManager {
 				table.put(count, td);
 				count++;
 			}
+			
+			output = output + "\n";
 		}
 
 		return output;
