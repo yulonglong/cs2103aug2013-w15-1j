@@ -55,10 +55,10 @@ public class TasksManager {
 		if (action.getStartTime() == null) {
 			if (action.getEndTime() == null) {
 				t = new Todo(++counter, action.getDescription(),
-						action.getPlace(), "");
+						action.getPlace(), "undone");
 			} else {
 				t = new Deadline(++counter, action.getEndTime(),
-						action.getDescription(), action.getPlace(), "");
+						action.getDescription(), action.getPlace(), "undone");
 			}
 		} else {
 			t = new Schedule(++counter, action.getStartTime(),
@@ -73,37 +73,34 @@ public class TasksManager {
 
 		try {
 			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			String output;
 
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
-				w.write(((Schedule) t).toString());
-				w.close();
-				return "Added " + t.getDescription() + " on "
-						+ ((Schedule) t).getStartTime().getTime() + " to "
-						+ ((Schedule) t).getEndTime().getTime()
-						+ " successfully";
+				output = "Added \n" + "Event: " + t.getDescription() + "\n Starting Time: "
+						+ ((Schedule) t).getStartTime().getTime() + "\n Ending Time: "
+						+ ((Schedule) t).getEndTime().getTime();
 			}
 
 			else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
-				w.write(((Deadline) t).toString());
-				w.close();
-				return "Added " + ((Deadline) t).getDescription() + " by "
-						+ ((Deadline) t).getEndTime().getTime()
-						+ " successfully";
+				output = "Added \n" + "Event: " + ((Deadline) t).getDescription() + "\n Due by: "
+						+ ((Deadline) t).getEndTime().getTime();
 			}
 
 			else if (t.getTaskType().equals("todo")) {
 				todo.add((Todo) t);
-				w.write(((Todo) t).toString());
-				w.close();
-				return "Added " + t.getDescription() + " successfully";
+				output =  "Added \n" + "Event: " + t.getDescription();
 			}
 
 			else {
-				w.close();
-				return "Add unsuccessful";
+				output = "Add unsuccessful";
 			}
+			
+			w.write(t.toString());
+			w.close();
+			
+			return output;
 
 		} catch (Exception e) {
 			return e.getMessage();
@@ -126,12 +123,6 @@ public class TasksManager {
 
 		String output = new String("");
 		count = 1;
-
-		assert ac.getDescription().equals("schedules")
-				|| ac.getDescription().equals("deadlines")
-				|| ac.getDescription().equals("todos")
-				|| ac.getDescription().equals("all")
-				|| ac.getDescription().equals("");
 
 		switch (ac.getDescription()) {
 

@@ -111,6 +111,7 @@ public class ATypistCalendar {
 			}
 			//reply = ac.toString();//kester using this to debug and try
 			// his parser
+			gui.outputWithNewline("Your Input: " + input + "\n");
 			gui.outputWithNewline(reply);
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
