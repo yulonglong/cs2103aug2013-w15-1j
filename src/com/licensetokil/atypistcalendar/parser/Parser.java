@@ -24,11 +24,13 @@ public class Parser {
 			SystemActionType systemActionType = determineSystemActionType(stringUserAction);
 			if (systemActionType == SystemActionType.EXIT) {
 				return new ExitAction();
-			} else {
+			}
+			else {
 				LocalActionType localActionType = determineLocalActionType(stringUserAction);
 				if (localActionType == LocalActionType.INVALID) {
 					throw new MalformedUserInputException("Invalid Input!");
-				} else {
+				}
+				else {
 					return localParser(st, localActionType);
 				}
 			}
@@ -43,10 +45,12 @@ public class Parser {
 		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
 
 		if (actionType == GoogleActionType.GCAL_SYNC) {
+			userAction.setType(GoogleActionType.GCAL_SYNC);
 			userInput = new String(getRemainingTokens(st));
 			userAction.setUserInput(userInput);
 			return userAction;
-		} else {
+		} 
+		else {
 			stringUserAction = stringUserAction + " " + st.nextToken();
 			actionType = determineGoogleActionType(stringUserAction);
 
@@ -55,7 +59,8 @@ public class Parser {
 				userInput = new String(getRemainingTokens(st));
 				userAction.setUserInput(userInput);
 				return userAction;
-			} else {
+			} 
+			else {
 				System.out.println("Error! Invalid GCAL Command!");
 				throw new MalformedUserInputException("Invalid input!");
 			}
@@ -78,7 +83,7 @@ public class Parser {
 		case MARK:
 			return markParser(st);
 		case UNDO:
-			return new UndoAction();
+			return (new UndoAction());
 		default:
 			throw new MalformedUserInputException("Invalid input!");
 		}
@@ -412,8 +417,6 @@ public class Parser {
 		calendarArray[0] = Calendar.getInstance();
 		calendarArray[1] = null;
 
-		// if command has more details after display
-		// e.g. display "deadlines on monday"
 		
 		String query = new String(st.nextToken());
 		userAction.setQuery(query);
@@ -447,10 +450,7 @@ public class Parser {
 				place = new String(st.nextToken());
 				userAction.setLocationQuery(place);
 			} else {// if not place then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,prep);
 			}
 			// check for place name, separated by space, and incorporate the
 			// proper place name
@@ -469,6 +469,7 @@ public class Parser {
 		}
 		
 		// string place retrieval END
+		
 		getCompleteDate(calendarArray,prep,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[0]);
 		userAction.setEndTime(calendarArray[1]);
@@ -958,7 +959,7 @@ public class Parser {
 						endTimeCal = Calendar.getInstance();
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 					}
-					else if(actionType==LocalActionType.ADD){
+					else if((actionType==LocalActionType.ADD)||(actionType==LocalActionType.UPDATE)){
 						startTimeCal = Calendar.getInstance();
 						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 						endTimeCal = Calendar.getInstance();
@@ -972,7 +973,7 @@ public class Parser {
 					}
 				}
 			}
-			else if((actionType==LocalActionType.ADD)&&(!isValidDeadlinePreposition(preposition))){
+			else if(((actionType==LocalActionType.ADD)||(actionType==LocalActionType.UPDATE))&&(!isValidDeadlinePreposition(preposition))){
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,8,0);
 				}
@@ -984,7 +985,7 @@ public class Parser {
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 9 ,0, 0);
 			}
-			else if((actionType.getString().equalsIgnoreCase("display"))){
+			else if((actionType==LocalActionType.DISPLAY)||(actionType==LocalActionType.SEARCH)){
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,0,0);
 				}
@@ -1189,7 +1190,10 @@ public class Parser {
 		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.MARK
 				.getString())) {
 			return LocalActionType.MARK;
-		} else {
+		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.UNDO
+				.getString())) {
+			return LocalActionType.UNDO;
+		}else {
 			return LocalActionType.INVALID;
 		}
 	}
