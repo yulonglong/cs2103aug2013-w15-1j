@@ -746,7 +746,7 @@ public class Parser {
 		}
 	}
 	
-	private static void getDate(int[] intStartDate, String date){
+	private static void getDate(int[] intStartDate, String date, LocalActionType type){
 		//get the date start
 		int stringDateLength = date.length();
 		int indexOfDelimiter = 0;
@@ -788,7 +788,7 @@ public class Parser {
 			}
 			intStartDate[2] = Integer.parseInt(stryear);
 		}
-		//if there is no year (assume it is the current year);
+		//if there is no year (assume it is the current year if the date is valid, else next year);
 		else{
 			strmonth = date.substring(indexOfDelimiter + 1);
 			
@@ -797,6 +797,18 @@ public class Parser {
 							   // (january) to 11 (december)
 			
 			intStartDate[2] = Calendar.getInstance().get(Calendar.YEAR);
+			
+			if(type==LocalActionType.ADD){
+				if(intStartDate[1]+1 == Calendar.getInstance().get(Calendar.MONTH)){
+					if(intStartDate[0] < Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
+						intStartDate[2]++;
+					}
+				}
+				else if(intStartDate[1]+1 < Calendar.getInstance().get(Calendar.MONTH)){
+					intStartDate[2]++;
+				}
+			}
+			
 		}
 		
 		//get date end
@@ -873,7 +885,7 @@ public class Parser {
 						getDateFromDay(intStartDate,date,intStartHour,intStartMinute);
 					}
 					else{
-						getDate(intStartDate,date);
+						getDate(intStartDate,date,actionType);
 					}
 					
 					if(st.hasMoreTokens()){
@@ -924,20 +936,26 @@ public class Parser {
 						endTimeCal = Calendar.getInstance();
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 					}
-					else{
+					else if(actionType==LocalActionType.ADD){
 						startTimeCal = Calendar.getInstance();
 						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 						endTimeCal = Calendar.getInstance();
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour+1, intStartMinute, 0);
 					}
+					else{
+						startTimeCal = Calendar.getInstance();
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+						endTimeCal = Calendar.getInstance();
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
+					}
 				}
 			}
-			else if((actionType.getString().equalsIgnoreCase("add"))&&(!isValidDeadlinePreposition(preposition))){
+			else if((actionType==LocalActionType.ADD)&&(!isValidDeadlinePreposition(preposition))){
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,8,0);
 				}
 				else{
-					getDate(intStartDate,date);
+					getDate(intStartDate,date,actionType);
 				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 8, 0, 0);
@@ -949,7 +967,7 @@ public class Parser {
 					getDateFromDay(intStartDate,date,0,0);
 				}
 				else{
-					getDate(intStartDate,date);
+					getDate(intStartDate,date,actionType);
 				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0],0,0,0);
@@ -961,7 +979,7 @@ public class Parser {
 					getDateFromDay(intStartDate,date,0,0);
 				}
 				else{
-					getDate(intStartDate,date);
+					getDate(intStartDate,date,actionType);
 				}
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
