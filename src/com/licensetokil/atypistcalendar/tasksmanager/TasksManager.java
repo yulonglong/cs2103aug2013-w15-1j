@@ -77,29 +77,32 @@ public class TasksManager {
 
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
-				output = "Added:\n" + "Event: " + t.getDescription() + "\nStarting Time: "
-						+ ((Schedule) t).getStartTime().getTime() + "\nEnding Time: "
+				output = "Added:\n" + "Event: " + t.getDescription()
+						+ "\nStarting Time: "
+						+ ((Schedule) t).getStartTime().getTime()
+						+ "\nEnding Time: "
 						+ ((Schedule) t).getEndTime().getTime() + "\n";
 			}
 
 			else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
-				output = "Added\n" + "Event: " + ((Deadline) t).getDescription() + "\nDue by: "
+				output = "Added\n" + "Event: "
+						+ ((Deadline) t).getDescription() + "\nDue by: "
 						+ ((Deadline) t).getEndTime().getTime() + "\n";
 			}
 
 			else if (t.getTaskType().equals("todo")) {
 				todo.add((Todo) t);
-				output =  "Added\n" + "Event: " + t.getDescription() + "\n";
+				output = "Added\n" + "Event: " + t.getDescription() + "\n";
 			}
 
 			else {
 				output = "Add unsuccessful\n";
 			}
-			
+
 			w.write(t.toString());
 			w.close();
-			
+
 			return output;
 
 		} catch (Exception e) {
@@ -191,7 +194,7 @@ public class TasksManager {
 			}
 			if (ac.getEndTime().get(Calendar.YEAR) == 2099) {
 				for (Todo td : todo) {
-					if(td.getStatus().equals(ac.getStatus())){
+					if (td.getStatus().equals(ac.getStatus())) {
 						toDo.add(td);
 					}
 				}
@@ -221,16 +224,16 @@ public class TasksManager {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
 				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n"
+						+ "\n" + "Due by: " + d.getEndTime().getTime()
 						+ "\n" + "Status: " + d.getStatus() + "\n";
-				
+
 				if (!d.getPlace().equals("")) {
 					output = output + "Place: " + d.getPlace() + "\n";
 				}
 				table.put(count, d);
 				count++;
 			}
-			
+
 			output = output + "\n";
 		}
 
@@ -238,12 +241,12 @@ public class TasksManager {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
 				output = output + count + ". " + "Event: "
-						+ td.getDescription() + "\n"
-						+ "Status: " + td.getStatus() + "\n";
+						+ td.getDescription() + "\n" + "Status: "
+						+ td.getStatus() + "\n";
 				table.put(count, td);
 				count++;
 			}
-			
+
 			output = output + "\n";
 		}
 
@@ -280,10 +283,6 @@ public class TasksManager {
 				else if (t instanceof Todo) {
 					todo.remove(t);
 					toDo.remove(t);
-				} else {
-					w.close();
-					r.close();
-					return "error";
 				}
 
 				w.close();
@@ -291,10 +290,10 @@ public class TasksManager {
 
 			}
 		} catch (Exception e) {
-
+			return "Delete was unsuccessful. Please try again \n";
 		}
 
-		return "Deleted " + ac.getReferenceNumber() + " successfully";
+		return "Deleted " + ac.getReferenceNumber() + " successfully \n";
 
 	}
 
@@ -469,10 +468,10 @@ public class TasksManager {
 		String currLine;
 
 		try {
-			
+
 			BufferedWriter w = new BufferedWriter(new FileWriter(file));
 			BufferedReader r = new BufferedReader(new FileReader(file));
-			
+
 			for (Integer num : ac.getReferenceNumber()) {
 				Task t = table.get(num);
 				originalTask = t.toString();
@@ -492,15 +491,15 @@ public class TasksManager {
 					r.close();
 					return "Mark Unsuccessful";
 				}
-				
+
 				updatedTask = t.toString();
-				
-				while((currLine = r.readLine())!=null){
-					if(currLine == originalTask){
+
+				while ((currLine = r.readLine()) != null) {
+					if (currLine == originalTask) {
 						w.write(updatedTask);
 					}
 				}
-				
+
 				w.close();
 				r.close();
 			}
