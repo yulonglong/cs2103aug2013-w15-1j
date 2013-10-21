@@ -26,7 +26,6 @@ public class TasksManager {
 
 	private static int counter = 0;
 	private static int count = 1;
-	private static int ID;
 
 	private static File file = new File("ATC");
 
@@ -243,6 +242,10 @@ public class TasksManager {
 				output = output + count + ". " + "Event: "
 						+ td.getDescription() + "\n" + "Status: "
 						+ td.getStatus() + "\n";
+				
+				if (!td.getPlace().equals("")) {
+					output = output + "Place: " + td.getPlace() + "\n";
+				}
 				table.put(count, td);
 				count++;
 			}
@@ -312,11 +315,12 @@ public class TasksManager {
 	private static String update(UpdateAction ac) {
 
 		Task t = table.get(ac.getReferenceNumber());
+		
 		updateOriginalTask = t;
+		
 		String updatedTask;
 		String originalTask;
 		String currLine;
-		ID = updateOriginalTask.getUniqueID();
 
 		try {
 			BufferedWriter w = new BufferedWriter(new FileWriter(file));
@@ -326,27 +330,15 @@ public class TasksManager {
 			if (t instanceof Schedule) {
 				((Schedule) t).setStartTime(ac.getUpdatedStartTime());
 				((Schedule) t).setEndTime(ac.getUpdatedEndTime());
-				((Schedule) t).setPlace(ac.getUpdatedLocationQuery());
-				((Schedule) t).setDescription(ac.getUpdatedQuery());
 			}
 
 			else if (t instanceof Deadline) {
 				((Deadline) t).setEndTime(ac.getUpdatedEndTime());
-				((Deadline) t).setPlace(ac.getUpdatedLocationQuery());
-				((Deadline) t).setDescription(ac.getUpdatedQuery());
 			}
 
-			else if (t instanceof Todo) {
-				((Todo) t).setPlace(ac.getUpdatedLocationQuery());
-				((Todo) t).setDescription(ac.getUpdatedQuery());
-			}
-
-			else {
-				w.close();
-				r.close();
-				return "Update unsuccessful";
-			}
-
+			t.setPlace(ac.getUpdatedLocationQuery());
+			t.setDescription(ac.getUpdatedQuery());
+			
 			updatedTask = t.toString();
 
 			while ((currLine = r.readLine()) != null) {
@@ -360,25 +352,25 @@ public class TasksManager {
 		}
 
 		catch (Exception e) {
-
+			return "Update was unsuccessful. Please try again";
 		}
 
-		return "Update Successful";
+		return "Updated " + ac.getReferenceNumber() + " Successfully";
 	}
 
 	private static void updateUndo() {
 		for (Schedule s : schedule) {
-			if (s.getUniqueID() == ID) {
+			if (s.getUniqueID() == updateOriginalTask.getUniqueID()) {
 				s = (Schedule) updateOriginalTask;
 			}
 		}
 		for (Deadline d : deadline) {
-			if (d.getUniqueID() == ID) {
+			if (d.getUniqueID() == updateOriginalTask.getUniqueID()) {
 				d = (Deadline) updateOriginalTask;
 			}
 		}
 		for (Todo td : todo) {
-			if (td.getUniqueID() == ID) {
+			if (td.getUniqueID() == updateOriginalTask.getUniqueID()) {
 				td = (Todo) updateOriginalTask;
 			}
 		}
