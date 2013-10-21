@@ -358,7 +358,7 @@ public class TasksManager {
 		}
 
 		catch (Exception e) {
-			return "Update was unsuccessful. Please try again";
+			return "Update was unsuccessful. Please try again\n";
 		}
 
 		return "Updated " + ac.getReferenceNumber() + " Successfully\n";
@@ -450,12 +450,6 @@ public class TasksManager {
 					((Todo) t).setStatus(ac.getStatus());
 				}
 
-				else {
-					w.close();
-					r.close();
-					return "Mark Unsuccessful";
-				}
-
 				updatedTask = t.toString();
 
 				while ((currLine = r.readLine()) != null) {
@@ -468,7 +462,7 @@ public class TasksManager {
 				r.close();
 			}
 		} catch (Exception e) {
-
+			return "Mark was unsuccessful. Please try again \n";
 		}
 
 		return "Marked " + numbers + "as " + ac.getStatus();
