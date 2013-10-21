@@ -77,6 +77,8 @@ public class Parser {
 			return searchParser(st);
 		case MARK:
 			return markParser(st);
+		case UNDO:
+			return new UndoAction();
 		default:
 			throw new MalformedUserInputException("Invalid input!");
 		}

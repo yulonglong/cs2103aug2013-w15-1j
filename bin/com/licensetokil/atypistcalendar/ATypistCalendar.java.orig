@@ -2,6 +2,7 @@ package com.licensetokil.atypistcalendar;
 
 import java.util.Calendar;
 
+import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.DefaultGUI;
@@ -15,6 +16,8 @@ public class ATypistCalendar {
 
 		gui = new DefaultGUI();
 		gui.setVisible(true);
+		
+		GoogleCalendarManager.getInstance().authenticateUser();
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n");
 		gui.outputWithNewline("Current time:");
@@ -37,7 +40,7 @@ public class ATypistCalendar {
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
-		
+		 
 		 userInput("display"); userInput("display schedules at Bukit Batok");
 		 userInput("display all on 10/6");
 		 userInput("display all in Korea on 10/12");
@@ -54,12 +57,11 @@ public class ATypistCalendar {
 		 
 		 userInput("delete #1 #2 #4");
 		 
-		 userInput("undo");
 		 userInput("search swimming tgt at bt batok on 10/6");
 		 userInput("search badminton on 5/3 from 3pm to 1900");
 		 
 		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
-		*/
+		 */
 
 		/*
 		 * Scanner sc = new Scanner(System.in); //TasksManager tm = new
@@ -112,7 +114,6 @@ public class ATypistCalendar {
 			}
 			//reply = ac.toString();//kester using this to debug and try
 			// his parser
-			gui.outputWithNewline("Your Command: \n" + input + "\n");
 			gui.outputWithNewline(reply);
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
