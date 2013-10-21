@@ -260,6 +260,100 @@ public class ParserJUnitTest {
 		}
 		
 		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//add go party at zouk today from 11pm
+		//multiple words description
+		//single word place
+		//today, date format
+		//flexible 12 hours time format.
+		//assume 1 hour event
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("go party");
+		startTime = Calendar.getInstance();
+		newAc.setPlace("zouk");
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 23, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 24, 0, 0);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add go party at zouk today from 11pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//add cycling at Science park II tmr at 4 for 90 minutes
+		//single words description
+		//multiple word place
+		//tmr, date format
+		//flexible 12 hours time format.
+		//time duration format
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("cycling");
+		startTime = Calendar.getInstance();
+		newAc.setPlace("Science park II");
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + 1, 16, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + 1, 17, 30, 0);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add cycling at Science park II tmr at 4 for 90 minutes");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//add cycling at Science park II tomorrow at 4 for 1 hr 15 mins
+		//single words description
+		//multiple word place
+		//tomorrow, date format
+		//flexible 12 hours time format.
+		//time duration format(hr and min and hrs and mins are accepted)
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("cycling");
+		startTime = Calendar.getInstance();
+		newAc.setPlace("Science park II");
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + 1, 16, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + 1, 17, 15, 0);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add cycling at Science park II tomorrow at 4 for 1 hr 15 mins");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
 	}
 
 }
