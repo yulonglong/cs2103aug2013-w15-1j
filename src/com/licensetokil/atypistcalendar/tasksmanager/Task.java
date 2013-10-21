@@ -3,6 +3,7 @@ package com.licensetokil.atypistcalendar.tasksmanager;
 abstract class Task {
 	protected String taskType;
 	protected int uniqueID;
+	protected String place;
 	protected String description;
 
 	
@@ -16,6 +17,18 @@ abstract class Task {
 	
 	public int getUniqueID(){
 		return uniqueID;
+	}
+	
+	public String getPlace(){
+		return place;
+	}
+	
+	public void setPlace(String place){
+		this.place = place;
+	}
+	
+	public void setDescription(String description){
+		this.description = description;
 	}
 	
 	public String toString(){
