@@ -37,7 +37,7 @@ public class ATypistCalendar {
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
-		 
+		
 		 userInput("display"); userInput("display schedules at Bukit Batok");
 		 userInput("display all on 10/6");
 		 userInput("display all in Korea on 10/12");

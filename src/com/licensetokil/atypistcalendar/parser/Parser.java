@@ -138,18 +138,22 @@ public class Parser {
 
 		// check for place name, separated by space, and incorporate the proper
 		// place name
-		prep = new String(st.nextToken());
-		while (!isValidDayPreposition(prep)) {
-			place = place + " " + prep;
-			userAction.setPlace(place);
-			if (st.hasMoreTokens()) {
-				prep = new String(st.nextToken());
-			} else {
-				break;
+		if(st.hasMoreTokens()){
+			prep = new String(st.nextToken());
+			while (!isValidDayPreposition(prep)) {
+				place = place + " " + prep;
+				userAction.setPlace(place);
+				if (st.hasMoreTokens()) {
+					prep = new String(st.nextToken());
+				} else {
+					break;
+				}
 			}
 		}
 
-
+		if(!st.hasMoreTokens()){
+			return userAction;
+		}
 		// if there is a date field
 		getCompleteDate(calendarArray,prep,st,LocalActionType.ADD);
 		userAction.setStartTime(calendarArray[0]);
@@ -242,14 +246,16 @@ public class Parser {
 				}
 				// check for place name, separated by space, and incorporate the
 				// proper place name
-				prep = new String(st.nextToken());
-				while (!isValidDayPreposition(prep)) {
-					place = place + " " + prep;
-					userAction.setPlace(place);
-					if (st.hasMoreTokens()) {
-						prep = new String(st.nextToken());
-					} else {
-						break;
+				if(st.hasMoreTokens()){
+					prep = new String(st.nextToken());
+					while (!isValidDayPreposition(prep)) {
+						place = place + " " + prep;
+						userAction.setPlace(place);
+						if (st.hasMoreTokens()) {
+							prep = new String(st.nextToken());
+						} else {
+							break;
+						}
 					}
 				}
 			}
