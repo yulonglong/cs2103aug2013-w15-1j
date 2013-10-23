@@ -48,14 +48,14 @@ class AuthenticationDialog extends JDialog {
 	private void webBrowserLocationChanged(WebBrowserNavigationEvent event) {
 		if(webBrowser.getResourceLocation().indexOf("https://accounts.google.com/o/oauth2/approval") != -1) {
 			String[] googleReplyDelimited = webBrowser.getPageTitle().split("=");
-			NativeInterface.close();
-			this.dispose();
 			if(googleReplyDelimited[0].equals("Success code")) {
 				AuthenticationManager.getInstance().authenticateUserSuccess(googleReplyDelimited[1]);
 			}
 			else {
 				AuthenticationManager.getInstance().authenticateUserFailed();
 			}
+			NativeInterface.close();
+			this.dispose();
 		}
 	}
 }

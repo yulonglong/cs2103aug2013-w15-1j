@@ -2,6 +2,8 @@ package com.licensetokil.atypistcalendar;
 
 import java.util.Calendar;
 
+import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
+import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.DefaultGUI;
@@ -10,7 +12,6 @@ public class ATypistCalendar {
 	private static DefaultGUI gui;
 
 	public static void main(String[] args) {
-
 		Calendar calendar = Calendar.getInstance();
 
 		gui = new DefaultGUI();
@@ -20,6 +21,9 @@ public class ATypistCalendar {
 		gui.outputWithNewline("Current time:");
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
+		
+		System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
+		GoogleCalendarManager.getInstance().createRemoteCalendar();
 
 		
 		/*

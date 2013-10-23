@@ -6,12 +6,13 @@ import java.util.HashMap;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 
 public class AuthenticationManager {
-	protected static final String GOOGLE_API_CLIENT_ID = "933956973767-2e8udf2em20mgl6djjesu5ggpot4um19.apps.googleusercontent.com";
-	protected static final String GOOGLE_API_CLIENT_SECRET = "JM25HSU3mBxWiGdSblG7Iqq5";
+	protected static final String GOOGLE_API_CLIENT_ID = "896350900683.apps.googleusercontent.com";
+	protected static final String GOOGLE_API_CLIENT_SECRET = "MvKdYK7Ec74rMesvRvVfVdDF";
 	private static final long TOKEN_EXPIRY_BUFFER = 120; //in seconds
 
 	private static AuthenticationManager instance = null;
@@ -21,12 +22,20 @@ public class AuthenticationManager {
 	private Date accessTokenExpiry;
 	
 	private AuthenticationManager() {
-		setAuthenticationToken(null);
-		setAccessToken(null);
-		setRefreshToken(null);
-		setAccessTokenExpiry(null);
+		setAuthenticationToken("4/F696Cw4XXidjxbNX1rVrVdyhvZ3F");
+		setAccessToken("ya29.AHES6ZTK0KTseILcLhfUOC3WAcjPaQMEUWf1FWAJl4Hkgw");
+		setRefreshToken("1/IzrgDGXLnEV7OMb38K8puKJMRM_dPWrRGfQuE30JRn0");
+		setAccessTokenExpiry(new Date(0));
 	}
-
+	
+	public static void debug() {
+		System.out.println(AuthenticationManager.getInstance().authenticationToken);
+		System.out.println(AuthenticationManager.getInstance().accessToken);
+		System.out.println(AuthenticationManager.getInstance().refreshToken);
+		System.out.println(AuthenticationManager.getInstance().accessTokenExpiry);
+		System.out.println("fuck off");
+	}
+	
 	protected static AuthenticationManager getInstance() {
 		if(instance == null) {
 			instance = new AuthenticationManager();
@@ -50,11 +59,20 @@ public class AuthenticationManager {
 	}
 
 	protected void authenticateUserFailed() {
-		;
+		//TODO what to do? what to do?!?!
+	}
+	
+	protected HashMap<String, String> getAuthorizationHeader()
+			throws IllegalStateException, JsonParseException, IOException {
+		HashMap<String, String> header = new HashMap<>();
+		header.put("Authorization", "Bearer " + this.getAccessToken());
+		return header;
 	}
 
 	private void fetchAccessTokenUsingAuthenticationToken()
 			throws IllegalStateException, JsonParseException, IOException {
+		assert getAuthenticationToken() != null;
+		
 		HashMap<String, String> parameters = new HashMap<>();
 		parameters.put("code", this.getAuthenticationToken());
 		parameters.put("client_id", GOOGLE_API_CLIENT_ID);
@@ -62,13 +80,18 @@ public class AuthenticationManager {
 		parameters.put("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
 		parameters.put("grant_type", "authorization_code");
 
-		JsonObject serverReply = HttpsConnectionHelper.sendByPostReturningReplyAsJsonObject("https://accounts.google.com/o/oauth2/token", parameters);
+		String serverReplyAsString = HttpsConnectionHelper.sendUrlencodedFormRequest(
+				"https://accounts.google.com/o/oauth2/token",
+				HttpsConnectionHelper.REQUEST_METHOD_POST,
+				null,
+				parameters);
+		JsonObject serverReply = (JsonObject)new JsonParser().parse(serverReplyAsString);
 
 		this.setAccessToken(serverReply.get("access_token").getAsString());
 		this.setRefreshToken(serverReply.get("refresh_token").getAsString());
 
-		Date timeNow = new Date();
-		long expiryTime = timeNow.getTime() + (serverReply.get("expires_in").getAsLong() - TOKEN_EXPIRY_BUFFER) * 1000L;
+		long timeNowAsLong = new Date().getTime();
+		long expiryTime = timeNowAsLong + (serverReply.get("expires_in").getAsLong() - TOKEN_EXPIRY_BUFFER) * 1000L;
 		this.setAccessTokenExpiry(new Date(expiryTime));
 	}
 
@@ -82,7 +105,12 @@ public class AuthenticationManager {
 		parameters.put("client_secret", GOOGLE_API_CLIENT_SECRET);
 		parameters.put("grant_type", "refresh_token");
 
-		JsonObject serverReply = HttpsConnectionHelper.sendByPostReturningReplyAsJsonObject("https://accounts.google.com/o/oauth2/token", parameters);
+		String serverReplyAsString = HttpsConnectionHelper.sendUrlencodedFormRequest(
+				"https://accounts.google.com/o/oauth2/token",
+				HttpsConnectionHelper.REQUEST_METHOD_POST,
+				null,
+				parameters);
+		JsonObject serverReply = (JsonObject)new JsonParser().parse(serverReplyAsString);
 
 		this.setAccessToken(serverReply.get("access_token").getAsString());
 
@@ -97,17 +125,18 @@ public class AuthenticationManager {
 	}
 
 	//Special setters and getters
-
-	protected String getAccessToken() throws IllegalStateException, JsonParseException, IOException {
+	
+	private String getAccessToken() throws IllegalStateException, JsonParseException, IOException {
 		assert this.isAuthenticated();
-
-		final boolean accessTokenIsNull = accessToken == null;
-		final boolean accessTokenHasExpired = this.getAccessTokenExpiry().getTime() < new Date().getTime();
-		if(accessTokenIsNull) {
+		
+		if(accessToken == null) {
 			fetchAccessTokenUsingAuthenticationToken();
 		}
-		else if(accessTokenHasExpired) {
-			fetchAccessTokenUsingRefreshToken();
+		else {
+			final boolean accessTokenHasExpired = this.getAccessTokenExpiry().getTime() < new Date().getTime();
+			if(accessTokenHasExpired) {
+				fetchAccessTokenUsingRefreshToken();
+			}
 		}
 		return accessToken;
 	}

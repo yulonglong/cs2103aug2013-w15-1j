@@ -24,11 +24,13 @@ public class Parser {
 			SystemActionType systemActionType = determineSystemActionType(stringUserAction);
 			if (systemActionType == SystemActionType.EXIT) {
 				return new ExitAction();
-			} else {
+			}
+			else {
 				LocalActionType localActionType = determineLocalActionType(stringUserAction);
 				if (localActionType == LocalActionType.INVALID) {
 					throw new MalformedUserInputException("Invalid Input!");
-				} else {
+				}
+				else {
 					return localParser(st, localActionType);
 				}
 			}
@@ -43,10 +45,12 @@ public class Parser {
 		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
 
 		if (actionType == GoogleActionType.GCAL_SYNC) {
+			userAction.setType(GoogleActionType.GCAL_SYNC);
 			userInput = new String(getRemainingTokens(st));
 			userAction.setUserInput(userInput);
 			return userAction;
-		} else {
+		} 
+		else {
 			stringUserAction = stringUserAction + " " + st.nextToken();
 			actionType = determineGoogleActionType(stringUserAction);
 
@@ -55,7 +59,8 @@ public class Parser {
 				userInput = new String(getRemainingTokens(st));
 				userAction.setUserInput(userInput);
 				return userAction;
-			} else {
+			} 
+			else {
 				System.out.println("Error! Invalid GCAL Command!");
 				throw new MalformedUserInputException("Invalid input!");
 			}
@@ -78,7 +83,7 @@ public class Parser {
 		case MARK:
 			return markParser(st);
 		case UNDO:
-			return new UndoAction();
+			return (new UndoAction());
 		default:
 			throw new MalformedUserInputException("Invalid input!");
 		}
@@ -193,14 +198,16 @@ public class Parser {
 		calendarArray[1] = null;
 
 		// if command has more details after display
-		// e.g. display "deadlines on monday"
+		// e.g. display "deadlines undone todos"
 		if (st.hasMoreTokens()) {
 
 			String prep = new String(st.nextToken());
 			
+			//check if the description is all
 			if (isStringAll(prep)){
 				userAction.setDescription("all");
 				if(!st.hasMoreTokens()){
+					calendarArray[1] = Calendar.getInstance();
 					calendarArray[1].set(2099, 11, 31, 23, 59, 59);
 					
 					userAction.setStartTime(calendarArray[0]);
@@ -209,27 +216,48 @@ public class Parser {
 				}
 			}
 			else {// if not then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,prep);
 			}
 			
 			
 			
 			prep = new String(st.nextToken());
-			// check if schedules/deadlines/todos is included in user input
+			// check if done/undone/schedules/deadlines/todos is included in user input
+			if(isValidStatus(prep)){
+				userAction.setStatus(prep);
+			}
+			else if (isValidTask(prep)) {
+				userAction.setDescription(prep);
+			}
+			else {// if not then return back the string
+				st = addStringToTokenizer(st,prep);
+			}
+			//if no more elements
+			if(!st.hasMoreTokens()){
+				calendarArray[1] = Calendar.getInstance();
+				calendarArray[1].set(2099, 11, 31, 23, 59, 59);
+				
+				userAction.setStartTime(calendarArray[0]);
+				userAction.setEndTime(calendarArray[1]);
+				return userAction;
+			}
+			
+			//check if schedules/deadlines/todos is included in user input
+			prep = new String(st.nextToken());
 			if (isValidTask(prep)) {
 				userAction.setDescription(prep);
 			}
-			else if(isValidStatus(prep)){
-				userAction.setStatus(prep);
-			}
 			else {// if not then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,prep);
+			}
+			
+			if(!st.hasMoreTokens()){
+				calendarArray[1] = Calendar.getInstance();
+				calendarArray[1].set(2099, 11, 31, 23, 59, 59);
+				
+				userAction.setStartTime(calendarArray[0]);
+				userAction.setEndTime(calendarArray[1]);
+				return userAction;
 			}
 			
 			String place = new String();
@@ -389,8 +417,6 @@ public class Parser {
 		calendarArray[0] = Calendar.getInstance();
 		calendarArray[1] = null;
 
-		// if command has more details after display
-		// e.g. display "deadlines on monday"
 		
 		String query = new String(st.nextToken());
 		userAction.setQuery(query);
@@ -407,6 +433,10 @@ public class Parser {
 			}
 		}
 		if(!st.hasMoreTokens()){
+			userAction.setStartTime(calendarArray[0]);
+			calendarArray[1] = Calendar.getInstance();
+			calendarArray[1].set(2099,11,31,23,59,0);
+			userAction.setEndTime(calendarArray[1]);
 			return userAction;
 		}
 		
@@ -420,26 +450,26 @@ public class Parser {
 				place = new String(st.nextToken());
 				userAction.setLocationQuery(place);
 			} else {// if not place then return back the string
-				String tempUserInput = new String();
-				tempUserInput = getRemainingTokens(st);
-				tempUserInput = prep + " " + tempUserInput;
-				st = new StringTokenizer(tempUserInput);
+				st = addStringToTokenizer(st,prep);
 			}
 			// check for place name, separated by space, and incorporate the
 			// proper place name
-			prep = new String(st.nextToken());
-			while (!isValidDayPreposition(prep)) {
-				place = place + " " + prep;
-				userAction.setLocationQuery(place);
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-				} else {
-					break;
+			if(st.hasMoreTokens()){
+				prep = new String(st.nextToken());
+				while (!isValidDayPreposition(prep)) {
+					place = place + " " + prep;
+					userAction.setLocationQuery(place);
+					if (st.hasMoreTokens()) {
+						prep = new String(st.nextToken());
+					} else {
+						break;
+					}
 				}
 			}
 		}
 		
 		// string place retrieval END
+		
 		getCompleteDate(calendarArray,prep,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[0]);
 		userAction.setEndTime(calendarArray[1]);
@@ -739,7 +769,7 @@ public class Parser {
 		}
 	}
 	
-	private static void getDate(int[] intStartDate, String date){
+	private static void getDate(int[] intStartDate, String date, LocalActionType type){
 		//get the date start
 		int stringDateLength = date.length();
 		int indexOfDelimiter = 0;
@@ -781,7 +811,7 @@ public class Parser {
 			}
 			intStartDate[2] = Integer.parseInt(stryear);
 		}
-		//if there is no year (assume it is the current year);
+		//if there is no year (assume it is the current year if the date is valid, else next year);
 		else{
 			strmonth = date.substring(indexOfDelimiter + 1);
 			
@@ -790,6 +820,18 @@ public class Parser {
 							   // (january) to 11 (december)
 			
 			intStartDate[2] = Calendar.getInstance().get(Calendar.YEAR);
+			
+			if(type==LocalActionType.ADD){
+				if(intStartDate[1]+1 == Calendar.getInstance().get(Calendar.MONTH)){
+					if(intStartDate[0] < Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
+						intStartDate[2]++;
+					}
+				}
+				else if(intStartDate[1]+1 < Calendar.getInstance().get(Calendar.MONTH)){
+					intStartDate[2]++;
+				}
+			}
+			
 		}
 		
 		//get date end
@@ -866,7 +908,7 @@ public class Parser {
 						getDateFromDay(intStartDate,date,intStartHour,intStartMinute);
 					}
 					else{
-						getDate(intStartDate,date);
+						getDate(intStartDate,date,actionType);
 					}
 					
 					if(st.hasMoreTokens()){
@@ -917,32 +959,50 @@ public class Parser {
 						endTimeCal = Calendar.getInstance();
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 					}
-					else{
+					else if((actionType==LocalActionType.ADD)||(actionType==LocalActionType.UPDATE)){
 						startTimeCal = Calendar.getInstance();
 						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
 						endTimeCal = Calendar.getInstance();
 						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour+1, intStartMinute, 0);
 					}
+					else{
+						startTimeCal = Calendar.getInstance();
+						startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], intStartHour, intStartMinute, 0);
+						endTimeCal = Calendar.getInstance();
+						endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
+					}
 				}
 			}
-			else if((actionType.getString().equalsIgnoreCase("add"))&&(!isValidDeadlinePreposition(preposition))){
+			else if(((actionType==LocalActionType.ADD)||(actionType==LocalActionType.UPDATE))&&(!isValidDeadlinePreposition(preposition))){
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,8,0);
 				}
 				else{
-					getDate(intStartDate,date);
+					getDate(intStartDate,date,actionType);
 				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 8, 0, 0);
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 9 ,0, 0);
 			}
+			else if((actionType==LocalActionType.DISPLAY)||(actionType==LocalActionType.SEARCH)){
+				if(!Character.isDigit(date.charAt(0))){
+					getDateFromDay(intStartDate,date,0,0);
+				}
+				else{
+					getDate(intStartDate,date,actionType);
+				}
+				startTimeCal = Calendar.getInstance();
+				startTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0],0,0,0);
+				endTimeCal = Calendar.getInstance();
+				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
+			}
 			else{
 				if(!Character.isDigit(date.charAt(0))){
 					getDateFromDay(intStartDate,date,0,0);
 				}
 				else{
-					getDate(intStartDate,date);
+					getDate(intStartDate,date,actionType);
 				}
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[2], intStartDate[1], intStartDate[0], 23, 59, 59);
@@ -1130,7 +1190,10 @@ public class Parser {
 		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.MARK
 				.getString())) {
 			return LocalActionType.MARK;
-		} else {
+		} else if (commandTypeString.equalsIgnoreCase(LocalActionType.UNDO
+				.getString())) {
+			return LocalActionType.UNDO;
+		}else {
 			return LocalActionType.INVALID;
 		}
 	}

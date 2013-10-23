@@ -8,6 +8,11 @@ public class GoogleAction extends Action{
 		type = null;
 		userInput = new String();
 	}
+	
+	public String toString(){
+		return ("Type	: " + type + "\n" +
+		        "userInput	: " + userInput + "\n");
+	}
 
 	public GoogleActionType getType(){
 		return type;
