@@ -1,7 +1,6 @@
 package com.licensetokil.atypistcalendar;
 
 import java.util.Calendar;
-
 import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
@@ -9,7 +8,7 @@ import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.DefaultGUI;
 
 public class ATypistCalendar {
-	private static DefaultGUI gui;
+	public static DefaultGUI gui;
 
 	public static void main(String[] args) {
 		Calendar calendar = Calendar.getInstance();
@@ -75,11 +74,12 @@ public class ATypistCalendar {
 
 	}
 
-	public static void userInput(String input) {
+	public static String userInput(String input) {
+		String reply="";
 		try {
 
 			Action ac = Parser.parse(input);
-			String reply;
+
 
 			if (!input.equals("undo")) {
 				if (ac.getClass().getName().contains("AddAction")) {
@@ -118,8 +118,12 @@ public class ATypistCalendar {
 			// his parser
 			gui.outputWithNewline("Your Command: \n" + input + "\n");
 			gui.outputWithNewline(reply);
+			return reply;
+
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
 		}
+		
+		return reply;
 	}
 }
