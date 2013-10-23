@@ -155,7 +155,7 @@ public class TasksManager {
 			break;
 		case "todos":
 			for (Todo td : todo) {
-				if (td.getStatus().equals("")) {
+				if (ac.getStatus().equals("")) {
 					toDo.add(td);
 				} else {
 					if (td.getStatus().equals(ac.getStatus())) {
