@@ -22,10 +22,15 @@ public class AuthenticationManager {
 	private Date accessTokenExpiry;
 	
 	private AuthenticationManager() {
+		/*
 		setAuthenticationToken("4/F696Cw4XXidjxbNX1rVrVdyhvZ3F");
 		setAccessToken("ya29.AHES6ZTK0KTseILcLhfUOC3WAcjPaQMEUWf1FWAJl4Hkgw");
 		setRefreshToken("1/IzrgDGXLnEV7OMb38K8puKJMRM_dPWrRGfQuE30JRn0");
-		setAccessTokenExpiry(new Date(0));
+		setAccessTokenExpiry(new Date(0));*/
+		setAuthenticationToken(null);
+		setAccessToken(null);
+		setRefreshToken(null);
+		setAccessTokenExpiry(null);
 	}
 	
 	public static void debug() {
@@ -33,7 +38,6 @@ public class AuthenticationManager {
 		System.out.println(AuthenticationManager.getInstance().accessToken);
 		System.out.println(AuthenticationManager.getInstance().refreshToken);
 		System.out.println(AuthenticationManager.getInstance().accessTokenExpiry);
-		System.out.println("fuck off");
 	}
 	
 	protected static AuthenticationManager getInstance() {

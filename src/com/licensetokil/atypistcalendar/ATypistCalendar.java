@@ -21,8 +21,10 @@ public class ATypistCalendar {
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
 		
-		System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
-		GoogleCalendarManager.getInstance().createRemoteCalendar();
+		GoogleCalendarManager.getInstance().authenticateUser();
+		AuthenticationManager.debug();
+		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
+		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 
 		
 		/*
@@ -79,7 +81,6 @@ public class ATypistCalendar {
 		try {
 
 			Action ac = Parser.parse(input);
-
 
 			if (!input.equals("undo")) {
 				if (ac.getClass().getName().contains("AddAction")) {
