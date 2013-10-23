@@ -2,6 +2,7 @@ package com.licensetokil.atypistcalendar.parser;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.junit.Test;
@@ -11,13 +12,24 @@ public class ParserJUnitTest {
 	@Test
 	public void test() {
 		int dayDifference = 0;
+		ArrayList<Integer> intArrayList = new ArrayList<Integer>();
 		AddAction newAc = new AddAction();
 		DisplayAction newDc = new DisplayAction();
+		SearchAction newSc = new SearchAction();
+		DeleteAction newDelc = new DeleteAction();
+		MarkAction newMc = new MarkAction();
+		UpdateAction newUc = new UpdateAction();
+		UndoAction newUndc = new UndoAction();
+		GoogleAction newGc = new GoogleAction();
+		
 		Action ac = null;
 		Action expectedAc = null;
 		Calendar startTime = null;
 		Calendar endTime = null;
-		//add swimming at Community Club on 21/11 from 1400 to 1500
+		
+		//...........ADD TESTING .........................................................
+		
+		//add swimming at Community Club on 21/12 from 1400 to 1500
 		//one word description
 		//multiple words place
 		//dd/mm date format
@@ -33,14 +45,14 @@ public class ParserJUnitTest {
 		newAc.setDescription("swimming");
 		newAc.setPlace("Community Club");
 		startTime = Calendar.getInstance();
-		startTime.set(2013, 10, 21, 14, 0, 0);
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), 11, 21, 14, 0, 0);
 		endTime = Calendar.getInstance();
-		endTime.set(2013, 10, 21, 15, 0, 0);
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), 11, 21, 15, 0, 0);
 		newAc.setStartTime(startTime);
 		newAc.setEndTime(endTime);
 		expectedAc = newAc;
 		try{
-			ac = Parser.parse("add swimming at Community Club on 21/11 from 1400 to 1500");
+			ac = Parser.parse("add swimming at Community Club on 21/12 from 1400 to 1500");
 		}
 		catch(MalformedUserInputException muie){
 			System.out.println(muie);
@@ -64,9 +76,9 @@ public class ParserJUnitTest {
 		newAc = new AddAction();
 		newAc.setDescription("swimming training");
 		startTime = Calendar.getInstance();
-		startTime.set(2013, 11, 30, 7, 0, 0);
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), 11, 30, 7, 0, 0);
 		endTime = Calendar.getInstance();
-		endTime.set(2013, 11, 30, 8, 0, 0);
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), 11, 30, 8, 0, 0);
 		newAc.setStartTime(startTime);
 		newAc.setEndTime(endTime);
 		expectedAc = newAc;
@@ -95,9 +107,9 @@ public class ParserJUnitTest {
 		newAc.setDescription("swimming training");
 		startTime = Calendar.getInstance();
 		newAc.setPlace("Bukit Batok Community Club");
-		startTime.set(2013, 2, 1, 5, 0, 0);
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR)+1, 2, 1, 5, 0, 0);
 		endTime = Calendar.getInstance();
-		endTime.set(2013, 2, 1, 18, 0, 0);
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR)+1, 2, 1, 18, 0, 0);
 		newAc.setStartTime(startTime);
 		newAc.setEndTime(endTime);
 		expectedAc = newAc;
@@ -365,7 +377,164 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
-		//DISPLAY TESTING ....................................................
+		//add do homework by today
+		//deadline
+		//multiple words description
+		//today, date format
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("do homework");
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 23, 59, 59);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add do homework by today");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+
+		//add do homework in my room by tmr 9pm
+		//deadline
+		//multiple words description
+		//tmr, date format
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("do homework");
+		newAc.setPlace("my room");
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH)+1, 21, 0, 0);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add do homework in my room by tmr at 9pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//add reply mary by 4 Jan at 1720
+		//deadline
+		//multiple words description
+		//day month, date format
+		//24 hours time format
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("reply mary");
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR)+1, 0, 4 , 17, 20, 0);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add reply mary by 4 Jan at 1720");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//add prepare cv by 12 february 2014
+		//deadline
+		//multiple words description
+		//day month year, date format
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("prepare cv");
+		endTime = Calendar.getInstance();
+		endTime.set(2014, 1, 12 , 23, 59, 59);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add prepare cv by 12 february 2014");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//add clean my room
+		//todos
+		//multiple words description
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("clean my room");
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add clean my room");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());	
+		
+		//add exercise
+		//todos
+		//single word description
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("exercise");
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add exercise");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());	
+		
+		
+		
+		
+		
+		
+		//................DISPLAY TESTING .........................................................
 		
 		//display
 		//single command word display
@@ -404,7 +573,9 @@ public class ParserJUnitTest {
 		assertEquals(expectedAc.toString(),ac.toString());
 		
 		//display all in Korea on 10/6
-		//single command word display
+		//all description
+		//single word place
+		//dd/mm time format
 		newDc=null;
 		expectedAc=null;
 		ac=null;
@@ -431,7 +602,437 @@ public class ParserJUnitTest {
 		assertEquals(expectedAc.toString(),ac.toString());
 		
 		
+		//display deadlines today from 8am to 1pm
+		//deadlines description
+		//today date format
+		//standard 12 hr time format
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("deadlines");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 8, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 13, 0, 0);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display deadlines today from 8am to 1pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display schedules on 21/3 from 8
+		//schedules description
+		//dd/mm date format
+		//from time to (null), assuming until the end of the day 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("schedules");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR),2,21, 8, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR),2,21, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display schedules on 21/3 from 8");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display undone todos
+		//todos description
+		//undone status
+		//no time, assuming current time until the end of the world 31/12/2099 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("todos");
+		newDc.setStatus("undone");
+		startTime = Calendar.getInstance();
+		endTime = Calendar.getInstance();
+		endTime.set(2099,11,31, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display undone todos");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display done
+		//done status
+		//no time, assuming current time until the end of the world 31/12/2099 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setStatus("done");
+		startTime = Calendar.getInstance();
+		endTime = Calendar.getInstance();
+		endTime.set(2099,11,31, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display done");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());		
+		
+		
+		//........SEARCH TESTING...............................................
+		
+		
+		//search meeting family in Korea on 10/6
+		//multiple words description
+		//single word place
+		//dd/mm time format
+		newSc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newSc = new SearchAction();
+		newSc.setQuery("meeting family");
+		newSc.setLocationQuery("Korea");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR),5,10,0,0,0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR),5,10,23,59,59);
+		newSc.setStartTime(startTime);
+		newSc.setEndTime(endTime);
+		expectedAc = newSc;
+		try{
+			ac = Parser.parse("search meeting family in Korea on 10/6");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		
+		//search sports on mon from 1pm to 9pm
+		//single word description
+		//day, date format
+		//timeframe flexible 12 hours format
+		newSc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newSc = new SearchAction();
+		newSc.setQuery("sports");
+		startTime = Calendar.getInstance();
+		dayDifference = 0;
+		dayDifference = 2 - startTime.get(Calendar.DAY_OF_WEEK);
+		if(dayDifference==0){
+			if(8==startTime.get(Calendar.HOUR)){
+				if(0<=startTime.get(Calendar.MINUTE)){
+				}
+				else{
+					dayDifference = dayDifference+7;
+				}
+			}
+			else if(8<startTime.get(Calendar.HOUR)){
+				dayDifference = dayDifference+7;
+			}
+		}
+		if(dayDifference<0){
+			dayDifference = dayDifference+7;
+		}
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 13, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 21, 0, 0);
+		newSc.setStartTime(startTime);
+		newSc.setEndTime(endTime);
+		expectedAc = newSc;
+		try{
+			ac = Parser.parse("search sports on mon from 1pm to 9pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//search sports on wed from 1
+		//single word description
+		//day, date format
+		//timeframe flexible 12 hours format
+		newSc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newSc = new SearchAction();
+		newSc.setQuery("sports");
+		startTime = Calendar.getInstance();
+		dayDifference = 0;
+		dayDifference = 4 - startTime.get(Calendar.DAY_OF_WEEK);
+		if(dayDifference==0){
+			if(8==startTime.get(Calendar.HOUR)){
+				if(0<=startTime.get(Calendar.MINUTE)){
+				}
+				else{
+					dayDifference = dayDifference+7;
+				}
+			}
+			else if(8<startTime.get(Calendar.HOUR)){
+				dayDifference = dayDifference+7;
+			}
+		}
+		if(dayDifference<0){
+			dayDifference = dayDifference+7;
+		}
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 13, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 23, 59, 59);
+		newSc.setStartTime(startTime);
+		newSc.setEndTime(endTime);
+		expectedAc = newSc;
+		try{
+			ac = Parser.parse("search sports on wed from 1");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//.................. DELETE TESTING ................................
+		
+
+		//delete #3
+		//single delete command
+		newDelc=null;
+		intArrayList = null;
+		expectedAc=null;
+		ac=null;
+		
+		
+		newDelc = new DeleteAction();
+		intArrayList = new ArrayList<Integer>();
+		intArrayList.add(3);
+		newDelc.setReferenceNumber(intArrayList);
+		expectedAc = newDelc;
+		try{
+			ac = Parser.parse("delete #3");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//delete #3 #2 #11 #9
+		//multiple delete command
+		newDelc=null;
+		intArrayList = null;
+		expectedAc=null;
+		ac=null;
+		
+		
+		newDelc = new DeleteAction();
+		intArrayList = new ArrayList<Integer>();
+		intArrayList.add(3);
+		intArrayList.add(2);
+		intArrayList.add(11);
+		intArrayList.add(9);
+		newDelc.setReferenceNumber(intArrayList);
+		expectedAc = newDelc;
+		try{
+			ac = Parser.parse("delete #3 #2 #11 #9");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//.................. MARK TESTING ....................................
+		
+		//mark #3 as done
+		//single mark command
+		newMc=null;
+		intArrayList = null;
+		expectedAc=null;
+		ac=null;
+		
+		
+		newMc = new MarkAction();
+		intArrayList = new ArrayList<Integer>();
+		intArrayList.add(3);
+		newMc.setReferenceNumber(intArrayList);
+		newMc.setStatus("done");
+		expectedAc = newMc;
+		try{
+			ac = Parser.parse("mark #3 as done");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//mark #3 #21 #5 as undone
+		//multiple mark command
+		newMc=null;
+		intArrayList = null;
+		expectedAc=null;
+		ac=null;
+		
+		
+		newMc = new MarkAction();
+		intArrayList = new ArrayList<Integer>();
+		intArrayList.add(3);
+		intArrayList.add(21);
+		intArrayList.add(5);
+		newMc.setReferenceNumber(intArrayList);
+		newMc.setStatus("undone");
+		expectedAc = newMc;
+		try{
+			ac = Parser.parse("mark #3 #21 #5 as undone");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		
+		//.................. UPDATE TESTING ....................................
+		
+		//update format after the ">>" delimiter is exactly the same as add
+		
+		//update #2 >> pay hall fees at admin office on 21/1/2014 at 5
+		//multiple words description
+		//single word place
+		//dd/mm time format
+		newUc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newUc = new UpdateAction();
+		newUc.setUpdatedQuery("pay hall fees");
+		newUc.setUpdatedLocationQuery("admin office");
+		newUc.setReferenceNumber(2);
+		startTime = Calendar.getInstance();
+		startTime.set(2014,0,21,17,0,0);
+		endTime = Calendar.getInstance();
+		endTime.set(2014,0,21,18,0,0);
+		newUc.setUpdatedStartTime(startTime);
+		newUc.setUpdatedEndTime(endTime);
+		expectedAc = newUc;
+		try{
+			ac = Parser.parse("update #2 >> pay hall fees at admin office on 21/1/2014 at 5");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//................... UNDO TESTING ..............................
+		
+		newUndc = null;
+		expectedAc = null;
+		ac = null;
+		
+		newUndc = new UndoAction();
+		expectedAc = newUndc;
+		try{
+			ac = Parser.parse("undo");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//.............. GCAL TESTING ...................
+		
+		//gcal quick add swimming monday at home 5 pm
+		//gcal quick add command
+		newGc = null;
+		expectedAc = null;
+		ac = null;
+		
+		newGc = new GoogleAction();
+		newGc.setType(GoogleActionType.GCAL_QUICK_ADD);
+		newGc.setUserInput(" swimming monday at home 5 pm");
+		expectedAc = newGc;
+		try{
+			ac = Parser.parse("gcal quick add swimming monday at home 5 pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//gcal sync latest calendar update on monday
+		//gcal sync command
+		newGc = null;
+		expectedAc = null;
+		ac = null;
+		
+		newGc = new GoogleAction();
+		newGc.setType(GoogleActionType.GCAL_SYNC);
+		newGc.setUserInput(" latest calendar update on monday");
+		expectedAc = newGc;
+		try{
+			ac = Parser.parse("gcal sync latest calendar update on monday");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+
+		assertEquals(expectedAc.toString(),ac.toString());
 		
 	}
-
 }
