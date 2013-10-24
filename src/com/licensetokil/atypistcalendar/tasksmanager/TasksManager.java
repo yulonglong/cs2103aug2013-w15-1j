@@ -1,6 +1,8 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import com.licensetokil.atypistcalendar.parser.*;
+import static org.junit.Assert.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -27,8 +29,8 @@ public class TasksManager {
 	private static int counter = 0;
 	private static int count = 1;
 
-	private static File file = new File("ATC");
-
+	private static File file = new File("ATC.txt");
+	
 	public void setAction(LocalAction action) {
 		this.action = action;
 	}
@@ -47,6 +49,93 @@ public class TasksManager {
 
 	public ArrayList<Todo> getTodo() {
 		return todo;
+	}
+	
+	public static void fileToArray(){
+		try{
+			BufferedReader r = new BufferedReader(new FileReader(file));
+			String currLine;
+			StringTokenizer st;
+			
+			System.out.println("Hi I'm debugging");
+			
+			while((currLine = r.readLine())!=null){
+				System.out.println(currLine);
+				st = new StringTokenizer(currLine, "@");
+				String token = st.nextToken();
+				if(token.equals("Schedule")){
+					Schedule s = new Schedule(Integer.parseInt(st.nextToken()), stringToCalendar(st.nextToken()), stringToCalendar(st.nextToken()), st.nextToken(), st.nextToken());
+					schedule.add(s);
+				}
+				else if(token.equals("Deadline")){
+					System.out.println("in this block");
+					Deadline d = new Deadline(Integer.parseInt(st.nextToken()), stringToCalendar(st.nextToken()), st.nextToken(), st.nextToken(), st.nextToken());
+					deadline.add(d);
+				}
+				else if(token.equals("Todo")){
+					Todo td = new Todo(Integer.parseInt(st.nextToken()), st.nextToken(), st.nextToken(), st.nextToken());
+					System.out.println(td);
+					todo.add(td);
+					System.out.println("in this block");
+				}
+			}
+			r.close();
+			System.out.println(todo);
+		}
+		catch(Exception e){
+			
+		}
+	}
+	
+	private static Calendar stringToCalendar(String time){
+		StringTokenizer st = new StringTokenizer(time);
+		st.nextToken();
+		
+		int month = determineMonth(st.nextToken());
+		int date = Integer.parseInt(st.nextToken());
+		
+		StringTokenizer stHrAndMin = new StringTokenizer(st.nextToken(), ":");
+		int hour = Integer.parseInt(stHrAndMin.nextToken());
+		int min = Integer.parseInt(stHrAndMin.nextToken());
+		int sec = Integer.parseInt(stHrAndMin.nextToken());
+		
+		st.nextToken();
+		
+		int year = Integer.parseInt(st.nextToken());
+		Calendar c = Calendar.getInstance();
+		c.set(year, month, date, hour, min, sec);
+		
+		return c;
+	}
+	
+	private static int determineMonth(String month){
+		switch(month){
+		case "Jan":
+			return 0;
+		case "Feb":
+			return 1;
+		case "Mar":
+			return 2;
+		case "Apr":
+			return 3;
+		case "May":
+			return 4;
+		case "Jun":
+			return 5;
+		case "Jul":
+			return 6;
+		case "Aug":
+			return 7;
+		case "Sep":
+			return 8;
+		case "Oct":
+			return 9;
+		case "Nov":
+			return 10;
+		case "Dec":
+			return 11;
+		}
+		return -1;
 	}
 
 	private static Task classify(AddAction action) {
@@ -71,7 +160,7 @@ public class TasksManager {
 	private static String add(Task t) {
 
 		try {
-			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
 			String output = "";
 
 			if (t.getTaskType().equals("schedule")) {
@@ -97,7 +186,9 @@ public class TasksManager {
 			}
 
 			w.write(t.toString());
+			w.newLine();
 			w.close();
+			
 			
 			if (!t.getPlace().equals("")) {
 				output = output + "Place: " + t.getPlace() + "\n";
@@ -265,7 +356,7 @@ public class TasksManager {
 	private static String delete(DeleteAction ac) {
 
 		try {
-			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
 			BufferedReader r = new BufferedReader(new FileReader(file));
 			String currLine;
 
@@ -329,7 +420,7 @@ public class TasksManager {
 		String currLine;
 
 		try {
-			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
 			BufferedReader r = new BufferedReader(new FileReader(file));
 			originalTask = t.toString();
 
@@ -433,7 +524,7 @@ public class TasksManager {
 
 		try {
 
-			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
 			BufferedReader r = new BufferedReader(new FileReader(file));
 
 			for (Integer num : ac.getReferenceNumber()) {

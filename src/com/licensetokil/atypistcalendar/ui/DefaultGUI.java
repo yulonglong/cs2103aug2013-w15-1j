@@ -4,10 +4,12 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import com.licensetokil.atypistcalendar.ATypistCalendar;
+import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 
 public class DefaultGUI extends JFrame {
 	private JScrollPane jScrollPane1;
@@ -16,6 +18,7 @@ public class DefaultGUI extends JFrame {
 	
 	private static Logger p = Logger.getLogger("atc");
 	private static Logger logger = Logger.getLogger("atc.DefaultUI");
+	private static TasksManager TM = new TasksManager();
 
 	public DefaultGUI() {
 		System.out.println(logger.getParent().getName());

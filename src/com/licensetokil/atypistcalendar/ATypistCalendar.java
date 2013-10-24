@@ -11,6 +11,7 @@ public class ATypistCalendar {
 	public static DefaultGUI gui;
 
 	public static void main(String[] args) {
+		TasksManager.fileToArray();
 		Calendar calendar = Calendar.getInstance();
 
 		gui = new DefaultGUI();

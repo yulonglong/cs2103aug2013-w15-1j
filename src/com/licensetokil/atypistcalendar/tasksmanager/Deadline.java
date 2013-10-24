@@ -5,7 +5,6 @@ import java.util.Calendar;
 public class Deadline extends Task {
 	private String taskType;
 	private int uniqueID;
-	private final Calendar startTime = Calendar.getInstance();
 	private Calendar endTime;
 	private String description;
 	private String place;
@@ -61,7 +60,10 @@ public class Deadline extends Task {
 	}
 
 	public String toString() {
-		return "Deadline@" + uniqueID + "@" + endTime.toString() + "@"
-				+ description + "@" + place;
+		if(place.equals("")){
+			this.place = " ";
+		}
+		return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
+				+ description + "@" + place + "@" + status;
 	}
 }

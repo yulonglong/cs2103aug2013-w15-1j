@@ -14,6 +14,7 @@ public class JUnitTestLogic {
 
 	@Test
 	public void test() {
+		/*
 		//TestAddSchedule
 		ATypistCalendar.gui = new DefaultGUI();
 		assertEquals(ATypistCalendar.userInput("add swimming on 30/12 from 1300 to 1400"),"Added:\nEvent: swimming\nStarting Time: Mon Dec 30 13:00:00 SGT 2013\nEnding Time: Mon Dec 30 14:00:00 SGT 2013\n");
@@ -27,6 +28,9 @@ public class JUnitTestLogic {
 		//TestMark
 		ATypistCalendar.userInput("display");
 		assertEquals(ATypistCalendar.userInput("mark #2 as done"),"Marked 2 as done");
+		*/
+		
+		TasksManager.fileToArray();
 	}
 
 }

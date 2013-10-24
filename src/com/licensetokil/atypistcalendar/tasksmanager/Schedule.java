@@ -61,7 +61,10 @@ public class Schedule extends Task {
 	}
 
 	public String toString() {
-		return "Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
-				+ endTime.getTime() + "@" + description + "@" + place;
+		if(place.equals("")){
+			this.place = " ";
+		}
+		return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
+				+ endTime.getTime() + "@" + description + "@" + place ;
 	}
 }
