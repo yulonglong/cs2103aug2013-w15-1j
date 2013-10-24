@@ -23,6 +23,7 @@ public class TasksManager {
 	private static Task updateOriginalTask;
 
 	private static LocalAction lastAction;
+	private static Task lastTaskCreated;
 
 	private static Hashtable<Integer, Task> table = new Hashtable<Integer, Task>();
 
@@ -193,6 +194,8 @@ public class TasksManager {
 			if (!t.getPlace().equals("")) {
 				output = output + "Place: " + t.getPlace() + "\n";
 			}
+			
+			lastTaskCreated = t;
 
 			return output;
 
@@ -203,10 +206,27 @@ public class TasksManager {
 	}
 
 	private static void addUndo() {
-		Task t = classify((AddAction) lastAction);
-		schedule.remove(t);
-		deadline.remove(t);
-		todo.remove(t);
+		schedule.remove(lastTaskCreated);
+		deadline.remove(lastTaskCreated);
+		todo.remove(lastTaskCreated);
+
+		try {
+			BufferedReader r = new BufferedReader(new FileReader(file));
+			BufferedWriter w = new BufferedWriter(new FileWriter(file));
+			
+			while (r.ready()) {
+				String line = r.readLine();
+				System.out.println(line);
+			}
+			w.write("");
+			
+			r.close();
+			w.close();
+		}
+		
+		catch(Exception e){
+			
+		}
 	}
 
 	private static String display(DisplayAction ac) {
@@ -610,14 +630,15 @@ public class TasksManager {
 		return mark(ac);
 	}
 
-	public static String executeUndo(LocalAction ac) {
-		if (ac instanceof AddAction) {
+	public static String executeUndo() {
+
+		if (lastAction instanceof AddAction) {
 			addUndo();
-		} else if (ac instanceof UpdateAction) {
+		} else if (lastAction instanceof UpdateAction) {
 			updateUndo();
-		} else if (ac instanceof DeleteAction) {
+		} else if (lastAction instanceof DeleteAction) {
 			deleteUndo();
-		} else if (ac instanceof MarkAction) {
+		} else if (lastAction instanceof MarkAction) {
 			markUndo();
 		}
 
