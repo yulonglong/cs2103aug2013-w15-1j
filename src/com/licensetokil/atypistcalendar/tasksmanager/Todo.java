@@ -14,6 +14,14 @@ public class Todo extends Task {
 		this.place = place;
 		this.status = status;
 	}
+	
+	public Todo(Todo td){
+		this.taskType = "deadline";
+		this.description = td.getDescription();
+		this.place = td.getPlace();
+		this.uniqueID = td.getUniqueID();
+		this.status = td.getStatus();
+	}
 
 	public int getUniqueID() {
 		return uniqueID;
@@ -49,7 +57,7 @@ public class Todo extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			this.place = " ";
+			return "@Todo@" + uniqueID + "@" + description + "@" + " " + "@" + status;
 		}
 		return "@Todo@" + uniqueID + "@" + description + "@" + place + "@" + status;
 	}

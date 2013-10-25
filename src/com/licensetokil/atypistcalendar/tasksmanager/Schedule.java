@@ -20,6 +20,15 @@ public class Schedule extends Task {
 		this.place = place;
 	}
 	
+	public Schedule(Schedule s){
+		this.taskType = "schedule";
+		this.endTime = s.getEndTime();
+		this.description = s.getDescription();
+		this.place = s.getPlace();
+		this.uniqueID = s.getUniqueID();
+		this.startTime = s.getStartTime();
+	}
+	
 	public String getTaskType() {
 		return taskType;
 	}
@@ -61,8 +70,10 @@ public class Schedule extends Task {
 	}
 
 	public String toString() {
+		String replace;
 		if(place.equals("")){
-			this.place = " ";
+			return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
+					+ endTime.getTime() + "@" + description + "@" + " ";
 		}
 		return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
 				+ endTime.getTime() + "@" + description + "@" + place ;

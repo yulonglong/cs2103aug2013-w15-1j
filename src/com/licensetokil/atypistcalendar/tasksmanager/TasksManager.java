@@ -1,8 +1,6 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import com.licensetokil.atypistcalendar.parser.*;
-import static org.junit.Assert.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -31,7 +29,7 @@ public class TasksManager {
 	private static int count = 1;
 
 	private static File file = new File("ATC.txt");
-	
+
 	public void setAction(LocalAction action) {
 		this.action = action;
 	}
@@ -51,66 +49,69 @@ public class TasksManager {
 	public ArrayList<Todo> getTodo() {
 		return todo;
 	}
-	
-	public static void fileToArray(){
-		try{
+
+	public static void fileToArray() {
+		try {
 			BufferedReader r = new BufferedReader(new FileReader(file));
 			String currLine;
 			StringTokenizer st;
-			
-			System.out.println("Hi I'm debugging");
-			
-			while((currLine = r.readLine())!=null){
+
+			while ((currLine = r.readLine()) != null) {
 				System.out.println(currLine);
 				st = new StringTokenizer(currLine, "@");
 				String token = st.nextToken();
-				if(token.equals("Schedule")){
-					Schedule s = new Schedule(Integer.parseInt(st.nextToken()), stringToCalendar(st.nextToken()), stringToCalendar(st.nextToken()), st.nextToken(), st.nextToken());
+				if (token.equals("Schedule")) {
+					Schedule s = new Schedule(Integer.parseInt(st.nextToken()),
+							stringToCalendar(st.nextToken()),
+							stringToCalendar(st.nextToken()), st.nextToken(),
+							st.nextToken());
 					schedule.add(s);
-				}
-				else if(token.equals("Deadline")){
+				} else if (token.equals("Deadline")) {
 					System.out.println("in this block");
-					Deadline d = new Deadline(Integer.parseInt(st.nextToken()), stringToCalendar(st.nextToken()), st.nextToken(), st.nextToken(), st.nextToken());
+					Deadline d = new Deadline(Integer.parseInt(st.nextToken()),
+							stringToCalendar(st.nextToken()), st.nextToken(),
+							st.nextToken(), st.nextToken());
 					deadline.add(d);
-				}
-				else if(token.equals("Todo")){
-					Todo td = new Todo(Integer.parseInt(st.nextToken()), st.nextToken(), st.nextToken(), st.nextToken());
+				} else if (token.equals("Todo")) {
+					Todo td = new Todo(Integer.parseInt(st.nextToken()),
+							st.nextToken(), st.nextToken(), st.nextToken());
 					System.out.println(td);
 					todo.add(td);
 					System.out.println("in this block");
+				} else if(token.equals("Counter")){
+					counter = Integer.parseInt(st.nextToken());
 				}
 			}
 			r.close();
 			System.out.println(todo);
-		}
-		catch(Exception e){
-			
+		} catch (Exception e) {
+
 		}
 	}
-	
-	private static Calendar stringToCalendar(String time){
+
+	private static Calendar stringToCalendar(String time) {
 		StringTokenizer st = new StringTokenizer(time);
 		st.nextToken();
-		
+
 		int month = determineMonth(st.nextToken());
 		int date = Integer.parseInt(st.nextToken());
-		
+
 		StringTokenizer stHrAndMin = new StringTokenizer(st.nextToken(), ":");
 		int hour = Integer.parseInt(stHrAndMin.nextToken());
 		int min = Integer.parseInt(stHrAndMin.nextToken());
 		int sec = Integer.parseInt(stHrAndMin.nextToken());
-		
+
 		st.nextToken();
-		
+
 		int year = Integer.parseInt(st.nextToken());
 		Calendar c = Calendar.getInstance();
 		c.set(year, month, date, hour, min, sec);
-		
+
 		return c;
 	}
-	
-	private static int determineMonth(String month){
-		switch(month){
+
+	private static int determineMonth(String month) {
+		switch (month) {
 		case "Jan":
 			return 0;
 		case "Feb":
@@ -171,7 +172,7 @@ public class TasksManager {
 						+ ((Schedule) t).getStartTime().getTime()
 						+ "\nEnding Time: "
 						+ ((Schedule) t).getEndTime().getTime() + "\n";
-				
+
 			}
 
 			else if (t.getTaskType().equals("deadline")) {
@@ -186,16 +187,14 @@ public class TasksManager {
 				output = "Added\n" + "Event: " + t.getDescription() + "\n";
 			}
 
-			w.write(t.toString());
-			w.newLine();
-			w.close();
-			
-			
 			if (!t.getPlace().equals("")) {
 				output = output + "Place: " + t.getPlace() + "\n";
 			}
-			
+
 			lastTaskCreated = t;
+			w.write(t.toString());
+			w.newLine();
+			w.close();
 
 			return output;
 
@@ -210,23 +209,7 @@ public class TasksManager {
 		deadline.remove(lastTaskCreated);
 		todo.remove(lastTaskCreated);
 
-		try {
-			BufferedReader r = new BufferedReader(new FileReader(file));
-			BufferedWriter w = new BufferedWriter(new FileWriter(file));
-			
-			while (r.ready()) {
-				String line = r.readLine();
-				System.out.println(line);
-			}
-			w.write("");
-			
-			r.close();
-			w.close();
-		}
-		
-		catch(Exception e){
-			
-		}
+		fileSync();
 	}
 
 	private static String display(DisplayAction ac) {
@@ -320,7 +303,7 @@ public class TasksManager {
 	private static String outputString(String output) {
 
 		if (!sch.isEmpty()) {
-			output = "Schedules: \n";
+			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
 				output = output + count + ". " + "Event: " + s.getDescription()
 						+ "\n" + "Starting Time: " + s.getStartTime().getTime()
@@ -376,19 +359,9 @@ public class TasksManager {
 	private static String delete(DeleteAction ac) {
 
 		try {
-			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
-			BufferedReader r = new BufferedReader(new FileReader(file));
-			String currLine;
-
 			for (Integer arr : ac.getReferenceNumber()) {
 				Task t = table.get(arr);
 				deletedTasks.add(t);
-
-				while ((currLine = r.readLine()) != null) {
-					if (!t.toString().equals(currLine)) {
-						w.write("");
-					}
-				}
 
 				if (t instanceof Schedule) {
 					schedule.remove(t);
@@ -404,11 +377,10 @@ public class TasksManager {
 					todo.remove(t);
 					toDo.remove(t);
 				}
-
-				w.close();
-				r.close();
-
 			}
+
+			fileSync();
+
 		} catch (Exception e) {
 			return "Delete was unsuccessful. Please try again \n";
 		}
@@ -418,54 +390,47 @@ public class TasksManager {
 	}
 
 	private static void deleteUndo() {
-		for (Task t : deletedTasks) {
-			if (t instanceof Schedule) {
-				schedule.add((Schedule) t);
-			} else if (t instanceof Deadline) {
-				deadline.add((Deadline) t);
-			} else if (t instanceof Todo) {
-				todo.add((Todo) t);
+		try {
+			for (Task t : deletedTasks) {
+				counter--;
+				if (t instanceof Schedule) {
+					schedule.add((Schedule) t);
+				} else if (t instanceof Deadline) {
+					deadline.add((Deadline) t);
+				} else if (t instanceof Todo) {
+					todo.add((Todo) t);
+				}
 			}
+			fileSync();
+		} catch (Exception e) {
+
 		}
 	}
 
 	private static String update(UpdateAction ac) {
-
 		Task t = table.get(ac.getReferenceNumber());
 
-		updateOriginalTask = t;
-
-		String updatedTask;
-		String originalTask;
-		String currLine;
-
 		try {
-			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
-			BufferedReader r = new BufferedReader(new FileReader(file));
-			originalTask = t.toString();
-
 			if (t instanceof Schedule) {
+				updateOriginalTask = new Schedule((Schedule) t);
 				((Schedule) t).setStartTime(ac.getUpdatedStartTime());
 				((Schedule) t).setEndTime(ac.getUpdatedEndTime());
 			}
 
 			else if (t instanceof Deadline) {
+				updateOriginalTask = new Deadline((Deadline) t);
 				((Deadline) t).setEndTime(ac.getUpdatedEndTime());
 			}
-
+			
+			else if(t instanceof Todo) {
+				updateOriginalTask = new Todo((Todo) t);
+			}
+			
 			t.setPlace(ac.getUpdatedLocationQuery());
 			t.setDescription(ac.getUpdatedQuery());
 
-			updatedTask = t.toString();
+			fileSync();
 
-			while ((currLine = r.readLine()) != null) {
-				if (currLine.equals(originalTask)) {
-					w.write(updatedTask);
-				}
-			}
-
-			w.close();
-			r.close();
 		}
 
 		catch (Exception e) {
@@ -476,20 +441,25 @@ public class TasksManager {
 	}
 
 	private static void updateUndo() {
-		for (Schedule s : schedule) {
-			if (s.getUniqueID() == updateOriginalTask.getUniqueID()) {
-				s = (Schedule) updateOriginalTask;
+		try {
+			for (Schedule s : schedule) {
+				if (s.getUniqueID() == updateOriginalTask.getUniqueID()) {
+					s = (Schedule) updateOriginalTask;
+				}
 			}
-		}
-		for (Deadline d : deadline) {
-			if (d.getUniqueID() == updateOriginalTask.getUniqueID()) {
-				d = (Deadline) updateOriginalTask;
+			for (Deadline d : deadline) {
+				if (d.getUniqueID() == updateOriginalTask.getUniqueID()) {
+					d = (Deadline) updateOriginalTask;
+				}
 			}
-		}
-		for (Todo td : todo) {
-			if (td.getUniqueID() == updateOriginalTask.getUniqueID()) {
-				td = (Todo) updateOriginalTask;
+			for (Todo td : todo) {
+				if (td.getUniqueID() == updateOriginalTask.getUniqueID()) {
+					td = (Todo) updateOriginalTask;
+				}
 			}
+			fileSync();
+		} catch (Exception e) {
+
 		}
 	}
 
@@ -527,8 +497,8 @@ public class TasksManager {
 		}
 
 		output = "Search Matches: \n\n";
-		
-		if(todo.isEmpty() && deadline.isEmpty() && schedule.isEmpty()){
+
+		if (todo.isEmpty() && deadline.isEmpty() && schedule.isEmpty()) {
 			output = output + "None";
 		}
 
@@ -538,18 +508,10 @@ public class TasksManager {
 	private static String mark(MarkAction ac) {
 		String numbers = "";
 		markUndoList = new ArrayList<Task>();
-		String originalTask;
-		String updatedTask;
-		String currLine;
 
 		try {
-
-			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
-			BufferedReader r = new BufferedReader(new FileReader(file));
-
 			for (Integer num : ac.getReferenceNumber()) {
 				Task t = table.get(num);
-				originalTask = t.toString();
 				markUndoList.add(t);
 				numbers = numbers + num + " ";
 
@@ -560,18 +522,10 @@ public class TasksManager {
 				else if (t instanceof Todo) {
 					((Todo) t).setStatus(ac.getStatus());
 				}
-
-				updatedTask = t.toString();
-
-				while ((currLine = r.readLine()) != null) {
-					if (currLine == originalTask) {
-						w.write(updatedTask);
-					}
-				}
-
-				w.close();
-				r.close();
 			}
+			
+			fileSync();
+			
 		} catch (Exception e) {
 			return "Mark was unsuccessful. Please try again \n";
 		}
@@ -582,8 +536,6 @@ public class TasksManager {
 	public static void markUndo() {
 		String status = ((MarkAction) lastAction).getStatus();
 		String newStatus;
-
-		assert status.equals("done") || status.equals("undone");
 
 		if (status.equals("done")) {
 			newStatus = "undone";
@@ -596,6 +548,35 @@ public class TasksManager {
 			} else {
 				((Todo) t).setStatus(newStatus);
 			}
+		}
+		
+		fileSync();
+	}
+	
+	public static void fileSync(){
+		try {
+			BufferedWriter clearWriter = new BufferedWriter(new FileWriter(file));
+			BufferedWriter appendWriter = new BufferedWriter(new FileWriter(file, true));
+			
+			for(Schedule s: schedule){
+				appendWriter.write(s.toString());
+				appendWriter.newLine();
+			}
+			
+			for(Deadline d: deadline){
+				appendWriter.write(d.toString());
+				appendWriter.newLine();
+			}
+			
+			for(Todo td: todo){
+				appendWriter.write(td.toString());
+				appendWriter.newLine();
+			}
+			
+			clearWriter.close();
+			appendWriter.close();
+		}catch(Exception e){
+			
 		}
 	}
 
@@ -643,5 +624,16 @@ public class TasksManager {
 		}
 
 		return "Undo Successful";
+	}
+	
+	public static void exit(){
+		try{
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+		writer.write("@Counter@"+counter);
+		writer.newLine();
+		writer.close();
+		} catch(Exception e){
+			
+		}
 	}
 }

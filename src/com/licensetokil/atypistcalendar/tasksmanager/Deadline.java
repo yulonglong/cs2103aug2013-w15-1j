@@ -18,6 +18,15 @@ public class Deadline extends Task {
 		this.uniqueID = uniqueID;
 		this.status = status;
 	}
+	
+	public Deadline(Deadline d){
+		this.taskType = "deadline";
+		this.endTime = d.getEndTime();
+		this.description = d.getDescription();
+		this.place = d.getPlace();
+		this.uniqueID = d.getUniqueID();
+		this.status = d.getStatus();
+	}
 
 	public int getUniqueID() {
 		return uniqueID;
@@ -61,7 +70,8 @@ public class Deadline extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			this.place = " ";
+			return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
+					+ description + "@" + " " + "@" + status;
 		}
 		return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
 				+ description + "@" + place + "@" + status;

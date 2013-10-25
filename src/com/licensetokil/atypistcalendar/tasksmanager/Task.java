@@ -6,7 +6,6 @@ abstract class Task {
 	protected String place;
 	protected String description;
 
-	
 	public String getTaskType(){
 		return taskType;
 	}

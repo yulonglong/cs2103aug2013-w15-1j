@@ -5,6 +5,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import java.awt.event.WindowEvent;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -92,6 +93,10 @@ public class DefaultGUI extends JFrame {
 			ATypistCalendar.userInput(jTextField1.getText());
 			jTextField1.setText("");
 		}
+	}
+	
+	public void windowClosing(WindowEvent e){
+		TasksManager.exit();
 	}
 	
 	public void outputWithNewline(String text) {
