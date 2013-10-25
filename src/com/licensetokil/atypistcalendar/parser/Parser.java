@@ -9,6 +9,7 @@ public class Parser {
 	private static final String MESSAGE_INVALID = "Invalid input!";
 	private static final String MESSAGE_INVALID_GCAL = "Invalid Google Calendar Command!";
 	
+
 	private static final int FIRST_INDEX = 0;
 	private static final int SECOND_INDEX = 1;
 	private static final String WHITE_SPACE = " ";
@@ -32,8 +33,10 @@ public class Parser {
 	
 	private static final int INDEX_START_TIME = 0;
 	private static final int INDEX_END_TIME = 1;
+	private static final int INDEX_ST = 0;
 	private static final int DEFAULT_CAL_ARR_SIZE = 2;
 	private static final int DEFAULT_DATE_ARR_SIZE = 3;
+	private static final int DEFAULT_ST_ARR_SIZE = 1;
 	
 	private static final int INDEX_YEAR = 2;
 	private static final int INDEX_MONTH = 1;
@@ -114,8 +117,7 @@ public class Parser {
 
 
 	
-	public static Action parse(String userInput)
-			throws MalformedUserInputException {
+	public static Action parse(String userInput) throws MalformedUserInputException {
 
 		// tokenize user input
 		StringTokenizer st = new StringTokenizer(userInput);
@@ -196,110 +198,63 @@ public class Parser {
 		}
 	}
 
-	// <time> format is completed, can follow those in user guide.
-	// however am and pm is strictly without dots (a.m. is not accepted)
-	// there must be no space between time and am or pm (e.g 3pm, 2.30pm)
-	//
-	// list of approved format:
-	// "add swimming at CommunityClub on 30/12 from 1300 to 1400" (fixed not
-	// flexible format)
-	// "add swimming on 21/11 from 1300 to 1400" (without place)
-	// "add swimming at Bukit Batok Community Club Swimming Pool on 21/11 from 1300 to 1400"
-	// (long place string, separated by space)
-	// now date can be detected either in single digits or double digits (e.g.
-	// 2/1, 02/01, 12/01, 12/2, 3/11, etc)
-	// "add swimming at BB CC on 2/1 from 1200 to 1300"
-	// completed <time> format
-	// "add swimming at BB CC on 2/1 from 1.33pm to 3.20pm"
-
-	//<time> format is fully functional
-	// add function : 100% done
+	/*add parser accepts the following format
+	 * add <task description> at <place> on <date/day> from <time> to <time>
+	 * add <task description> at <place> on <date/day> at <time>
+	 * 
+	 * e.g. add swimming at my apartment on sunday from 2pm to 3pm
+	 * 
+	 * the parser is flexible, for more information please refer to the user guide
+	 */
 	private static AddAction addParser(StringTokenizer st) {
 		AddAction userAction = new AddAction();
+		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = null;
 		calendarArray[INDEX_END_TIME] = null;
-		
-
-		String tempDescription = new String();
-		String description = new String(st.nextToken());
-		userAction.setDescription(description);
-		
-		while(st.hasMoreTokens()){
-			tempDescription = new String(st.nextToken());
-			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
-				description = description + WHITE_SPACE + tempDescription;
-				userAction.setDescription(description);
-			}
-			else{
-				st = addStringToTokenizer(st,tempDescription);
-				break;
-			}
-		}
-		if(!st.hasMoreTokens()){
-			return userAction;
-		}
+		String description = new String();
 		String place = new String();
-		String prep = new String(st.nextToken());
+		
+		//get the description of the task
+		description = getDescription(st,tempSt);
+		st = tempSt[INDEX_ST];
+		userAction.setDescription(description);
 
-		// check if place is included in user input
-		if (isValidPlacePreposition(prep)) {
-			place = new String(st.nextToken());
-			userAction.setPlace(place);
-		} else {
-			st = addStringToTokenizer(st,prep);
-		}
-
-		// check for place name, separated by space, and incorporate the proper
-		// place name
-		if(st.hasMoreTokens()){
-			prep = new String(st.nextToken());
-			while (!isValidDayPreposition(prep)) {
-				place = place + WHITE_SPACE + prep;
-				userAction.setPlace(place);
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-				} else {
-					break;
-				}
-			}
-		}
-
+		//return action if there is no more tokens
 		if(!st.hasMoreTokens()){
 			return userAction;
 		}
-		// if there is a date field
-		getCompleteDate(calendarArray,prep,st,LocalActionType.ADD);
+		
+		//get the place of the task
+		place=getPlace(st,tempSt);
+		st= tempSt[INDEX_ST];
+		userAction.setPlace(place);
+		
+		//return action if there is no more tokens
+		if(!st.hasMoreTokens()){
+			return userAction;
+		}
+		
+		//get the timeframe of the task
+		getCompleteDate(calendarArray,st,LocalActionType.ADD);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 		
-	return userAction;
+		return userAction;
 	}
 
-	// <time> format is completed,
-	// explanation will be the same as add function above
-
-	// approved format:
-	// "display" will return display, startTime today's date and time, and endTime 31/12/2099
-	// "display <place preposition> <Place>" is now available
-	// "display all at Bukit Batok"
-	// "display all in Computing Hall"
-	// "display <day prep> <date>  <timeframe>" is now available (however
-	// timeframe is strict)
-	// "display on 1/3 from 1200 to 1300"
-	// it can also be combined with place
-	// "display all at Bukit Batok on 1/3 from 1200 to 1300"
-	// it accepts input without timeframe
-	// "display <day prep> <date>"
-	// "display all on 10/6"
-	// can be combined with place
-	// "display all in Korea on 10/12"
-
-	// display function : 100 % done
+	/* display parser accepts the following format
+	 * display <all/schedules/deadlines/todos/done/undone> at <place> on <timeframe>
+	 * 
+	 * e.g.
+	 * display all at home on monday from 3pm to 9pm
+	 * 
+	 * the parser is flexible, for more information please refer to the user guide
+	 */
 	private static DisplayAction displayParser(StringTokenizer st) {
 		DisplayAction userAction = new DisplayAction();
 
-		
+		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
 		calendarArray[INDEX_END_TIME] = null;
@@ -367,40 +322,21 @@ public class Parser {
 				return userAction;
 			}
 			
+			//get place start
 			String place = new String();
-			// string place retrieval BEGIN
-			if (st.hasMoreTokens()) {
-				prep = new String(st.nextToken());
-				// check if place is included in user input
-				if (isValidPlacePreposition(prep)) {
-					place = new String(st.nextToken());
-					userAction.setPlace(place);
-				} else {// if not place then return back the string
-					String tempUserInput = new String();
-					tempUserInput = getRemainingTokens(st);
-					tempUserInput = prep + WHITE_SPACE + tempUserInput;
-					st = new StringTokenizer(tempUserInput);
-				}
-				// check for place name, separated by space, and incorporate the
-				// proper place name
-				if(st.hasMoreTokens()){
-					prep = new String(st.nextToken());
-					while (!isValidDayPreposition(prep)) {
-						place = place + WHITE_SPACE + prep;
-						userAction.setPlace(place);
-						if (st.hasMoreTokens()) {
-							prep = new String(st.nextToken());
-						} else {
-							break;
-						}
-					}
-				}
-			}
+			prep = new String();
 			
-			// string place retrieval END
+			place=getPlace(st,tempSt);
+			st= tempSt[INDEX_ST];
+			userAction.setPlace(place);
+			
+			if(!st.hasMoreTokens()){
+				return userAction;
+			}
+			//get place end
 			
 			// if there is a date field
-			getCompleteDate(calendarArray,prep,st,LocalActionType.DISPLAY);
+			getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
 			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 		}
@@ -421,21 +357,13 @@ public class Parser {
 	// "delete #1 #7 #4"
 	// can delete multiple items separated with space
 	// delete function : 100 %
-	private static DeleteAction deleteParser(StringTokenizer st) {
-		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
+	private static DeleteAction deleteParser(StringTokenizer st) throws MalformedUserInputException{
 		DeleteAction userAction = new DeleteAction();
-		String temp = new String(st.nextToken());
-		temp = temp.substring(SECOND_INDEX); //remove the hex(#) and retrieve the integer
-		int tempInt = Integer.parseInt(temp);
-		referenceNumber.add(tempInt);
-		while (st.hasMoreTokens()) {
-			temp = new String (st.nextToken());
-			temp = temp.substring(1);
-			tempInt = Integer.parseInt(temp);
-			referenceNumber.add(tempInt);
-		}
-		userAction.setReferenceNumber(referenceNumber);
+		ArrayList<Integer> referenceNumber = null;
 		
+		//get the numbers
+		referenceNumber = getMultipleReferenceNumber(st);
+		userAction.setReferenceNumber(referenceNumber);
 	
 		return userAction;
 	}
@@ -445,6 +373,7 @@ public class Parser {
 		UpdateAction userAction = new UpdateAction();
 		String temp = new String(st.nextToken());
 		
+		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
 		calendarArray[INDEX_END_TIME] = null;
@@ -461,53 +390,30 @@ public class Parser {
 		
 		
 		//after finding the delimiter ">>"
-		String tempDescription = new String();
-		String description = new String(st.nextToken());
-		userAction.setUpdatedQuery(description);
+		String description = new String();
 		
-		while(st.hasMoreTokens()){
-			tempDescription = new String(st.nextToken());
-			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
-				description = description + WHITE_SPACE + tempDescription;
-				userAction.setUpdatedQuery(description);
-			}
-			else{
-				st = addStringToTokenizer(st,tempDescription);
-				break;
-			}
-		}
+		description = getDescription(st,tempSt);
+		st = tempSt[INDEX_ST];
+		userAction.setUpdatedQuery(description);
+
 		if(!st.hasMoreTokens()){
 			return userAction;
 		}
-		
+
+
+		//get place start
 		String place = new String();
-		String prep = new String(st.nextToken());
-
-		// check if place is included in user input
-		if (isValidPlacePreposition(prep)) {
-			place = new String(st.nextToken());
-			userAction.setUpdatedLocationQuery(place);
-		} else {
-			String tempUserInput = new String();
-			tempUserInput = getRemainingTokens(st);
-			tempUserInput = prep + WHITE_SPACE + tempUserInput;
-			st = new StringTokenizer(tempUserInput);
+		
+		place=getPlace(st,tempSt);
+		st= tempSt[INDEX_ST];
+		userAction.setUpdatedLocationQuery(place);
+		
+		if(!st.hasMoreTokens()){
+			return userAction;
 		}
+		//get place end
 
-		// check for place name, separated by space, and incorporate the proper
-		// place name
-		prep = new String(st.nextToken());
-		while (!isValidDayPreposition(prep)) {
-			place = place + WHITE_SPACE + prep;
-			userAction.setUpdatedLocationQuery(place);
-			if (st.hasMoreTokens()) {
-				prep = new String(st.nextToken());
-			} else {
-				break;
-			}
-		}
-
-		getCompleteDate(calendarArray,prep,st,LocalActionType.UPDATE);
+		getCompleteDate(calendarArray,st,LocalActionType.UPDATE);
 		userAction.setUpdatedStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setUpdatedEndTime(calendarArray[INDEX_END_TIME]);
 
@@ -519,26 +425,20 @@ public class Parser {
 	// search function: 100 %
 	private static SearchAction searchParser(StringTokenizer st) {
 		SearchAction userAction = new SearchAction();
-		
+
+		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
 		calendarArray[INDEX_END_TIME] = null;
 
 		
-		String query = new String(st.nextToken());
-		userAction.setQuery(query);
-		String tempQuery = new String();
-		while(st.hasMoreTokens()){
-			tempQuery = new String(st.nextToken());
-			if((!isValidPlacePreposition(tempQuery))&&(!isValidDayPreposition(tempQuery))){
-				query = query + WHITE_SPACE + tempQuery;
-				userAction.setQuery(query);
-			}
-			else{
-				st = addStringToTokenizer(st,tempQuery);
-				break;
-			}
-		}
+		String description = new String();
+		
+		description = getDescription(st,tempSt);
+		st = tempSt[INDEX_ST];
+		userAction.setQuery(description);
+
+		
 		if(!st.hasMoreTokens()){
 			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 			calendarArray[INDEX_END_TIME] = Calendar.getInstance();
@@ -547,37 +447,19 @@ public class Parser {
 			return userAction;
 		}
 		
-		String prep = new String();
+		//get place start
 		String place = new String();
-		// string place retrieval BEGIN
-		if (st.hasMoreTokens()) {
-			prep = new String(st.nextToken());
-			// check if place is included in user input
-			if (isValidPlacePreposition(prep)) {
-				place = new String(st.nextToken());
-				userAction.setLocationQuery(place);
-			} else {// if not place then return back the string
-				st = addStringToTokenizer(st,prep);
-			}
-			// check for place name, separated by space, and incorporate the
-			// proper place name
-			if(st.hasMoreTokens()){
-				prep = new String(st.nextToken());
-				while (!isValidDayPreposition(prep)) {
-					place = place + WHITE_SPACE + prep;
-					userAction.setLocationQuery(place);
-					if (st.hasMoreTokens()) {
-						prep = new String(st.nextToken());
-					} else {
-						break;
-					}
-				}
-			}
+		
+		place=getPlace(st,tempSt);
+		st= tempSt[INDEX_ST];
+		userAction.setLocationQuery(place);
+		
+		if(!st.hasMoreTokens()){
+			return userAction;
 		}
+		//get place end
 		
-		// string place retrieval END
-		
-		getCompleteDate(calendarArray,prep,st,LocalActionType.SEARCH);
+		getCompleteDate(calendarArray,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 		
@@ -590,26 +472,108 @@ public class Parser {
 	 * "mark #1 #2 as done"
 	 */
 	// mark function: 100 %
-	private static MarkAction markParser(StringTokenizer st) {
-		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
+	private static MarkAction markParser(StringTokenizer st) throws MalformedUserInputException{
 		MarkAction userAction = new MarkAction();
-		String refNum = new String();
-		String temp = new String(st.nextToken());
-		temp = temp.substring(SECOND_INDEX); // remove the hex (#) and retrieve the integer
-		int tempInt = Integer.parseInt(temp);
-		referenceNumber.add(tempInt);
-		temp = new String(st.nextToken());
-		while ((st.hasMoreTokens()) &&(!isValidMarkPreposition(temp))){
-			refNum = new String(temp.substring(1));
-			tempInt = Integer.parseInt(refNum);
-			referenceNumber.add(tempInt);
-			temp = new String(st.nextToken());
-		}
-		String status = new String(st.nextToken());
-		userAction.setStatus(status);
+		ArrayList<Integer> referenceNumber = null;
+		String status = new String();
+		
+		//get reference number array list
+		referenceNumber = getMultipleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);
 		
+		if(st.hasMoreTokens()){
+			status = new String(st.nextToken());
+		}
+		if(isValidStatus(status)){
+			userAction.setStatus(status);
+		}
+		else{
+			throw new MalformedUserInputException(MESSAGE_INVALID);
+		}
 		return userAction;
+	}
+	
+	private static ArrayList<Integer> getMultipleReferenceNumber(StringTokenizer st) throws MalformedUserInputException{
+		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
+		String temp = new String();
+		String expectHex = new String();
+		int tempInt = 0;
+		
+		while (st.hasMoreTokens()) {
+			try{
+				temp = new String (st.nextToken());
+				//check whether it reaches preposition "as"
+				if (isValidMarkPreposition(temp)){
+					return referenceNumber;
+				}
+				
+				expectHex = temp.substring(FIRST_INDEX,SECOND_INDEX);
+				//if the first character is not hex, throw error
+				if(!isStringHex(expectHex)){
+					throw new MalformedUserInputException(MESSAGE_INVALID);
+				}
+				
+				temp = temp.substring(SECOND_INDEX); //retrieve the integer and remove the hex (#)
+				tempInt = Integer.parseInt(temp);
+				referenceNumber.add(tempInt);
+			}
+			catch (Exception e){
+				throw new MalformedUserInputException(MESSAGE_INVALID);
+			}
+		}
+		
+		return referenceNumber;
+	}
+	
+	private static String getDescription(StringTokenizer st, StringTokenizer[] tempSt){
+
+		String tempDescription = new String();
+		String description = new String(st.nextToken());
+		
+		while(st.hasMoreTokens()){
+			tempDescription = new String(st.nextToken());
+			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
+				description = description + WHITE_SPACE + tempDescription;
+			}
+			else{
+				st = addStringToTokenizer(st,tempDescription);
+				break;
+			}
+		}
+		tempSt[INDEX_ST]=st;
+		return description;
+	}
+	
+	private static String getPlace(StringTokenizer st, StringTokenizer[] tempSt){
+		String prep = new String(st.nextToken());
+		String place = new String();
+
+		// check if place is included in user input
+		if (isValidPlacePreposition(prep)) {
+			place = new String(st.nextToken());
+		} else {
+			st = addStringToTokenizer(st,prep);
+		}
+
+		// check for place name, separated by space, and incorporate the proper
+		// place name
+		if(st.hasMoreTokens()){
+			prep = new String(st.nextToken());
+			while (!isValidDayPreposition(prep)) {
+				place = place + WHITE_SPACE + prep;
+				if (st.hasMoreTokens()) {
+					prep = new String(st.nextToken());
+				} else {
+					break;
+				}
+			}
+		}
+		
+		if(isValidDayPreposition(prep)){
+			st=addStringToTokenizer(st,prep);
+		}
+		tempSt[INDEX_ST]=st;
+		return place;
 	}
 
 	private static int getTimeMinute(String time) {
@@ -935,7 +899,7 @@ public class Parser {
 	// using calendarArray to store date as integers.
 	// calendarArray[0] is startTime
 	// calendarArray[1] is endTime
-	private static void getCompleteDate(Calendar[] calendarArray, String preposition, StringTokenizer st, LocalActionType actionType) {
+	private static void getCompleteDate(Calendar[] calendarArray, StringTokenizer st, LocalActionType actionType) {
 		Calendar startTimeCal = calendarArray[INDEX_START_TIME];
 		Calendar endTimeCal = calendarArray[INDEX_END_TIME];
 		int[] intStartDate = new int[DEFAULT_DATE_ARR_SIZE];
@@ -947,6 +911,8 @@ public class Parser {
 		intEndDate[INDEX_MONTH] = MAX_MONTH;
 		intEndDate[INDEX_DAY] = MAX_DAY;
 		String date = new String();
+		String preposition = new String(st.nextToken());
+		
 		if((isStringToday(preposition))||(isStringTomorrow(preposition))){
 			st = addStringToTokenizer(st,preposition);
 		}
@@ -1122,6 +1088,13 @@ public class Parser {
 		tempUserInput = getRemainingTokens(st);
 		tempUserInput = tempString + WHITE_SPACE + tempUserInput;
 		return new StringTokenizer(tempUserInput);
+	}
+	
+	private static boolean isStringHex(String input){
+		if(input.equals("#")){
+			return true;
+		}
+		return false;
 	}
 	
 	private static boolean isStringMinute(String timeUnit){
