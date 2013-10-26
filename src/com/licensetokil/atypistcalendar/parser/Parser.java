@@ -12,6 +12,9 @@ public class Parser {
 
 	private static final int FIRST_INDEX = 0;
 	private static final int SECOND_INDEX = 1;
+	private static final int THIRD_INDEX = 2;
+	private static final int FOURTH_INDEX = 3;
+	private static final int FIFTH_INDEX = 4;
 	private static final String WHITE_SPACE = " ";
 	private static final String SLASH = "/";
 	private static final String HEX = "#";
@@ -42,6 +45,8 @@ public class Parser {
 	private static final int INDEX_MONTH = 1;
 	private static final int INDEX_DAY = 0;
 	
+	private static final int DEFAULT_HOUR_LENGTH = 2;
+	private static final int DEFAULT_MINUTE_LENGTH = 2;
 	private static final int DEFAULT_START_HOUR = 8;
 	private static final int DEFAULT_END_HOUR = 9;
 	private static final int DEFAULT_DURATION_HOUR = 1;
@@ -65,6 +70,7 @@ public class Parser {
 	private static final int TIME_FORMAT_DIFF = 12;
 	private static final int TIME_DEFAULT_MIN_AM = 8;
 	private static final int TIME_DEFAULT_MAX_AM = 11;
+	private static final int TIME_DEFAULT_MIDNIGHT = 0;
 	private static final int TIME_DEFAULT_MIN_PM = 12;
 	private static final int TIME_DEFAULT_MAX_PM = 7;
 	
@@ -258,17 +264,18 @@ public class Parser {
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
 		calendarArray[INDEX_END_TIME] = null;
+		
+		setEndTimeMax(calendarArray);
+		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
+		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
+		
 		String place = new String();
 		String all = null;
 		String status = null;
 		String task = null;
 
-		// if command has more details after display
-		// e.g. display "deadlines undone todos"
+		// if command has no more details after display
 		if (!st.hasMoreTokens()) {
-			setEndTimeMax(calendarArray);
-			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			userAction.setDescription(ALL);
 			return userAction;
 		}
@@ -279,12 +286,8 @@ public class Parser {
 		userAction.setDescription(all);
 		
 		if(!st.hasMoreTokens()){
-			setEndTimeMax(calendarArray);
-			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			return userAction;
 		}
-		
 		
 		// check if done/undone is included in user input
 		status=getStatus(st,tempSt);
@@ -293,23 +296,17 @@ public class Parser {
 		
 		//if no more elements
 		if(!st.hasMoreTokens()){
-			setEndTimeMax(calendarArray);
-			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			return userAction;
 		}
 		
 		//check if schedules/deadlines/todos is included in user input
 		task=getTask(st,tempSt);
 		st= tempSt[INDEX_ST];
-		if(!task.equals("")){
+		if(!task.equals(EMPTY_STRING)){
 			userAction.setDescription(task);
 		}
 		
 		if(!st.hasMoreTokens()){
-			setEndTimeMax(calendarArray);
-			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			return userAction;
 		}
 		
@@ -321,7 +318,6 @@ public class Parser {
 		if(!st.hasMoreTokens()){
 			return userAction;
 		}
-		//get place end
 		
 		// if there is a date field
 		getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
@@ -372,6 +368,7 @@ public class Parser {
 		}
 				
 		//after finding the delimiter ">>"
+		
 		//get the description
 		description = getDescription(st,tempSt);
 		st = tempSt[INDEX_ST];
@@ -403,7 +400,12 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_END_TIME] = null;		
+		calendarArray[INDEX_END_TIME] = null;
+		
+		setEndTimeMax(calendarArray);
+		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
+		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
+		
 		String description = new String();
 		String place = new String();
 		
@@ -413,9 +415,6 @@ public class Parser {
 		userAction.setQuery(description);
 
 		if(!st.hasMoreTokens()){
-			setEndTimeMax(calendarArray);
-			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			return userAction;
 		}
 		
@@ -581,6 +580,8 @@ public class Parser {
 		return description;
 	}
 	
+	
+	
 	private static String getPlace(StringTokenizer st, StringTokenizer[] tempSt){
 		String prep = new String(st.nextToken());
 		String place = new String();
@@ -590,6 +591,9 @@ public class Parser {
 			place = new String(st.nextToken());
 		} else {
 			st = addStringToTokenizer(st,prep);
+			place = new String();
+			tempSt[INDEX_ST]=st;
+			return place;
 		}
 
 		// check for place name, separated by space, and incorporate the proper
@@ -613,115 +617,6 @@ public class Parser {
 		return place;
 	}
 
-	private static int getTimeMinute(String time) {
-		int intTimeMinute = INIT_INT_VALUE;
-		int stringTimeLength = time.length();
-		boolean allDigits = true;
-		for (int i = 0; (i < stringTimeLength); i++) {
-			if (!Character.isDigit(time.charAt(i))) {
-				allDigits = false;
-			}
-		}
-		if (allDigits == true) {
-			if (stringTimeLength <= 2) {
-				return INIT_INT_VALUE;
-			} else {
-				time = time.substring(2, 4);
-				intTimeMinute = Integer.parseInt(time);
-				return intTimeMinute;
-			}
-		}
-		else {
-			int indexOfDelimiter = INIT_INT_VALUE;
-			// get the index of delimiter
-			for (int i = 0; (i < stringTimeLength); i++) {
-				if (!Character.isDigit(time.charAt(i))) {
-					indexOfDelimiter = i;
-					break;
-				}
-			}
-			if(indexOfDelimiter + 3 <= stringTimeLength){
-				time = time.substring(indexOfDelimiter + 1, indexOfDelimiter + 3);
-				if((Character.isDigit(time.charAt(FIRST_INDEX)))&&(Character.isDigit(time.charAt(SECOND_INDEX)))){
-					intTimeMinute = Integer.parseInt(time);	
-					return intTimeMinute;
-			    }
-			}
-			return 0;
-		}
-	}
-
-	private static int getTimeHour(String time) {
-		String suffix = new String();
-		int intTimeHour = INIT_INT_VALUE;
-		int stringTimeLength = time.length();
-		boolean allDigits = true;
-		for (int i = 0; (i < stringTimeLength); i++) {
-			if (!Character.isDigit(time.charAt(i))) {
-				allDigits = false;
-			}
-		}
-		if (allDigits == true) {
-			if (stringTimeLength <= 2) {
-				intTimeHour = Integer.parseInt(time);
-				if(intTimeHour<8){
-					//add 12 hrs based on assumption, 12:00-07.59, pm suffix will be assumed
-					intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
-				}
-				return intTimeHour;
-			} else {
-				time = time.substring(FIRST_INDEX, 2);
-				intTimeHour = Integer.parseInt(time);
-				return intTimeHour;
-			}
-		}
-		else {
-			int indexOfDelimiter = INIT_INT_VALUE;
-			int indexOfSuffixDelimiter = INIT_INT_VALUE;
-			// get the index of suffix delimiter
-			for (int i = (stringTimeLength-1); (i >= 0); i--) {
-				if (Character.isDigit(time.charAt(i))) {
-					indexOfSuffixDelimiter = i+1;
-					break;
-				}
-			}
-			if(indexOfSuffixDelimiter!=stringTimeLength){
-				suffix = time.substring(indexOfSuffixDelimiter);
-			}
-			
-			//get the index of hour and minute delimiter
-			for (int i = 0; (i < stringTimeLength); i++) {
-				if (!Character.isDigit(time.charAt(i))) {
-					indexOfDelimiter = i;
-					break;
-				}
-			}
-			
-			if (indexOfDelimiter == 1) {
-				//if only single digit hour
-				time = time.substring(FIRST_INDEX, 1);
-			}
-			else{
-				//if double digits hour
-				time = time.substring(FIRST_INDEX, 2);
-			}
-			
-			intTimeHour = Integer.parseInt(time);
-			if (isPm(suffix)) {
-				intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
-			}
-			else if(suffix.equals(EMPTY_STRING)){
-				if(intTimeHour< TIME_DEFAULT_MIN_AM){
-					//add 12 hrs based on assumption, 12:00-07.59, pm suffix will be assumed
-					intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
-				}
-			}
-			
-			return intTimeHour;
-			
-		}
-	}
-	
 	private static int getDayOfMonth(String month){
 		month=month.toLowerCase();
 		if(JANUARY.contains(month)){
@@ -794,6 +689,134 @@ public class Parser {
 		}
 	}
 	
+	private static int getTimeMinute24Hour(String time){
+		int intTimeMinute = INIT_INT_VALUE;
+		int stringTimeLength = time.length();
+		if (stringTimeLength <= DEFAULT_MINUTE_LENGTH) {
+			return intTimeMinute;
+		} else {
+			time = time.substring(THIRD_INDEX, FIFTH_INDEX);
+			intTimeMinute = Integer.parseInt(time);
+			return intTimeMinute;
+		}
+	}
+	
+	private static int getTimeMinute12Hour(String time){
+		int intTimeMinute = INIT_INT_VALUE;
+		int stringTimeLength = time.length();
+		int indexOfDelimiter = INIT_INT_VALUE;
+		// get the index of delimiter
+		for (int i = INIT_INT_VALUE; (i < stringTimeLength); i++) {
+			if (!Character.isDigit(time.charAt(i))) {
+				indexOfDelimiter = i;
+				break;
+			}
+		}
+		if(indexOfDelimiter + 3 <= stringTimeLength){
+			time = time.substring(indexOfDelimiter + 1, indexOfDelimiter + 3);
+			if((Character.isDigit(time.charAt(FIRST_INDEX)))&&(Character.isDigit(time.charAt(SECOND_INDEX)))){
+				intTimeMinute = Integer.parseInt(time);	
+				return intTimeMinute;
+		    }
+		}
+		return intTimeMinute;
+	}
+	
+	private static int getTimeMinute(String time) {
+		int intTimeMinute = INIT_INT_VALUE;
+		if (isAllDigits(time)) {
+			intTimeMinute = getTimeMinute24Hour(time);
+			return intTimeMinute;
+		}
+		else {
+			intTimeMinute = getTimeMinute12Hour(time);
+			return intTimeMinute;
+		}
+	}
+	
+	private static int getTimeHour24Hour(String time){
+		int intTimeHour = INIT_INT_VALUE;
+		int stringTimeLength = time.length();
+		if (stringTimeLength <= DEFAULT_HOUR_LENGTH) {
+			intTimeHour = Integer.parseInt(time);
+			if((intTimeHour < TIME_DEFAULT_MIN_AM)&&(intTimeHour > TIME_DEFAULT_MIDNIGHT)) {
+				//add 12 hrs based on assumption, 12:00-07.59, pm suffix will be assumed
+				intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
+			}
+			return intTimeHour;
+		}
+		else {
+			time = time.substring(FIRST_INDEX, THIRD_INDEX);
+			intTimeHour = Integer.parseInt(time);
+			return intTimeHour;
+		}
+	}
+	
+	private static int getTimeHour12Hour(String time){
+		String suffix = new String();
+		int stringTimeLength = time.length();
+		int intTimeHour = INIT_INT_VALUE;
+		int indexOfDelimiter = INIT_INT_VALUE;
+		int indexOfSuffixDelimiter = INIT_INT_VALUE;
+		// get the index of suffix delimiter
+		for (int i = (stringTimeLength-1); (i >= 0); i--) {
+			if (Character.isDigit(time.charAt(i))) {
+				indexOfSuffixDelimiter = i+1;
+				break;
+			}
+		}
+		if(indexOfSuffixDelimiter!=stringTimeLength){
+			suffix = time.substring(indexOfSuffixDelimiter);
+		}
+		
+		//get the index of hour and minute delimiter
+		for (int i = 0; (i < stringTimeLength); i++) {
+			if (!Character.isDigit(time.charAt(i))) {
+				indexOfDelimiter = i;
+				break;
+			}
+		}
+		
+		if (indexOfDelimiter == SECOND_INDEX) {
+			//if only single digit hour
+			time = time.substring(FIRST_INDEX, SECOND_INDEX);
+		}
+		else{
+			//if double digits hour
+			time = time.substring(FIRST_INDEX, THIRD_INDEX);
+		}
+		
+		intTimeHour = Integer.parseInt(time);
+		
+		if ((isAm(suffix))&&(intTimeHour==12)){
+			intTimeHour = intTimeHour - TIME_FORMAT_DIFF;
+		}
+		else if (isPm(suffix)) {
+			intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
+		}
+		else if(suffix.equals(EMPTY_STRING)){
+			if((intTimeHour< TIME_DEFAULT_MIN_AM)&&(intTimeHour > TIME_DEFAULT_MIDNIGHT)){
+				//add 12 hrs based on assumption, 12:00-07.59, pm suffix will be assumed
+				intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
+			}
+		}
+		
+		return intTimeHour;
+	}
+
+	private static int getTimeHour(String time) {
+		int intTimeHour = INIT_INT_VALUE;
+		if (isAllDigits(time)) {
+			intTimeHour = getTimeHour24Hour(time);
+			return intTimeHour;
+		}
+		else {
+			intTimeHour = getTimeHour12Hour(time);
+			return intTimeHour;
+		}
+	}
+	
+	
 	private static void getDateFromDay(int[] intStartDate, String eventDay, int intEventTimeHours, int intEventTimeMinutes){
 		Calendar currentDate = Calendar.getInstance();
 		int intCurrentDayOfWeek = INVALID_INT_VALUE;
@@ -859,7 +882,8 @@ public class Parser {
 			return;
 		}
 	}
-	
+
+
 	private static void getDate(int[] intStartDate, String date, LocalActionType type){
 		//get the date start
 		int stringDateLength = date.length();
@@ -1127,8 +1151,17 @@ public class Parser {
 		return new StringTokenizer(tempUserInput);
 	}
 	
+	private static boolean isAllDigits(String input){
+		for (int i = 0; i < input.length(); i++) {
+			if (!Character.isDigit(input.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	private static boolean isStringHex(String input){
-		if(input.equals("#")){
+		if(input.equals(HEX)){
 			return true;
 		}
 		return false;
@@ -1173,6 +1206,14 @@ public class Parser {
 		if((day.equalsIgnoreCase(TOMORROW_LONG))
 			||(day.equalsIgnoreCase(TOMORROW_MEDIUM))
 			||(day.equalsIgnoreCase(TOMORROW_SHORT))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isAm(String suffix){
+		if((suffix.equalsIgnoreCase(AM_SHORT))
+				||(suffix.equalsIgnoreCase(AM_LONG))){
 			return true;
 		}
 		return false;

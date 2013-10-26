@@ -976,6 +976,35 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		
+		//update format after the ">>" delimiter is exactly the same as add
+		
+		//update #3 >> jogging at park
+		//multiple words description
+		//single word place
+		//dd/mm time format
+		newUc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newUc = new UpdateAction();
+		newUc.setUpdatedQuery("jogging");
+		newUc.setUpdatedLocationQuery("park");
+		newUc.setReferenceNumber(3);
+		newUc.setUpdatedStartTime(startTime);
+		newUc.setUpdatedEndTime(endTime);
+		expectedAc = newUc;
+		try{
+			ac = Parser.parse("update #3 >> jogging at park");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
 		//................... UNDO TESTING ..............................
 		
 		newUndc = null;
