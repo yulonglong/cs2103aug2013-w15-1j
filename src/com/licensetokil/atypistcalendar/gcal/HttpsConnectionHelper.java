@@ -18,7 +18,6 @@ public class HttpsConnectionHelper {
 	public static final String REQUEST_METHOD_GET = "GET";
 	public static final String REQUEST_METHOD_DELETE = "DELETE";
 	public static final String REQUEST_METHOD_PUT = "PUT";
-	public static final String REQUEST_METHOD_PATCH = "PATCH";
 	
 	public static final String CONTENT_TYPE_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 	public static final String CONTENT_TYPE_JSON = "application/json";

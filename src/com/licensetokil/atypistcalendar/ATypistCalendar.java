@@ -1,6 +1,9 @@
 package com.licensetokil.atypistcalendar;
 
+import java.io.IOException;
 import java.util.Calendar;
+
+import com.google.gson.JsonParseException;
 import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
@@ -23,6 +26,13 @@ public class ATypistCalendar {
 		
 		GoogleCalendarManager.getInstance().authenticateUser();
 		AuthenticationManager.debug();
+		
+		try {
+			GoogleCalendarManager.getInstance().remoteCalendarExists();
+		} catch (JsonParseException | IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
 		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 
