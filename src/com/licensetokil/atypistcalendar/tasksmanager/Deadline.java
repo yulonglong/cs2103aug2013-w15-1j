@@ -5,7 +5,6 @@ import java.util.Calendar;
 public class Deadline extends Task {
 	private String taskType;
 	private int uniqueID;
-	private final Calendar startTime = Calendar.getInstance();
 	private Calendar endTime;
 	private String description;
 	private String place;
@@ -18,6 +17,15 @@ public class Deadline extends Task {
 		this.place = place;
 		this.uniqueID = uniqueID;
 		this.status = status;
+	}
+	
+	public Deadline(Deadline d){
+		this.taskType = "deadline";
+		this.endTime = d.getEndTime();
+		this.description = d.getDescription();
+		this.place = d.getPlace();
+		this.uniqueID = d.getUniqueID();
+		this.status = d.getStatus();
 	}
 
 	public int getUniqueID() {
@@ -61,7 +69,11 @@ public class Deadline extends Task {
 	}
 
 	public String toString() {
-		return "Deadline@" + uniqueID + "@" + endTime.toString() + "@"
-				+ description + "@" + place;
+		if(place.equals("")){
+			return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
+					+ description + "@" + " " + "@" + status;
+		}
+		return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
+				+ description + "@" + place + "@" + status;
 	}
 }

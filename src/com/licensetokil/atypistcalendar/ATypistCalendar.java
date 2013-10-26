@@ -1,9 +1,6 @@
 package com.licensetokil.atypistcalendar;
 
-import java.io.IOException;
 import java.util.Calendar;
-
-import com.google.gson.JsonParseException;
 import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
@@ -14,6 +11,7 @@ public class ATypistCalendar {
 	public static DefaultGUI gui;
 
 	public static void main(String[] args) {
+		TasksManager.fileToArray();
 		Calendar calendar = Calendar.getInstance();
 
 		gui = new DefaultGUI();
@@ -26,13 +24,6 @@ public class ATypistCalendar {
 		
 		GoogleCalendarManager.getInstance().authenticateUser();
 		AuthenticationManager.debug();
-		
-		try {
-			GoogleCalendarManager.getInstance().remoteCalendarExists();
-		} catch (JsonParseException | IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
 		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 
@@ -92,7 +83,6 @@ public class ATypistCalendar {
 
 			Action ac = Parser.parse(input);
 
-			if (!input.equals("undo")) {
 				if (ac.getClass().getName().contains("AddAction")) {
 					reply = TasksManager.executeCommand((AddAction) ac);
 				}
@@ -116,15 +106,15 @@ public class ATypistCalendar {
 				else if (ac.getClass().getName().contains("SearchAction")) {
 					reply = TasksManager.executeCommand((SearchAction) ac);
 				}
+				
+				else if(ac.getClass().getName().contains("UndoAction")){
+					reply = TasksManager.executeUndo();
+				}
 
 				else {
 					reply = ac.getClass().getName();
 				}
-			}
 
-			else {
-				reply = TasksManager.executeUndo((LocalAction) ac);
-			}
 			//reply = ac.toString();//kester using this to debug and try
 			// his parser
 			gui.outputWithNewline("Your Command: \n" + input + "\n");

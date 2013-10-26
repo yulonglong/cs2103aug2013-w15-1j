@@ -1,5 +1,4 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
-import java.util.Calendar;
 
 public class Todo extends Task {
 	private String taskType;
@@ -14,6 +13,14 @@ public class Todo extends Task {
 		this.description = description;
 		this.place = place;
 		this.status = status;
+	}
+	
+	public Todo(Todo td){
+		this.taskType = "deadline";
+		this.description = td.getDescription();
+		this.place = td.getPlace();
+		this.uniqueID = td.getUniqueID();
+		this.status = td.getStatus();
 	}
 
 	public int getUniqueID() {
@@ -49,6 +56,9 @@ public class Todo extends Task {
 	}
 
 	public String toString() {
-		return "Todo@" + uniqueID + "@" + description + "@" + place;
+		if(place.equals("")){
+			return "@Todo@" + uniqueID + "@" + description + "@" + " " + "@" + status;
+		}
+		return "@Todo@" + uniqueID + "@" + description + "@" + place + "@" + status;
 	}
 }

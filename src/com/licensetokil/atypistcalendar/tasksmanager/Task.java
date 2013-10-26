@@ -1,12 +1,11 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
-abstract class Task {
+public abstract class Task {
 	protected String taskType;
 	protected int uniqueID;
 	protected String place;
 	protected String description;
 
-	
 	public String getTaskType(){
 		return taskType;
 	}
