@@ -251,103 +251,83 @@ public class Parser {
 	 * 
 	 * the parser is flexible, for more information please refer to the user guide
 	 */
-	private static DisplayAction displayParser(StringTokenizer st) {
+	private static DisplayAction displayParser(StringTokenizer st) throws MalformedUserInputException{
 		DisplayAction userAction = new DisplayAction();
 
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
 		calendarArray[INDEX_END_TIME] = null;
+		String place = new String();
+		String all = null;
+		String status = null;
+		String task = null;
 
 		// if command has more details after display
 		// e.g. display "deadlines undone todos"
-		if (st.hasMoreTokens()) {
-
-			String prep = new String(st.nextToken());
-			
-			//check if the description is all
-			if (isStringAll(prep)){
-				userAction.setDescription(ALL);
-				if(!st.hasMoreTokens()){
-					calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-					calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
-					
-					userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-					userAction.setEndTime(calendarArray[INDEX_END_TIME]);
-					return userAction;
-				}
-			}
-			else {// if not then return back the string
-				st = addStringToTokenizer(st,prep);
-			}
-			
-			
-			
-			prep = new String(st.nextToken());
-			// check if done/undone/schedules/deadlines/todos is included in user input
-			if(isValidStatus(prep)){
-				userAction.setStatus(prep);
-			}
-			else if (isValidTask(prep)) {
-				userAction.setDescription(prep);
-			}
-			else {// if not then return back the string
-				st = addStringToTokenizer(st,prep);
-			}
-			//if no more elements
-			if(!st.hasMoreTokens()){
-				calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-				calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
-				
-				userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-				userAction.setEndTime(calendarArray[INDEX_END_TIME]);
-				return userAction;
-			}
-			
-			//check if schedules/deadlines/todos is included in user input
-			prep = new String(st.nextToken());
-			if (isValidTask(prep)) {
-				userAction.setDescription(prep);
-			}
-			else {// if not then return back the string
-				st = addStringToTokenizer(st,prep);
-			}
-			
-			if(!st.hasMoreTokens()){
-				calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-				calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
-				
-				userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-				userAction.setEndTime(calendarArray[INDEX_END_TIME]);
-				return userAction;
-			}
-			
-			//get place start
-			String place = new String();
-			prep = new String();
-			
-			place=getPlace(st,tempSt);
-			st= tempSt[INDEX_ST];
-			userAction.setPlace(place);
-			
-			if(!st.hasMoreTokens()){
-				return userAction;
-			}
-			//get place end
-			
-			// if there is a date field
-			getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
-			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
-		}
-		else{
-			calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-			calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
-			
+		if (!st.hasMoreTokens()) {
+			setEndTimeMax(calendarArray);
 			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			userAction.setDescription(ALL);
+			return userAction;
 		}
+		
+		//check if the description is all
+		all=getStringAll(st,tempSt);
+		st= tempSt[INDEX_ST];
+		userAction.setDescription(all);
+		
+		if(!st.hasMoreTokens()){
+			setEndTimeMax(calendarArray);
+			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
+			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
+			return userAction;
+		}
+		
+		
+		// check if done/undone is included in user input
+		status=getStatus(st,tempSt);
+		st= tempSt[INDEX_ST];
+		userAction.setStatus(status);
+		
+		//if no more elements
+		if(!st.hasMoreTokens()){
+			setEndTimeMax(calendarArray);
+			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
+			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
+			return userAction;
+		}
+		
+		//check if schedules/deadlines/todos is included in user input
+		task=getTask(st,tempSt);
+		st= tempSt[INDEX_ST];
+		if(!task.equals("")){
+			userAction.setDescription(task);
+		}
+		
+		if(!st.hasMoreTokens()){
+			setEndTimeMax(calendarArray);
+			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
+			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
+			return userAction;
+		}
+		
+		//get place start
+		place=getPlace(st,tempSt);
+		st= tempSt[INDEX_ST];
+		userAction.setPlace(place);
+		
+		if(!st.hasMoreTokens()){
+			return userAction;
+		}
+		//get place end
+		
+		// if there is a date field
+		getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
+		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
+		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
+	
 		return userAction;
 	}
 
@@ -371,27 +351,28 @@ public class Parser {
 	// update function: 100 %
 	private static UpdateAction updateParser(StringTokenizer st) throws MalformedUserInputException {
 		UpdateAction userAction = new UpdateAction();
-		String temp = new String(st.nextToken());
 		
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
 		calendarArray[INDEX_END_TIME] = null;
-
-		temp = temp.substring(1);
-		int tempInt = Integer.parseInt(temp);
-		userAction.setReferenceNumber(tempInt);
+		String description = null;
+		String place = null;
+		String updateDelimiter = null;
+		int referenceNumber = INIT_INT_VALUE;
 		
-		temp = st.nextToken();
-		while(!isValidUpdateDelimiter(temp)){
+		//get reference number (e.g. #3)
+		referenceNumber = getSingleReferenceNumber(st);
+		userAction.setReferenceNumber(referenceNumber);
+		
+		//check is there ">>" delimiter after the reference number
+		updateDelimiter = st.nextToken();
+		if (!isValidUpdateDelimiter(updateDelimiter)){
 			throw new MalformedUserInputException (MESSAGE_INVALID);
 		}
-		
-		
-		
+				
 		//after finding the delimiter ">>"
-		String description = new String();
-		
+		//get the description
 		description = getDescription(st,tempSt);
 		st = tempSt[INDEX_ST];
 		userAction.setUpdatedQuery(description);
@@ -400,10 +381,7 @@ public class Parser {
 			return userAction;
 		}
 
-
-		//get place start
-		String place = new String();
-		
+		//get place to be updated
 		place=getPlace(st,tempSt);
 		st= tempSt[INDEX_ST];
 		userAction.setUpdatedLocationQuery(place);
@@ -411,7 +389,6 @@ public class Parser {
 		if(!st.hasMoreTokens()){
 			return userAction;
 		}
-		//get place end
 
 		getCompleteDate(calendarArray,st,LocalActionType.UPDATE);
 		userAction.setUpdatedStartTime(calendarArray[INDEX_START_TIME]);
@@ -420,36 +397,29 @@ public class Parser {
 		return userAction;
 	}
 
-	// can search with exact same format as display,
-	// but without description or query yet.
-	// search function: 100 %
 	private static SearchAction searchParser(StringTokenizer st) {
 		SearchAction userAction = new SearchAction();
 
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_END_TIME] = null;
-
-		
+		calendarArray[INDEX_END_TIME] = null;		
 		String description = new String();
+		String place = new String();
 		
+		//get the task description / query
 		description = getDescription(st,tempSt);
 		st = tempSt[INDEX_ST];
 		userAction.setQuery(description);
 
-		
 		if(!st.hasMoreTokens()){
+			setEndTimeMax(calendarArray);
 			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
-			calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-			calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
 			userAction.setEndTime(calendarArray[INDEX_END_TIME]);
 			return userAction;
 		}
 		
-		//get place start
-		String place = new String();
-		
+		//get the place query, if any
 		place=getPlace(st,tempSt);
 		st= tempSt[INDEX_ST];
 		userAction.setLocationQuery(place);
@@ -457,7 +427,6 @@ public class Parser {
 		if(!st.hasMoreTokens()){
 			return userAction;
 		}
-		//get place end
 		
 		getCompleteDate(calendarArray,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
@@ -491,6 +460,74 @@ public class Parser {
 			throw new MalformedUserInputException(MESSAGE_INVALID);
 		}
 		return userAction;
+	}
+	
+	private static void setEndTimeMax (Calendar[] calendarArray) {
+		calendarArray[INDEX_END_TIME] = Calendar.getInstance();
+		calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
+		return;
+	}
+	
+	private static String getStringAll(StringTokenizer st, StringTokenizer[] tempSt) {
+		String all = new String(st.nextToken());
+		if (!isStringAll(all)){
+			st = addStringToTokenizer(st,all);
+			all= new String();
+		}
+		tempSt[INDEX_ST]=st;
+		return all;
+	}
+	
+	private static String getTask(StringTokenizer st, StringTokenizer[] tempSt) {
+		String task = new String(st.nextToken());
+		// if not then return back the string
+		if(!isValidTask(task)){
+			st = addStringToTokenizer(st,task);
+			task = new String();
+		}
+		tempSt[INDEX_ST] = st;
+		return task;
+	}
+	
+	private static String getStatus(StringTokenizer st, StringTokenizer[] tempSt){
+		String status = new String(st.nextToken());
+		// if not then return back the string
+		if(!isValidStatus(status)){
+			st = addStringToTokenizer(st,status);
+			status = new String();
+		}
+		tempSt[INDEX_ST] = st;
+		return status;
+	}
+	
+	private static int getSingleReferenceNumber(StringTokenizer st) throws MalformedUserInputException {
+		int referenceNumber = INIT_INT_VALUE; 
+		String temp = new String();
+		String expectHex = new String();
+		int tempInt = 0;
+		
+		if (!st.hasMoreTokens()) {
+			throw new MalformedUserInputException(MESSAGE_INVALID);
+		}
+		try{
+			temp = new String (st.nextToken());
+			
+			expectHex = temp.substring(FIRST_INDEX,SECOND_INDEX);
+			//if the first character is not hex, throw error
+			if(!isStringHex(expectHex)){
+				throw new MalformedUserInputException(MESSAGE_INVALID);
+			}
+			
+			temp = temp.substring(SECOND_INDEX); //retrieve the integer and remove the hex (#)
+			tempInt = Integer.parseInt(temp);
+			referenceNumber = tempInt;
+		}
+		catch (Exception e){
+			throw new MalformedUserInputException(MESSAGE_INVALID);
+		}
+		
+		
+		return referenceNumber;
 	}
 	
 	private static ArrayList<Integer> getMultipleReferenceNumber(StringTokenizer st) throws MalformedUserInputException{
@@ -1170,8 +1207,7 @@ public class Parser {
 	private static boolean isValidTask(String task) {
 		if ((task.equalsIgnoreCase(SCHEDULES))
 				|| (task.equalsIgnoreCase(DEADLINES))
-				|| (task.equalsIgnoreCase(TODOS))
-				|| (task.equalsIgnoreCase(ALL))) {
+				|| (task.equalsIgnoreCase(TODOS))) {
 			return true;
 		}
 		return false;
