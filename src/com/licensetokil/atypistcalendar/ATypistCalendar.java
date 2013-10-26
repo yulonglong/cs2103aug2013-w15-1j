@@ -22,8 +22,8 @@ public class ATypistCalendar {
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
 		
-		GoogleCalendarManager.getInstance().authenticateUser();
-		AuthenticationManager.debug();
+		//GoogleCalendarManager.getInstance().authenticateUser();
+		//AuthenticationManager.debug();
 		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
 		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 

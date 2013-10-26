@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import com.licensetokil.atypistcalendar.ATypistCalendar;
+import com.licensetokil.atypistcalendar.gcal.SyncManager;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 
 public class DefaultGUI extends JFrame implements WindowListener {
@@ -20,7 +21,6 @@ public class DefaultGUI extends JFrame implements WindowListener {
 
     private static Logger p = Logger.getLogger("atc");
     private static Logger logger = Logger.getLogger("atc.DefaultUI");
-    private static TasksManager TM = new TasksManager();
 
     public DefaultGUI() {
         System.out.println(logger.getParent().getName());
@@ -85,13 +85,19 @@ public class DefaultGUI extends JFrame implements WindowListener {
         logger.info("jTextField1 key released");
         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
             logger.info("jTextField1 key released = [Enter]");
+            
+            //DEBUG STATEMENTS
+            if(jTextField1.getText().equals("sstart")) {
+            	System.out.println("run syncer called");
+            }
+            //DEBUG STATEMENTS
 
             if (jTextField1.getText().equals("")) {
                 logger.warning("jTextField1 is empty, returning.");
                 return;
             }
 
-            logger.warning("jTextField1 calling userInput of Logic");
+            logger.info("jTextField1 calling userInput of Logic");
             ATypistCalendar.userInput(jTextField1.getText());
             jTextField1.setText("");
         }
