@@ -22,16 +22,13 @@ public class ATypistCalendar {
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
 		
-		
-		//if(refreshKey == null)
-			GoogleCalendarManager.getInstance().authenticateUser();
+		GoogleCalendarManager.getInstance().authenticateUser();
 			
-			if(GoogleCalendarManager.getInstance().userIsAuthenticated()) {
-				GoogleCalendarManager.getInstance().initialiseRemoteCalendar();
-			}
-		
-		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
-		//GoogleCalendarManager.getInstance().createRemoteCalendar();
+		if(GoogleCalendarManager.getInstance().userIsAuthenticated()) {
+			GoogleCalendarManager.getInstance().initialiseRemoteCalendar();
+			GoogleCalendarManager.getInstance().doCompleteSync();
+		}
+		System.out.println("all okay");
 
 		
 		/*

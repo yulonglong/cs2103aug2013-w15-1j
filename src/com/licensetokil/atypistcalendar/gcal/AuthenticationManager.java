@@ -23,14 +23,14 @@ public class AuthenticationManager {
 	private Date accessTokenExpiry;
 	
 	private AuthenticationManager() {
-		setAuthenticationToken("4/0rQ4LmbULSVN1giNttoK1ufVSy-b");
-		setAccessToken("ya29.AHES6ZRwYfeQE1cMO9oxzN-dmE4NHWAEWsnuZq0OoP2GPwM6XfyQng");
-		setRefreshToken("1/Y_H1dNBTyUqprVu3dV8YfNFMZEn5e2Y2FOHmTkJ-EOY");
-		setAccessTokenExpiry(new Date(0));
-//		setAuthenticationToken(null);
-//		setAccessToken(null);
-//		setRefreshToken(null);
-//		setAccessTokenExpiry(null);
+//		setAuthenticationToken("4/0rQ4LmbULSVN1giNttoK1ufVSy-b");
+//		setAccessToken("ya29.AHES6ZRwYfeQE1cMO9oxzN-dmE4NHWAEWsnuZq0OoP2GPwM6XfyQng");
+//		setRefreshToken("1/Y_H1dNBTyUqprVu3dV8YfNFMZEn5e2Y2FOHmTkJ-EOY");
+//		setAccessTokenExpiry(new Date(0));
+		setAuthenticationToken(null);
+		setAccessToken(null);
+		setRefreshToken(null);
+		setAccessTokenExpiry(null);
 	}
 	
 	public static void debug() {

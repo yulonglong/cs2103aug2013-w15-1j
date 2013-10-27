@@ -1,7 +1,10 @@
 package com.licensetokil.atypistcalendar.gcal;
 
+import java.util.Calendar;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
 
 class SyncManager {
@@ -11,10 +14,20 @@ class SyncManager {
 	private Syncer syncer;
 	private String remoteCalendarId;
 	
+	//TODO field-like objects - how?
+	private final Calendar remoteTodoStartEndDate;
+	private final JsonArray remoteTodoRecurrenceProperty;
+	
 	private SyncManager() {
 		queue = new ConcurrentLinkedQueue<SyncAction>();
 		syncer = null;
 		remoteCalendarId = null;
+		
+		remoteTodoRecurrenceProperty = new JsonArray();
+		remoteTodoRecurrenceProperty.add(new JsonPrimitive("RRULE:FREQ=MONTHLY"));
+		
+		remoteTodoStartEndDate = Calendar.getInstance();
+		remoteTodoStartEndDate.set(2013, 1, 1);
 	}
 	
 	protected static SyncManager getInstance() {
@@ -67,5 +80,13 @@ class SyncManager {
 
 	protected void setRemoteCalendarId(String remoteCalendarId) {
 		this.remoteCalendarId = remoteCalendarId;
+	}
+	
+	protected JsonArray getRemoteTodoRecurrenceProperty() {
+		return remoteTodoRecurrenceProperty;
+	}
+	
+	protected Calendar getRemoteTodoStartEndDate() {
+		return remoteTodoStartEndDate;
 	}
 }

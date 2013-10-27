@@ -23,6 +23,10 @@ public class GoogleCalendarManager {
 		return AuthenticationManager.getInstance().isAuthenticated();
 	}
 	
+	public void initialiseRemoteCalendar() {
+		SyncManager.getInstance().initialiseRemoteCalendar();
+	}
+	
 	public void addRemoteTask(Task localTask) {
 		SyncManager.getInstance().addRemoteTask(localTask);
 	}
@@ -35,7 +39,7 @@ public class GoogleCalendarManager {
 		SyncManager.getInstance().deleteRemoteTask(remoteTask);
 	}
 	
-	public void initialiseRemoteCalendar() {
-		SyncManager.getInstance().initialiseRemoteCalendar();
+	public void doCompleteSync() {
+		SyncManager.getInstance().doCompleteSync();
 	}
 }

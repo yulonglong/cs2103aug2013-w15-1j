@@ -88,11 +88,8 @@ public class DefaultGUI extends JFrame implements WindowListener {
             logger.info("jTextField1 key released = [Enter]");
             
             //DEBUG STATEMENTS
-            if(jTextField1.getText().equals("sstart")) {
-            	ArrayList<Task> list = TasksManager.getAllTasks();
-            	for(int i = 0; i < list.size(); i++) {
-            		GoogleCalendarManager.getInstance().addRemoteTask(list.get(i));
-            	}
+            if(jTextField1.getText().equals("ssync")) {
+            	GoogleCalendarManager.getInstance().doCompleteSync();
             }
             //DEBUG STATEMENTS
 
