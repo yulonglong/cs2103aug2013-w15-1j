@@ -1,7 +1,7 @@
 package com.licensetokil.atypistcalendar;
 
 import java.util.Calendar;
-import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
+
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
@@ -22,8 +22,14 @@ public class ATypistCalendar {
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
 		
-		//GoogleCalendarManager.getInstance().authenticateUser();
-		//AuthenticationManager.debug();
+		
+		//if(refreshKey == null)
+			GoogleCalendarManager.getInstance().authenticateUser();
+			
+			if(GoogleCalendarManager.getInstance().userIsAuthenticated()) {
+				GoogleCalendarManager.getInstance().initialiseRemoteCalendar();
+			}
+		
 		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
 		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 

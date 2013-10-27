@@ -1,4 +1,4 @@
-package com.licensetokil.atypistcalendar.gcal;
+package com.licensetokil.atypistcalendar.gcal.util;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;

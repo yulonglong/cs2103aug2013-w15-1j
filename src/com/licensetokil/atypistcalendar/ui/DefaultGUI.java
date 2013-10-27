@@ -6,24 +6,25 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import com.licensetokil.atypistcalendar.ATypistCalendar;
-import com.licensetokil.atypistcalendar.gcal.SyncManager;
+import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
+import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 
 public class DefaultGUI extends JFrame implements WindowListener {
-
-    private JScrollPane jScrollPane1;
+	private static final long serialVersionUID = 1L;
+	
+	private JScrollPane jScrollPane1;
     private JTextArea jTextArea1;
     private JTextField jTextField1;
 
-    private static Logger p = Logger.getLogger("atc");
     private static Logger logger = Logger.getLogger("atc.DefaultUI");
 
     public DefaultGUI() {
-        System.out.println(logger.getParent().getName());
         logger.setLevel(Level.OFF);
         logger.info("Creating new instance of DefaultGUI");
         initComponents();
@@ -88,7 +89,10 @@ public class DefaultGUI extends JFrame implements WindowListener {
             
             //DEBUG STATEMENTS
             if(jTextField1.getText().equals("sstart")) {
-            	System.out.println("run syncer called");
+            	ArrayList<Task> list = TasksManager.getAllTasks();
+            	for(int i = 0; i < list.size(); i++) {
+            		GoogleCalendarManager.getInstance().addRemoteTask(list.get(i));
+            	}
             }
             //DEBUG STATEMENTS
 

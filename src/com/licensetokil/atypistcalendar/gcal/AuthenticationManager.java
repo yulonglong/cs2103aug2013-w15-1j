@@ -7,6 +7,7 @@ import java.util.HashMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.licensetokil.atypistcalendar.gcal.util.HttpsConnectionHelper;
 
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 
@@ -22,15 +23,14 @@ public class AuthenticationManager {
 	private Date accessTokenExpiry;
 	
 	private AuthenticationManager() {
-		/*
-		setAuthenticationToken("4/F696Cw4XXidjxbNX1rVrVdyhvZ3F");
-		setAccessToken("ya29.AHES6ZTK0KTseILcLhfUOC3WAcjPaQMEUWf1FWAJl4Hkgw");
-		setRefreshToken("1/IzrgDGXLnEV7OMb38K8puKJMRM_dPWrRGfQuE30JRn0");
-		setAccessTokenExpiry(new Date(0));*/
-		setAuthenticationToken(null);
-		setAccessToken(null);
-		setRefreshToken(null);
-		setAccessTokenExpiry(null);
+		setAuthenticationToken("4/0rQ4LmbULSVN1giNttoK1ufVSy-b");
+		setAccessToken("ya29.AHES6ZRwYfeQE1cMO9oxzN-dmE4NHWAEWsnuZq0OoP2GPwM6XfyQng");
+		setRefreshToken("1/Y_H1dNBTyUqprVu3dV8YfNFMZEn5e2Y2FOHmTkJ-EOY");
+		setAccessTokenExpiry(new Date(0));
+//		setAuthenticationToken(null);
+//		setAccessToken(null);
+//		setRefreshToken(null);
+//		setAccessTokenExpiry(null);
 	}
 	
 	public static void debug() {
