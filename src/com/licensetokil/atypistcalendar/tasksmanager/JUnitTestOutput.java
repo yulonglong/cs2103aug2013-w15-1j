@@ -3,7 +3,6 @@ package com.licensetokil.atypistcalendar.tasksmanager;
 import static org.junit.Assert.*;
 import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-import com.licensetokil.atypistcalendar.ui.DefaultGUI;
 import java.util.Calendar;
 import org.junit.Test;
 

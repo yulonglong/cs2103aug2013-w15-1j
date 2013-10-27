@@ -70,7 +70,6 @@ public class Schedule extends Task {
 	}
 
 	public String toString() {
-		String replace;
 		if(place.equals("")){
 			return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
 					+ endTime.getTime() + "@" + description + "@" + " ";
