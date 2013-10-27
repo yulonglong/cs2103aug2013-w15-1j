@@ -2,6 +2,7 @@ package com.licensetokil.atypistcalendar.gcal;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.google.gson.JsonObject;
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
 
 public class SyncManager {
