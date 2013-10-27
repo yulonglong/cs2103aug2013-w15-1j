@@ -12,125 +12,82 @@ import java.util.logging.Level;
 import com.licensetokil.atypistcalendar.ATypistCalendar;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 
-public class DefaultGUI extends JFrame implements WindowListener {
+javax
 
-    private JScrollPane jScrollPane1;
-    private JTextArea jTextArea1;
-    private JTextField jTextField1;
 
-    private static Logger p = Logger.getLogger("atc");
-    private static Logger logger = Logger.getLogger("atc.DefaultUI");
-    private static TasksManager TM = new TasksManager();
 
-    public DefaultGUI() {
-        System.out.println(logger.getParent().getName());
-        logger.setLevel(Level.OFF);
-        logger.info("Creating new instance of DefaultGUI");
-        initComponents();
-        logger.info("New instance of DefaultGUI created");
-        addWindowListener(this);
+.swing.JPanel; /** * GradientPanel is a class with a gradient background, put your non-opaque objects over it and enjoy. * @author Mohammad Abou-Basha * */ public class GradientPanel extends JPanel {
+
+    private Color startColor;
+    private Color endColor;
+
+    public GradientPanel() {
+        this(Color.GRAY, Color.WHITE);
     }
 
-    private void initComponents() {
-
-        logger.info("Initialising components");
-
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jTextField1 = new javax.swing.JTextField();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("A Typist's Calendar");
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setWrapStyleWord(true);
-
-        jScrollPane1.setViewportView(jTextArea1);
-
-        jTextField1.setText("");
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jTextField1KeyReleased(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6))
-        );
-
-        pack();
+    public GradientPanel(Color startColor, Color endColor) {
+        super();
+        this.startColor = startColor;
+        this.endColor = endColor;
     }
 
-    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {
-        logger.info("jTextField1 key released");
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-            logger.info("jTextField1 key released = [Enter]");
-
-            if (jTextField1.getText().equals("")) {
-                logger.warning("jTextField1 is empty, returning.");
-                return;
-            }
-
-            logger.warning("jTextField1 calling userInput of Logic");
-            ATypistCalendar.userInput(jTextField1.getText());
-            jTextField1.setText("");
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        int panelHeight = getHeight();
+        int panelWidth = getWidth();
+        GradientPaint gradientPaint = new GradientPaint(0, 0, startColor, panelWidth, panelHeight, endColor);
+        if (g instanceof Graphics2D) {
+            Graphics2D graphics2D = (Graphics2D) g;
+            graphics2D.setPaint(gradientPaint);
+            graphics2D.fillRect(0, 0, panelWidth, panelHeight);
         }
     }
+}
 
-    @Override
-    public void windowClosing(WindowEvent e) {
-        TasksManager.exit();
+public class GradientPanelDemo extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel jContentPane = null;
+    private GradientPanel gradientPanel = null;
+
+    /**
+     * * This is the default constructor
+     */
+    public GradientPanelDemo() {
+        super();
+        initialize();
     }
 
-    public void outputWithNewline(String text) {
-        logger.info("Output to user: " + text);
-
-        jTextArea1.append(text + "\n");
-        jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
-        jTextField1.requestFocus();
+    /**
+     * * This method initializes this * * @return void
+     */
+    private void initialize() {
+        this.setSize(300, 200);
+        this.setContentPane(getJContentPane());
+        this.setTitle("JFrame");
     }
 
-    @Override
-    public void windowOpened(WindowEvent e) {
+    /**
+     * * This method initializes jContentPane * * @return javax.swing.JPanel
+     */
+    private JPanel getJContentPane() {
+        if (jContentPane == null) {
+            jContentPane = new JPanel();
+            jContentPane.setLayout(new BorderLayout());
+            jContentPane.add(getGradientPanel(), BorderLayout.CENTER);
+        }
+        return jContentPane;
     }
 
-    @Override
-    public void windowClosed(WindowEvent e) {
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
+    /**
+     * * This method initializes gradientPanel * * @return
+     * gradient.GradientPanel
+     */
+    private GradientPanel getGradientPanel() {
+        if (gradientPanel == null) {
+            gradientPanel = new GradientPanel();
+        }
+        return gradientPanel;
     }
 }

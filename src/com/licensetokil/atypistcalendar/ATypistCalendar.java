@@ -5,16 +5,17 @@ import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-import com.licensetokil.atypistcalendar.ui.DefaultGUI;
+import com.licensetokil.atypistcalendar.ui.ATCGUI;
+import java.awt.Color;
 
 public class ATypistCalendar {
-	public static DefaultGUI gui;
+	public static ATCGUI gui;
 
 	public static void main(String[] args) {
 		TasksManager.fileToArray();
 		Calendar calendar = Calendar.getInstance();
 
-		gui = new DefaultGUI();
+		gui = new ATCGUI();
 		gui.setVisible(true);
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n");
