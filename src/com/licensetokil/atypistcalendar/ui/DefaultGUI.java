@@ -1,23 +1,22 @@
 package com.licensetokil.atypistcalendar.ui;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 import com.licensetokil.atypistcalendar.ATypistCalendar;
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 
 public class DefaultGUI extends JFrame implements WindowListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private JScrollPane jScrollPane1;
     private JTextArea jTextArea1;
     private JTextField jTextField1;
@@ -86,7 +85,7 @@ public class DefaultGUI extends JFrame implements WindowListener {
         logger.info("jTextField1 key released");
         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
             logger.info("jTextField1 key released = [Enter]");
-            
+
             //DEBUG STATEMENTS
             if(jTextField1.getText().equals("ssync")) {
             	GoogleCalendarManager.getInstance().doCompleteSync();

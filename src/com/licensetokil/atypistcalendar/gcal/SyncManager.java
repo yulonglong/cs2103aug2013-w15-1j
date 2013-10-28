@@ -14,20 +14,18 @@ class SyncManager {
 	private Syncer syncer;
 	private String remoteCalendarId;
 	
-	//TODO field-like objects - how?
-	private final Calendar remoteTodoStartEndDate;
-	private final JsonArray remoteTodoRecurrenceProperty;
+	public static final Calendar REMOTE_TODO_START_END_DATE = Calendar.getInstance();
+	private static final JsonArray REMOTE_TODO_RECURRENCE_PROPERTY = new JsonArray();
+	
+	static {
+		REMOTE_TODO_START_END_DATE.set(2013, Calendar.JANUARY, 1);
+		REMOTE_TODO_RECURRENCE_PROPERTY.add(new JsonPrimitive("RRULE:FREQ=MONTHLY"));
+	}
 	
 	private SyncManager() {
 		queue = new ConcurrentLinkedQueue<SyncAction>();
 		syncer = null;
 		remoteCalendarId = null;
-		
-		remoteTodoRecurrenceProperty = new JsonArray();
-		remoteTodoRecurrenceProperty.add(new JsonPrimitive("RRULE:FREQ=MONTHLY"));
-		
-		remoteTodoStartEndDate = Calendar.getInstance();
-		remoteTodoStartEndDate.set(2013, 1, 1);
 	}
 	
 	protected static SyncManager getInstance() {
@@ -83,10 +81,10 @@ class SyncManager {
 	}
 	
 	protected JsonArray getRemoteTodoRecurrenceProperty() {
-		return remoteTodoRecurrenceProperty;
+		return REMOTE_TODO_RECURRENCE_PROPERTY;
 	}
 	
 	protected Calendar getRemoteTodoStartEndDate() {
-		return remoteTodoStartEndDate;
+		return REMOTE_TODO_START_END_DATE;
 	}
 }
