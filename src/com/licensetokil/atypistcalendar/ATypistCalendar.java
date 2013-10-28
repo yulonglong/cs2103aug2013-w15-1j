@@ -13,16 +13,16 @@ import com.licensetokil.atypistcalendar.parser.Parser;
 import com.licensetokil.atypistcalendar.parser.SearchAction;
 import com.licensetokil.atypistcalendar.parser.UpdateAction;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-import com.licensetokil.atypistcalendar.ui.DefaultGUI;
+import com.licensetokil.atypistcalendar.ui.ATCGUI;
 
 public class ATypistCalendar {
-	public static DefaultGUI gui;
+	public static ATCGUI gui;
 
 	public static void main(String[] args) {
 		TasksManager.fileToArray();
 		Calendar calendar = Calendar.getInstance();
 
-		gui = new DefaultGUI();
+		gui = new ATCGUI();
 		gui.setVisible(true);
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n");
