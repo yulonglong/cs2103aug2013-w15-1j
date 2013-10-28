@@ -1,34 +1,37 @@
 package com.licensetokil.atypistcalendar;
 
 import java.util.Calendar;
-import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
+
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.parser.*;
+import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.AddAction;
+import com.licensetokil.atypistcalendar.parser.DeleteAction;
+import com.licensetokil.atypistcalendar.parser.DisplayAction;
+import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
+import com.licensetokil.atypistcalendar.parser.MarkAction;
+import com.licensetokil.atypistcalendar.parser.Parser;
+import com.licensetokil.atypistcalendar.parser.SearchAction;
+import com.licensetokil.atypistcalendar.parser.UpdateAction;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-import com.licensetokil.atypistcalendar.ui.ATCGUI;
-import java.awt.Color;
+import com.licensetokil.atypistcalendar.ui.DefaultGUI;
 
 public class ATypistCalendar {
-	public static ATCGUI gui;
+	public static DefaultGUI gui;
 
 	public static void main(String[] args) {
 		TasksManager.fileToArray();
 		Calendar calendar = Calendar.getInstance();
 
-		gui = new ATCGUI();
+		gui = new DefaultGUI();
 		gui.setVisible(true);
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n");
 		gui.outputWithNewline("Current time:");
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
-		
-		GoogleCalendarManager.getInstance().authenticateUser();
-		AuthenticationManager.debug();
-		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
-		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 
-		
+		GoogleCalendarManager.getInstance().initialise();
+
 		/*
 		 userInput("add swimming on 30/12 from 1300 to 1400");
 		 userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
@@ -44,7 +47,7 @@ public class ATypistCalendar {
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
-		
+
 		 userInput("display"); userInput("display schedules at Bukit Batok");
 		 userInput("display all on 10/6");
 		 userInput("display all in Korea on 10/12");
@@ -54,17 +57,17 @@ public class ATypistCalendar {
 		 userInput("display schedules on 5/3 from 3pm to 1900");
 		 userInput("display todos"); userInput("display schedules");
 		 userInput("display undone"); userInput("display done");
-		 
+
 		 userInput("abcd");
-		 
+
 		 userInput("mark #1 as done"); userInput("mark #1 #2 as done");
-		 
+
 		 userInput("delete #1 #2 #4");
-		 
+
 		 userInput("undo");
 		 userInput("search swimming tgt at bt batok on 10/6");
 		 userInput("search badminton on 5/3 from 3pm to 1900");
-		 
+
 		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
 		*/
 
@@ -102,12 +105,12 @@ public class ATypistCalendar {
 
 				else if (ac.getClass().getName().contains("MarkAction")) {
 					reply = TasksManager.executeCommand((MarkAction) ac);
-				}	
+				}
 
 				else if (ac.getClass().getName().contains("SearchAction")) {
 					reply = TasksManager.executeCommand((SearchAction) ac);
 				}
-				
+
 				else if(ac.getClass().getName().contains("UndoAction")){
 					reply = TasksManager.executeUndo();
 				}
@@ -125,7 +128,7 @@ public class ATypistCalendar {
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
 		}
-		
+
 		return reply;
 	}
 }

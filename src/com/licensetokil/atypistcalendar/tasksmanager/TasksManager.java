@@ -50,7 +50,7 @@ public class TasksManager {
         return todo;
     }
     
-    public ArrayList<Task> getAllTasks(){
+    public static ArrayList<Task> getAllTasks(){
         ArrayList<Task> allTasks = new ArrayList<Task>();
         allTasks.addAll(schedule);
         allTasks.addAll(deadline);

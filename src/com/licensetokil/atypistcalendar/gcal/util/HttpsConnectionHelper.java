@@ -1,4 +1,4 @@
-package com.licensetokil.atypistcalendar.gcal;
+package com.licensetokil.atypistcalendar.gcal.util;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
@@ -18,7 +18,6 @@ public class HttpsConnectionHelper {
 	public static final String REQUEST_METHOD_GET = "GET";
 	public static final String REQUEST_METHOD_DELETE = "DELETE";
 	public static final String REQUEST_METHOD_PUT = "PUT";
-	public static final String REQUEST_METHOD_PATCH = "PATCH";
 	
 	public static final String CONTENT_TYPE_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 	public static final String CONTENT_TYPE_JSON = "application/json";
@@ -40,13 +39,34 @@ public class HttpsConnectionHelper {
 		if(requestBody != null) {
 			return sendAndReceiveRequest(httpsConnection, requestBody.toString());
 		}
-		return sendAndReceiveRequest(httpsConnection, null);
+		else {
+			return sendAndReceiveRequest(httpsConnection, null);
+		}
 	}
 	
 	public static String sendUrlencodedFormRequest(String url, String requestMethod, Map<String, String> additionalHeaders, Map<String, String> formParameters)
 			throws IOException {
-		//TODO handle get
-		URL urlObject = new URL(url);
+		assert requestMethod == REQUEST_METHOD_GET;
+		assert requestMethod == REQUEST_METHOD_POST;
+		
+		//Handle form parameters first, because if requestMethod == GET then we need to append it to the url.
+		String formParametersAsString = "";
+		if(formParameters != null) {
+			Iterator<String> parametersKeyIterator = formParameters.keySet().iterator();
+			while (parametersKeyIterator.hasNext()) {
+				String currentKey = parametersKeyIterator.next();
+				formParametersAsString += currentKey + "=" + formParameters.get(currentKey) + "&";
+			}
+		}
+		
+		URL urlObject;
+		if(requestMethod == REQUEST_METHOD_POST) {
+			urlObject = new URL(url);
+		}
+		else {
+			urlObject = new URL(url + "?" + formParametersAsString);
+		}
+
 		HttpsURLConnection httpsConnection = (HttpsURLConnection)urlObject.openConnection();
 
 		httpsConnection.setRequestMethod(requestMethod);
@@ -56,17 +76,12 @@ public class HttpsConnectionHelper {
 			addHeaders(httpsConnection, additionalHeaders);
 		}
 		
-		if(formParameters != null) {
-			String parametersAsString = "";
-			Iterator<String> parametersKeyIterator = formParameters.keySet().iterator();
-			while (parametersKeyIterator.hasNext()) {
-				String currentKey = parametersKeyIterator.next();
-				parametersAsString += currentKey + "=" + formParameters.get(currentKey) + "&";
-			}
-			return sendAndReceiveRequest(httpsConnection, parametersAsString);
+		if(requestMethod == REQUEST_METHOD_POST) {
+			return sendAndReceiveRequest(httpsConnection, formParametersAsString);
 		}
-
-		return sendAndReceiveRequest(httpsConnection, null);
+		else {
+			return sendAndReceiveRequest(httpsConnection, null);
+		}
 	}
 	
 	private static void addHeaders(HttpsURLConnection httpsConnection, Map<String, String> headers) {

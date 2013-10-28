@@ -1,8 +1,7 @@
-package com.licensetokil.atypistcalendar.gcal;
+package com.licensetokil.atypistcalendar.gcal.util;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 import org.junit.After;

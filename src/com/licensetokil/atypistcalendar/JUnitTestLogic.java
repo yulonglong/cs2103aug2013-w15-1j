@@ -1,12 +1,6 @@
 package com.licensetokil.atypistcalendar;
 
-import static org.junit.Assert.*;
-import java.util.Calendar;
-import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
-import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-import com.licensetokil.atypistcalendar.ui.DefaultGUI;
 
 import org.junit.Test;
 
