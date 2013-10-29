@@ -1,10 +1,12 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
-import static org.junit.Assert.*;
-import com.licensetokil.atypistcalendar.parser.*;
-import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Calendar;
+
 import org.junit.Test;
+
+import com.licensetokil.atypistcalendar.parser.AddAction;
 
 public class JUnitTestOutput {
 
@@ -21,23 +23,23 @@ public class JUnitTestOutput {
 		aa.setEndTime(endTime);
 		aa.setDescription("swimming");
 		aa.setPlace("Community Centre");
-		
-		assertEquals(TasksManager.executeCommand(aa), "Added:\nEvent: swimming\nStarting Time: Fri Oct 25 12:00:00 SGT 2013\nEnding Time: Fri Oct 25 13:00:00 SGT 2013\nPlace: Community Centre\n"); 
-		
+
+		assertEquals(TasksManager.getInstance().executeCommand(aa), "Added:\nEvent: swimming\nStarting Time: Fri Oct 25 12:00:00 SGT 2013\nEnding Time: Fri Oct 25 13:00:00 SGT 2013\nPlace: Community Centre\n");
+
 		//testAdd2
 		//Equivalence partitioning: Deadline
 		aa.setDescription("reply Edward");
 		aa.setStartTime(null);
 		aa.setPlace("");
-		
-		assertEquals(TasksManager.executeCommand(aa), "Added\nEvent: reply Edward\nDue by: Fri Oct 25 13:00:00 SGT 2013\n");
-		
+
+		assertEquals(TasksManager.getInstance().executeCommand(aa), "Added\nEvent: reply Edward\nDue by: Fri Oct 25 13:00:00 SGT 2013\n");
+
 		//testAdd3
 		//Equivalence partitioning: Todo
 		aa.setEndTime(null);
 		aa.setDescription("clean my room");
-		
-		assertEquals(TasksManager.executeCommand(aa), "Added\nEvent: clean my room\n");
+
+		assertEquals(TasksManager.getInstance().executeCommand(aa), "Added\nEvent: clean my room\n");
 	}
 
 }

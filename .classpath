@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="lib/DJNativeSwing-SWT.jar"/>
 	<classpathentry kind="lib" path="lib/DJNativeSwing.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.2.4.jar"/>
-	<classpathentry kind="lib" path="lib/swt_x86.jar"/>
 	<classpathentry kind="lib" path="lib/swt_x64.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
