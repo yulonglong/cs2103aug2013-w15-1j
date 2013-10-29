@@ -561,6 +561,8 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		startTime.set(2000,0,1,0,0,0);
+		newDc.setStartTime(startTime);
 		//display all
 		//display all will give same result as display
 		try{

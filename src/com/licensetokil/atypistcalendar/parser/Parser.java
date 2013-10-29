@@ -292,6 +292,8 @@ public class Parser {
 		userAction.setDescription(all);
 		
 		if(!st.hasMoreTokens()){
+			calendarArray[INDEX_START_TIME].set(MIN_YEAR,MIN_MONTH,MIN_DAY,MIN_HOUR,MIN_MINUTE,MIN_SECOND);
+			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 			return userAction;
 		}
 		
