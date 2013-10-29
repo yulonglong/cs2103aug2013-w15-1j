@@ -20,6 +20,8 @@ public class ParserJUnitTest {
 		MarkAction newMc = new MarkAction();
 		UpdateAction newUc = new UpdateAction();
 		UndoAction newUndc = new UndoAction();
+		AddGoogleAction newAddGc = new AddGoogleAction();
+		SyncGoogleAction newSyncGc = new SyncGoogleAction();
 		GoogleAction newGc = new GoogleAction();
 		
 		Action ac = null;
@@ -1029,15 +1031,16 @@ public class ParserJUnitTest {
 		//gcal quick add swimming monday at home 5 pm
 		//gcal quick add command
 		newGc = null;
+		newAddGc = null;
 		expectedAc = null;
 		ac = null;
 		
-		newGc = new GoogleAction();
-		newGc.setType(GoogleActionType.GCAL_QUICK_ADD);
-		newGc.setUserInput(" swimming monday at home 5 pm");
-		expectedAc = newGc;
+		newAddGc = new AddGoogleAction();
+		newAddGc.setType(GoogleActionType.GOOGLE_ADD);
+		newAddGc.setUserInput(" swimming monday at home 5 pm");
+		expectedAc = newAddGc;
 		try{
-			ac = Parser.parse("gcal quick add swimming monday at home 5 pm");
+			ac = Parser.parse("google add swimming monday at home 5 pm");
 		}
 		catch(MalformedUserInputException muie){
 			System.out.println(muie);
@@ -1049,15 +1052,15 @@ public class ParserJUnitTest {
 		//gcal sync latest calendar update on monday
 		//gcal sync command
 		newGc = null;
+		newSyncGc = null;
 		expectedAc = null;
 		ac = null;
 		
-		newGc = new GoogleAction();
-		newGc.setType(GoogleActionType.GCAL_SYNC);
-		newGc.setUserInput(" latest calendar update on monday");
-		expectedAc = newGc;
+		newSyncGc = new SyncGoogleAction();
+		newSyncGc.setType(GoogleActionType.GOOGLE_SYNC);
+		expectedAc = newSyncGc;
 		try{
-			ac = Parser.parse("gcal sync latest calendar update on monday");
+			ac = Parser.parse("google sync");
 		}
 		catch(MalformedUserInputException muie){
 			System.out.println(muie);

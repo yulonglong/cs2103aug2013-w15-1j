@@ -1,3 +1,5 @@
-@Schedule@1@Tue Oct 29 16:00:00 SGT 2013@Tue Oct 29 17:00:00 SGT 2013@swimming@CC
 @Schedule@2@Tue Oct 29 08:00:00 SGT 2013@Tue Oct 29 09:00:00 SGT 2013@reply janet@ 
-@uniqueID@2
+@Schedule@7@Tue Oct 29 08:00:00 SGT 2013@Tue Oct 29 09:00:00 SGT 2013@swimming@ 
+@Deadline@8@Wed Oct 30 23:59:59 SGT 2013@do somth@ @done
+@Deadline@9@Thu Oct 31 23:59:59 SGT 2013@do bla@ @done
+@uniqueID@9

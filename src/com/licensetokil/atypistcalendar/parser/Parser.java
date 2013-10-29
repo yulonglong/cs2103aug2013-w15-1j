@@ -138,7 +138,7 @@ public class Parser {
 		String stringUserAction = new String(st.nextToken());
 		GoogleActionType googleActionType = determineGoogleActionType(stringUserAction);
 		// if GCAL type
-		if (googleActionType == GoogleActionType.GCAL) {
+		if (googleActionType == GoogleActionType.GOOGLE) {
 			return gcalParser(st);
 		}
 		// if not GCAL type (means Local type)
@@ -161,31 +161,24 @@ public class Parser {
 
 	private static Action gcalParser(StringTokenizer st) throws MalformedUserInputException {
 		String userInput = new String();
-		String stringUserAction = new String(GoogleActionType.GCAL.getString());
-		GoogleAction userAction = new GoogleAction();
+		String stringUserAction = new String(GoogleActionType.GOOGLE.getString());
+		AddGoogleAction userActionAdd = new AddGoogleAction();
 		stringUserAction = stringUserAction + WHITE_SPACE + st.nextToken();
 		GoogleActionType actionType = determineGoogleActionType(stringUserAction);
-
-		if (actionType == GoogleActionType.GCAL_SYNC) {
-			userAction.setType(GoogleActionType.GCAL_SYNC);
+		
+		switch (actionType) {
+		case GOOGLE_ADD:
 			userInput = new String(getRemainingTokens(st));
-			userAction.setUserInput(userInput);
-			return userAction;
-		} 
-		else {
-			stringUserAction = stringUserAction + WHITE_SPACE + st.nextToken();
-			actionType = determineGoogleActionType(stringUserAction);
-
-			if (actionType == GoogleActionType.GCAL_QUICK_ADD) {
-				userAction.setType(GoogleActionType.GCAL_QUICK_ADD);
-				userInput = new String(getRemainingTokens(st));
-				userAction.setUserInput(userInput);
-				return userAction;
-			} 
-			else {
-				System.out.println(MESSAGE_INVALID_GCAL);
-				throw new MalformedUserInputException(MESSAGE_INVALID);
-			}
+			userActionAdd.setUserInput(userInput);
+			return userActionAdd;
+		case GOOGLE_SYNC:
+			return new SyncGoogleAction();
+		case GOOGLE_LOGIN:
+			return new LoginGoogleAction();
+		case GOOGLE_LOGOUT:
+			return new LogoutGoogleAction();
+		default:
+			throw new MalformedUserInputException(MESSAGE_INVALID);
 		}
 	}
 
@@ -1391,15 +1384,21 @@ public class Parser {
 			String commandTypeString) {
 		if (commandTypeString == null) {
 			throw new Error(MESSAGE_INVALID);
-		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GCAL
+		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GOOGLE
 				.getString())) {
-			return GoogleActionType.GCAL;
+			return GoogleActionType.GOOGLE;
+		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GOOGLE_LOGIN
+				.getString())) {
+			return GoogleActionType.GOOGLE_LOGIN;
+		} else if (commandTypeString.equalsIgnoreCase(GoogleActionType.GOOGLE_LOGOUT
+				.getString())) {
+			return GoogleActionType.GOOGLE_LOGOUT;
 		} else if (commandTypeString
-				.equalsIgnoreCase(GoogleActionType.GCAL_SYNC.getString())) {
-			return GoogleActionType.GCAL_SYNC;
+				.equalsIgnoreCase(GoogleActionType.GOOGLE_SYNC.getString())) {
+			return GoogleActionType.GOOGLE_SYNC;
 		} else if (commandTypeString
-				.equalsIgnoreCase(GoogleActionType.GCAL_QUICK_ADD.getString())) {
-			return GoogleActionType.GCAL_QUICK_ADD;
+				.equalsIgnoreCase(GoogleActionType.GOOGLE_ADD.getString())) {
+			return GoogleActionType.GOOGLE_ADD;
 		} else {
 			return GoogleActionType.INVALID;
 		}
