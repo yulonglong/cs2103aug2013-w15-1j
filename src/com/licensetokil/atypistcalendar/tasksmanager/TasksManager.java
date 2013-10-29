@@ -6,6 +6,13 @@ import java.util.*;
 
 public class TasksManager {
 
+	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!";
+	private static final String ADDED_SCHEDULE = "Added Schedule:\nEvent:  %s\nStarting Time: %s\nEnding Time: %s\n";
+	private static final String APPEND_PLACE = "Place: %s\n";
+	private static final String ADDED_DEADLINE = "Added Deadline\n"
+			+ "Event: %s\nDue by: %s\n";
+	private static final String ADDED_TODO = "Added\nEvent: %s\n";
+
 	private static TasksManager TM;
 
 	private LocalAction action;
@@ -198,56 +205,54 @@ public class TasksManager {
 		return t;
 	}
 
-	private static String add(Task t) {
+	private String appendIfPlaceNotNull(String output, Task t) {
+		if (!t.getPlace().equals("")) {
+			output = output + String.format(APPEND_PLACE, t.getPlace());
+		}
+		return output;
+	}
+
+	private String add(Task t) {
 
 		try {
-			BufferedWriter w = new BufferedWriter(new FileWriter(file, true));
 			String output = "";
 
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
-				output = "Added:\n" + "Event: " + t.getDescription()
-						+ "\nStarting Time: "
-						+ ((Schedule) t).getStartTime().getTime()
-						+ "\nEnding Time: "
-						+ ((Schedule) t).getEndTime().getTime() + "\n";
-
+				output = String.format(ADDED_SCHEDULE, t.getDescription(),
+						((Schedule) t).getStartTime().getTime(), ((Schedule) t)
+								.getEndTime().getTime());
 			} else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
-				output = "Added\n" + "Event: "
-						+ ((Deadline) t).getDescription() + "\nDue by: "
-						+ ((Deadline) t).getEndTime().getTime() + "\n";
+				output = String.format(ADDED_DEADLINE, ((Deadline) t)
+						.getDescription(), ((Deadline) t).getEndTime()
+						.getTime());
 			} else if (t.getTaskType().equals("todo")) {
 				todo.add((Todo) t);
-				output = "Added\n" + "Event: " + t.getDescription() + "\n";
+				output = String.format(ADDED_TODO, t.getDescription());
 			}
 
-			if (!t.getPlace().equals("")) {
-				output = output + "Place: " + t.getPlace() + "\n";
-			}
+			output = appendIfPlaceNotNull(output, t);
 
 			lastTaskCreated = t;
-			w.write(t.toString());
-			w.newLine();
-			w.close();
+			fileSync();
 
 			return output;
 
 		} catch (Exception e) {
-			return "Add was unsuccessful. Please try again";
+			return ADD_UNSUCCESSFUL;
 		}
 
 	}
 
-	private static void addUndo() {
+	private void addUndo() {
 		schedule.remove(lastTaskCreated);
 		deadline.remove(lastTaskCreated);
 		todo.remove(lastTaskCreated);
-
 		fileSync();
 	}
 
-	private static String display(DisplayAction ac) {
+	private String display(DisplayAction ac) {
 		sch.clear();
 		dl.clear();
 		toDo.clear();
@@ -335,7 +340,7 @@ public class TasksManager {
 		return outputString(output);
 	}
 
-	private static String outputString(String output) {
+	private String outputString(String output) {
 
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
@@ -391,7 +396,7 @@ public class TasksManager {
 		return output;
 	}
 
-	private static String delete(DeleteAction ac) {
+	private String delete(DeleteAction ac) {
 
 		try {
 			for (Integer arr : ac.getReferenceNumber()) {
@@ -420,7 +425,7 @@ public class TasksManager {
 
 	}
 
-	private static void deleteUndo() {
+	private void deleteUndo() {
 		try {
 			for (Task t : deletedTasks) {
 				uniqueID--;
@@ -438,7 +443,7 @@ public class TasksManager {
 		}
 	}
 
-	private static String update(UpdateAction ac) {
+	private String update(UpdateAction ac) {
 		Task t = table.get(ac.getReferenceNumber());
 
 		try {
@@ -465,7 +470,7 @@ public class TasksManager {
 		return "Updated " + ac.getReferenceNumber() + " Successfully\n";
 	}
 
-	private static void updateUndo() {
+	private void updateUndo() {
 		try {
 			for (Schedule s : schedule) {
 				if (s.getUniqueID() == updateOriginalTask.getUniqueID()) {
@@ -488,7 +493,7 @@ public class TasksManager {
 		}
 	}
 
-	private static String search(SearchAction ac) {
+	private String search(SearchAction ac) {
 		sch.clear();
 		dl.clear();
 		toDo.clear();
@@ -530,7 +535,7 @@ public class TasksManager {
 		return outputString(output);
 	}
 
-	private static String mark(MarkAction ac) {
+	private String mark(MarkAction ac) {
 		String numbers = "";
 		markUndoList = new ArrayList<Task>();
 
@@ -556,7 +561,7 @@ public class TasksManager {
 		return "Marked " + numbers + "as " + ac.getStatus();
 	}
 
-	public static void markUndo() {
+	public void markUndo() {
 		String status = ((MarkAction) lastAction).getStatus();
 		String newStatus;
 
@@ -576,7 +581,7 @@ public class TasksManager {
 		fileSync();
 	}
 
-	public static void fileSync() {
+	public void fileSync() {
 		try {
 			BufferedWriter clearWriter = new BufferedWriter(
 					new FileWriter(file));
@@ -606,38 +611,38 @@ public class TasksManager {
 	}
 
 	public String executeCommand(LocalAction ac) {
-		if(ac.getType() == LocalActionType.ADD){
-			Task t = classify((AddAction)ac);
+		if (ac.getType() == LocalActionType.ADD) {
+			Task t = classify((AddAction) ac);
 			lastAction = ac;
 			System.out.println(ac.toString());
 			return add(t);
 		}
 
-		else if(ac.getType() == LocalActionType.DISPLAY){
-			return display((DisplayAction)ac);
+		else if (ac.getType() == LocalActionType.DISPLAY) {
+			return display((DisplayAction) ac);
 		}
 
-		else if(ac.getType() == LocalActionType.SEARCH){
+		else if (ac.getType() == LocalActionType.SEARCH) {
 			System.out.println(ac.toString());
 			return search((SearchAction) ac);
 		}
 
-		else if(ac.getType() == LocalActionType.DELETE){
+		else if (ac.getType() == LocalActionType.DELETE) {
 			lastAction = ac;
 			return delete((DeleteAction) ac);
 		}
 
-		else if(ac.getType() == LocalActionType.UPDATE){
+		else if (ac.getType() == LocalActionType.UPDATE) {
 			lastAction = ac;
 			return update((UpdateAction) ac);
 		}
 
-		else if(ac.getType() == LocalActionType.MARK){
+		else if (ac.getType() == LocalActionType.MARK) {
 			lastAction = ac;
 			return mark((MarkAction) ac);
 		}
 
-		else if(ac.getType() == LocalActionType.UNDO){
+		else if (ac.getType() == LocalActionType.UNDO) {
 
 			if (lastAction instanceof AddAction) {
 				addUndo();
@@ -650,8 +655,7 @@ public class TasksManager {
 			}
 
 			return "Undo Successful";
-		}
-		else {
+		} else {
 			return "ERROR";
 		}
 	}
