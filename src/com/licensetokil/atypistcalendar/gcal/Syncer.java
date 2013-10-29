@@ -57,13 +57,15 @@ class Syncer extends Thread {
 					assert false;
 				}
 
-				logger.info("Dropping SyncAction item that has been done (removing head of queue).");
+				logger.info("Dequeuing SyncAction item that has been completed (removing head of queue).");
 				SyncManager.getInstance().getQueue().poll();
 				currentSyncAction = SyncManager.getInstance().getQueue().peek();
 			}
 			catch(IllegalStateException | JsonParseException | IOException e) {
 				logger.warning("Exception thrown: " + e.getMessage());
 				e.printStackTrace();
+				logger.warning("DEBUG measure: Breaking out of queue loop...");
+				break;
 			}
 		}
 		logger.info("Queue is empty, terminating...");
@@ -167,10 +169,10 @@ class Syncer extends Thread {
 			requestBody.addProperty("summary", "Todo: " + localTodo.getDescription());
 			requestBody.addProperty("description", localTodo.getDescription());
 			requestBody.addProperty("location", localTodo.getPlace());
-			requestBody.add("start", GoogleCalendarUtilities.createDateObject(SyncManager.getInstance().getRemoteTodoStartEndDate()));
-			requestBody.add("end", GoogleCalendarUtilities.createDateObject(SyncManager.getInstance().getRemoteTodoStartEndDate()));
+			requestBody.add("start", GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+			requestBody.add("end", GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 			requestBody.add("extendedProperties", GoogleCalendarUtilities.createExtendedPropertiesObject(localTodo.getUniqueID()));
-			requestBody.add("recurrence", SyncManager.getInstance().getRemoteTodoRecurrenceProperty());
+			requestBody.add("recurrence", SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 		}
 		else {
 			assert false;
@@ -265,7 +267,6 @@ class Syncer extends Thread {
 
 					logger.info("Removing corresponding local task from the local tasks list.");
 					localTasks.remove(currentLocalTask);
-					break;
 				}
 				else {
 					logger.info("Corresponding local task not found, enqueuing to delete remote copy.");
@@ -392,9 +393,9 @@ class Syncer extends Thread {
 				locationIsIdentical = localTodo.getPlace().equals("");
 			}
 
-			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(GoogleCalendarUtilities.createDateObject(SyncManager.getInstance().getRemoteTodoStartEndDate()));
-			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(GoogleCalendarUtilities.createDateObject(SyncManager.getInstance().getRemoteTodoStartEndDate()));
-			final boolean recurrenceIsIdentical = remoteTask.get("recurrence").getAsJsonArray().equals(SyncManager.getInstance().getRemoteTodoRecurrenceProperty());
+			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+			final boolean recurrenceIsIdentical = remoteTask.get("recurrence").getAsJsonArray().equals(SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&

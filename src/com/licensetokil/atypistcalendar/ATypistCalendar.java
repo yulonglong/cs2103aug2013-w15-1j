@@ -107,6 +107,8 @@ public class ATypistCalendar {
 			gui.outputWithNewline(muie.getMessage());
 		}
 
+		//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
+		GoogleCalendarManager.getInstance().doCompleteSync();
 		return reply;
 	}
 

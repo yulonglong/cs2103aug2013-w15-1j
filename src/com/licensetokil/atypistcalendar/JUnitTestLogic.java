@@ -1,7 +1,5 @@
 package com.licensetokil.atypistcalendar;
 
-import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-
 import org.junit.Test;
 
 public class JUnitTestLogic {
@@ -12,19 +10,19 @@ public class JUnitTestLogic {
 		//TestAddSchedule
 		ATypistCalendar.gui = new DefaultGUI();
 		assertEquals(ATypistCalendar.userInput("add swimming on 30/12 from 1300 to 1400"),"Added:\nEvent: swimming\nStarting Time: Mon Dec 30 13:00:00 SGT 2013\nEnding Time: Mon Dec 30 14:00:00 SGT 2013\n");
-		
+
 		//TestDisplay
 		assertEquals(ATypistCalendar.userInput("display"),"Schedules: \n1. Event: swimming\nStarting Time: Mon Dec 30 13:00:00 SGT 2013\nEnding Time: Mon Dec 30 14:00:00 SGT 2013\n\n");
-		
+
 		//TestAddTodo
 		assertEquals(ATypistCalendar.userInput("add clean my room"), "Added\nEvent: clean my room\n");
-		
+
 		//TestMark
 		ATypistCalendar.userInput("display");
 		assertEquals(ATypistCalendar.userInput("mark #2 as done"),"Marked 2 as done");
 		*/
-		
-		TasksManager.fileToArray();
+
+		//TasksManager.getInstance().fileToArray();
 	}
 
 }
