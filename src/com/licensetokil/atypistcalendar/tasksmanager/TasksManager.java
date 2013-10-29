@@ -6,12 +6,23 @@ import java.util.*;
 
 public class TasksManager {
 
-	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!";
-	private static final String ADDED_SCHEDULE = "Added Schedule:\nEvent:  %s\nStarting Time: %s\nEnding Time: %s\n";
-	private static final String APPEND_PLACE = "Place: %s\n";
-	private static final String ADDED_DEADLINE = "Added Deadline\n"
-			+ "Event: %s\nDue by: %s\n";
-	private static final String ADDED_TODO = "Added\nEvent: %s\n";
+	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n";
+	
+	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n";
+	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n";
+	
+	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n";
+	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n";
+
+	private static final String UNDO_DELETE_SUCCESSFUL = "Delete command successfully undone\n";
+	private static final String UNDO_MARK_SUCCESSFUL = "Mark command successfully undone\n";
+	private static final String UNDO_UPDATE_SUCCESSFUL = "Update command successfully undone\n";
+	private static final String UNDO_ADD_SUCCESSFUL = "Add command successfully undone\n";
+
+	private static final String UNDO_DELETE_UNSUCCESSFUL = "Undo Delete command unsuccessful. Please try again!\n";
+	private static final String UNDO_MARK_UNSUCCESSFUL = "Undo Mark command unsuccessful. Please try again!\n";
+	private static final String UNDO_UPDATE_UNSUCCESSFUL = "Undo Update command unsuccessful. Please try again!\n";
+	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n";
 
 	private static TasksManager TM;
 
@@ -35,7 +46,6 @@ public class TasksManager {
 	private static Hashtable<Integer, Task> table = new Hashtable<Integer, Task>();
 
 	private static int uniqueID = 0;
-	private static int count = 1;
 
 	private static File file = new File("ATC.txt");
 
@@ -205,34 +215,22 @@ public class TasksManager {
 		return t;
 	}
 
-	private String appendIfPlaceNotNull(String output, Task t) {
-		if (!t.getPlace().equals("")) {
-			output = output + String.format(APPEND_PLACE, t.getPlace());
-		}
-		return output;
-	}
-
 	private String add(Task t) {
 
 		try {
-			String output = "";
+			String output = new String("");
 
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
-				output = String.format(ADDED_SCHEDULE, t.getDescription(),
-						((Schedule) t).getStartTime().getTime(), ((Schedule) t)
-								.getEndTime().getTime());
+
 			} else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
-				output = String.format(ADDED_DEADLINE, ((Deadline) t)
-						.getDescription(), ((Deadline) t).getEndTime()
-						.getTime());
+
 			} else if (t.getTaskType().equals("todo")) {
 				todo.add((Todo) t);
-				output = String.format(ADDED_TODO, t.getDescription());
 			}
 
-			output = appendIfPlaceNotNull(output, t);
+			output = "Added: \n" + t.outputStringForDisplay();
 
 			lastTaskCreated = t;
 			fileSync();
@@ -245,11 +243,16 @@ public class TasksManager {
 
 	}
 
-	private void addUndo() {
-		schedule.remove(lastTaskCreated);
-		deadline.remove(lastTaskCreated);
-		todo.remove(lastTaskCreated);
-		fileSync();
+	private String addUndo() {
+		try {
+			schedule.remove(lastTaskCreated);
+			deadline.remove(lastTaskCreated);
+			todo.remove(lastTaskCreated);
+			fileSync();
+		} catch (Exception e) {
+			return UNDO_ADD_UNSUCCESSFUL;
+		}
+		return UNDO_ADD_SUCCESSFUL;
 	}
 
 	private String display(DisplayAction ac) {
@@ -259,7 +262,6 @@ public class TasksManager {
 		table.clear();
 
 		String output = new String("");
-		count = 1;
 
 		switch (ac.getDescription()) {
 
@@ -333,26 +335,19 @@ public class TasksManager {
 					}
 				}
 			}
-			System.out.println(ac.toString());
 			break;
 		}
 
-		return outputString(output);
+		return displayOutput(output);
 	}
 
-	private String outputString(String output) {
+	private String displayOutput(String output) {
+		int count = 1;
 
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
-				output = output + count + ". " + "Event: " + s.getDescription()
-						+ "\n" + "Starting Time: " + s.getStartTime().getTime()
-						+ "\n" + "Ending Time: " + s.getEndTime().getTime()
-						+ "\n";
-
-				if (!s.getPlace().equals("")) {
-					output = output + "Place: " + s.getPlace() + "\n";
-				}
+				output = output + count + ". " + s.outputStringForDisplay();
 				table.put(count, s);
 				count++;
 			}
@@ -362,13 +357,7 @@ public class TasksManager {
 		if (!dl.isEmpty()) {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
-				output = output + count + ". " + "Event: " + d.getDescription()
-						+ "\n" + "Due by: " + d.getEndTime().getTime() + "\n"
-						+ "Status: " + d.getStatus() + "\n";
-
-				if (!d.getPlace().equals("")) {
-					output = output + "Place: " + d.getPlace() + "\n";
-				}
+				output = output + count + ". " + d.outputStringForDisplay();
 				table.put(count, d);
 				count++;
 			}
@@ -379,13 +368,7 @@ public class TasksManager {
 		if (!toDo.isEmpty()) {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
-				output = output + count + ". " + "Event: "
-						+ td.getDescription() + "\n" + "Status: "
-						+ td.getStatus() + "\n";
-
-				if (!td.getPlace().equals("")) {
-					output = output + "Place: " + td.getPlace() + "\n";
-				}
+				output = output + count + ". " +  td.outputStringForDisplay();
 				table.put(count, td);
 				count++;
 			}
@@ -418,14 +401,14 @@ public class TasksManager {
 			fileSync();
 
 		} catch (Exception e) {
-			return "Delete was unsuccessful. Please try again \n";
+			return DELETE_UNSUCCESSFUL;
 		}
 
-		return "Deleted " + ac.getReferenceNumber() + " successfully \n";
+		return String.format(DELETE_SUCCESSFUL, ac.getReferenceNumber());
 
 	}
 
-	private void deleteUndo() {
+	private String deleteUndo() {
 		try {
 			for (Task t : deletedTasks) {
 				uniqueID--;
@@ -439,8 +422,10 @@ public class TasksManager {
 			}
 			fileSync();
 		} catch (Exception e) {
-
+			return UNDO_DELETE_UNSUCCESSFUL;
 		}
+
+		return UNDO_DELETE_SUCCESSFUL;
 	}
 
 	private String update(UpdateAction ac) {
@@ -464,13 +449,13 @@ public class TasksManager {
 			fileSync();
 
 		} catch (Exception e) {
-			return "Update was unsuccessful. Please try again\n";
+			return UPDATE_UNSUCCESSFUL;
 		}
 
-		return "Updated " + ac.getReferenceNumber() + " Successfully\n";
+		return String.format(UPDATE_SUCCESSFUL, ac.getReferenceNumber(), t.getDescription());
 	}
 
-	private void updateUndo() {
+	private String updateUndo() {
 		try {
 			for (Schedule s : schedule) {
 				if (s.getUniqueID() == updateOriginalTask.getUniqueID()) {
@@ -489,8 +474,9 @@ public class TasksManager {
 			}
 			fileSync();
 		} catch (Exception e) {
-
+			return UNDO_UPDATE_UNSUCCESSFUL;
 		}
+		return UNDO_UPDATE_SUCCESSFUL;
 	}
 
 	private String search(SearchAction ac) {
@@ -500,7 +486,6 @@ public class TasksManager {
 		table.clear();
 
 		String output = new String("");
-		count = 1;
 
 		for (Schedule s : schedule) {
 			if (s.getDescription().contains(ac.getQuery())) {
@@ -532,7 +517,7 @@ public class TasksManager {
 			output = output + "None";
 		}
 
-		return outputString(output);
+		return displayOutput(output);
 	}
 
 	private String mark(MarkAction ac) {
@@ -561,24 +546,30 @@ public class TasksManager {
 		return "Marked " + numbers + "as " + ac.getStatus();
 	}
 
-	public void markUndo() {
-		String status = ((MarkAction) lastAction).getStatus();
-		String newStatus;
+	public String markUndo() {
+		try {
+			String status = ((MarkAction) lastAction).getStatus();
+			String newStatus;
 
-		if (status.equals("done")) {
-			newStatus = "undone";
-		} else {
-			newStatus = "done";
-		}
-		for (Task t : markUndoList) {
-			if (t instanceof Deadline) {
-				((Deadline) t).setStatus(newStatus);
+			if (status.equals("done")) {
+				newStatus = "undone";
 			} else {
-				((Todo) t).setStatus(newStatus);
+				newStatus = "done";
 			}
+			for (Task t : markUndoList) {
+				if (t instanceof Deadline) {
+					((Deadline) t).setStatus(newStatus);
+				} else {
+					((Todo) t).setStatus(newStatus);
+				}
+			}
+
+			fileSync();
+		} catch (Exception e) {
+			return UNDO_MARK_UNSUCCESSFUL;
 		}
 
-		fileSync();
+		return UNDO_MARK_SUCCESSFUL;
 	}
 
 	public void fileSync() {
@@ -645,19 +636,17 @@ public class TasksManager {
 		else if (ac.getType() == LocalActionType.UNDO) {
 
 			if (lastAction instanceof AddAction) {
-				addUndo();
+				return addUndo();
 			} else if (lastAction instanceof UpdateAction) {
-				updateUndo();
+				return updateUndo();
 			} else if (lastAction instanceof DeleteAction) {
-				deleteUndo();
+				return deleteUndo();
 			} else if (lastAction instanceof MarkAction) {
-				markUndo();
+				return markUndo();
 			}
-
-			return "Undo Successful";
-		} else {
-			return "ERROR";
 		}
+		return "ERROR";
+
 	}
 
 	public static void exit() {

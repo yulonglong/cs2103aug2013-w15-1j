@@ -34,4 +34,8 @@ public abstract class Task {
 		return "";
 	}
 	
+	public String outputStringForDisplay(){
+		return "";
+	}
+	
 }

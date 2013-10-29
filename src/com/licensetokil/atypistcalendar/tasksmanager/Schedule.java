@@ -1,6 +1,7 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 public class Schedule extends Task {
 	private String taskType;
@@ -76,5 +77,21 @@ public class Schedule extends Task {
 		}
 		return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
 				+ endTime.getTime() + "@" + description + "@" + place ;
+	}
+	
+	public String outputStringForDisplay(){
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
+		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
+		
+		String output = "Event: " + this.getDescription()
+				+ "\n" + "Day: " + formatDay.format(this.getStartTime().getTime())
+				+ "\n" + "Starting Time: " + formatTime.format(this.getStartTime().getTime())
+				+ "\n" + "Ending Time: " + formatTime.format(this.getEndTime().getTime())
+				+ "\n";
+		if(!place.equals("")){
+			output = output+"Place: " + this.getPlace() + "\n";
+		}
+		
+		return output;
 	}
 }

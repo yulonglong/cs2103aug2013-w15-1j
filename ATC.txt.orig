@@ -1,1 +1,6 @@
-@Schedule@1@Mon Oct 28 08:00:00 SGT 2013@Mon Oct 28 09:00:00 SGT 2013@clean my room@ 
+@Schedule@1@Tue Oct 29 16:00:00 SGT 2013@Tue Oct 29 17:00:00 SGT 2013@swimming@CC
+@Schedule@2@Tue Oct 29 08:00:00 SGT 2013@Tue Oct 29 09:00:00 SGT 2013@reply janet@ 
+@Schedule@3@Tue Oct 29 20:00:00 SGT 2013@Tue Oct 29 22:00:00 SGT 2013@clean my room@ 
+@Deadline@5@Mon Nov 11 00:00:00 SGT 2013@do project 2 CS2106@ @undone
+@Todo@4@do project 2 CS2106@ @undone
+@uniqueID@5

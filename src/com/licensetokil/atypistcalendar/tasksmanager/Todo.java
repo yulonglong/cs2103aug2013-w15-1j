@@ -61,4 +61,15 @@ public class Todo extends Task {
 		}
 		return "@Todo@" + uniqueID + "@" + description + "@" + place + "@" + status;
 	}
+	
+	public String outputStringForDisplay(){
+		String output = "Event: " + this.getDescription() 
+				+ "\nStatus: " + this.getStatus()
+				+ "\n";
+		if(!place.equals("")){
+			output = output+"Place: " + this.getPlace() + "\n";
+		}
+		
+		return output;
+	}
 }
