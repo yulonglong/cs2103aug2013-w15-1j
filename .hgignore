@@ -1,0 +1,4 @@
+syntax: glob
+ATC_AUTH.txt
+syntax: regexp
+.+\.orig
