@@ -3,15 +3,7 @@ package com.licensetokil.atypistcalendar;
 import java.util.Calendar;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.parser.Action;
-import com.licensetokil.atypistcalendar.parser.AddAction;
-import com.licensetokil.atypistcalendar.parser.DeleteAction;
-import com.licensetokil.atypistcalendar.parser.DisplayAction;
-import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
-import com.licensetokil.atypistcalendar.parser.MarkAction;
-import com.licensetokil.atypistcalendar.parser.Parser;
-import com.licensetokil.atypistcalendar.parser.SearchAction;
-import com.licensetokil.atypistcalendar.parser.UpdateAction;
+import com.licensetokil.atypistcalendar.parser.*;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
 
@@ -19,7 +11,7 @@ public class ATypistCalendar {
 	public static ATCGUI gui;
 
 	public static void main(String[] args) {
-		TasksManager.fileToArray();
+		TasksManager TM = TasksManager.getInstance();
 		Calendar calendar = Calendar.getInstance();
 
 		gui = new ATCGUI();
@@ -81,43 +73,13 @@ public class ATypistCalendar {
 
 	}
 
-	public static String userInput(String input) {
+	public static String userInput(String input, TasksManager TM) {
 		String reply="";
 		try {
 
 			Action ac = Parser.parse(input);
 
-				if (ac.getClass().getName().contains("AddAction")) {
-					reply = TasksManager.executeCommand((AddAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("DeleteAction")) {
-					reply = TasksManager.executeCommand((DeleteAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("DisplayAction")) {
-					reply = TasksManager.executeCommand((DisplayAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("UpdateAction")) {
-					reply = TasksManager.executeCommand((UpdateAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("MarkAction")) {
-					reply = TasksManager.executeCommand((MarkAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("SearchAction")) {
-					reply = TasksManager.executeCommand((SearchAction) ac);
-				}
-
-				else if(ac.getClass().getName().contains("UndoAction")){
-					reply = TasksManager.executeUndo();
-				}
-
-				else {
-					reply = ac.getClass().getName();
-				}
+			reply = TM.executeCommand((LocalAction) ac);
 
 			//reply = ac.toString();//kester using this to debug and try
 			// his parser

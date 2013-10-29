@@ -120,7 +120,8 @@ public class ATCGUI extends JFrame implements WindowListener {
             if (jTextField1.getText().equals("")) {
                 return;
             }
-            ATypistCalendar.userInput(jTextField1.getText());
+            TasksManager TM = TasksManager.getInstance();
+            ATypistCalendar.userInput(jTextField1.getText(), TM);
             jTextField1.setText("");
         }        // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1KeyReleased
