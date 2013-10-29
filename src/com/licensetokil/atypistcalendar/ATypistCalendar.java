@@ -1,14 +1,30 @@
 package com.licensetokil.atypistcalendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.parser.*;
+import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.LocalAction;
+import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
+import com.licensetokil.atypistcalendar.parser.Parser;
+import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
 
 public class ATypistCalendar {
+	private static ATypistCalendar instance = null;
 	public static ATCGUI gui;
+
+	private ATypistCalendar() {
+	}
+
+	public static ATypistCalendar getInstance() {
+		if(instance == null) {
+			instance = new ATypistCalendar();
+		}
+		return instance;
+	}
 
 	public static void main(String[] args) {
 		TasksManager TM = TasksManager.getInstance();
@@ -92,5 +108,9 @@ public class ATypistCalendar {
 		}
 
 		return reply;
+	}
+
+	public ArrayList<Task> getCopyOfAllLocalTasks() {
+		return TasksManager.getInstance().getAllTasks();
 	}
 }
