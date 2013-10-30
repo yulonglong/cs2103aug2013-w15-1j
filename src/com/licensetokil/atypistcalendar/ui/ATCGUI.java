@@ -5,11 +5,15 @@
  */
 package com.licensetokil.atypistcalendar.ui;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.UIManager;
+
 import com.licensetokil.atypistcalendar.ATypistCalendar;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
 
 /**
  *
@@ -115,20 +119,19 @@ public class ATCGUI extends JFrame implements WindowListener {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {
         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
             if (jTextField1.getText().equals("")) {
                 return;
             }
-            TasksManager TM = TasksManager.getInstance();
-            ATypistCalendar.userInput(jTextField1.getText(), TM);
+            ATypistCalendar.userInput(jTextField1.getText());
             jTextField1.setText("");
-        }        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1KeyReleased
+        }
+    }
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {
+
+    }
 
     public ATCGUI(JScrollPane jScrollPane1) {
         this.jScrollPane1 = jScrollPane1;
@@ -138,11 +141,11 @@ public class ATCGUI extends JFrame implements WindowListener {
      * @param args the command line arguments
      */
     /* public static void main(String args[]) {
-     Set the Nimbus look and feel 
+     Set the Nimbus look and feel
      //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
      /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-     * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         
+     * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+
      try {
      for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
      if ("Nimbus".equals(info.getName())) {
@@ -161,7 +164,7 @@ public class ATCGUI extends JFrame implements WindowListener {
      }
      //</editor-fold>
 
-     Create and display the form 
+     Create and display the form
      java.awt.EventQueue.invokeLater(new Runnable() {
      public void run() {
      new ATCGUI().setVisible(true);

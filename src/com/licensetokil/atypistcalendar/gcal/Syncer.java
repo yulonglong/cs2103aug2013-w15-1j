@@ -80,6 +80,9 @@ class Syncer extends Thread {
 			logger.info("Remote calendar does not exist, creating remote calendar.");
 			createRemoteCalendar();
 		}
+		else {
+			logger.info("Remote calendar exists. Nothing to do.");
+		}
 	}
 
 	private void executeSyncAction(AddSyncAction addSyncAction)

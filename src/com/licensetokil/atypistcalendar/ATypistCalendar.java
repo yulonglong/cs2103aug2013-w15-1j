@@ -89,27 +89,21 @@ public class ATypistCalendar {
 
 	}
 
-	public static String userInput(String input, TasksManager TM) {
-		String reply="";
+	public static void userInput(String input) {
+		String reply = "";
 		try {
-
 			Action ac = Parser.parse(input);
 
-			reply = TM.executeCommand((LocalAction) ac);
+			reply = TasksManager.getInstance().executeCommand((LocalAction) ac);
 
-			//reply = ac.toString();//kester using this to debug and try
-			// his parser
 			gui.outputWithNewline("Your Command: \n" + input + "\n");
 			gui.outputWithNewline(reply);
-			return reply;
 
+			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
+			GoogleCalendarManager.getInstance().doCompleteSync();
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
 		}
-
-		//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
-		GoogleCalendarManager.getInstance().doCompleteSync();
-		return reply;
 	}
 
 	public ArrayList<Task> getCopyOfAllLocalTasks() {
