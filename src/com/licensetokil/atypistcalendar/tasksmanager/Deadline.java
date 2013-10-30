@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Deadline extends Task {
+	private String remoteID;
 	private String taskType;
 	private int uniqueID;
 	private Calendar endTime;
@@ -71,11 +72,11 @@ public class Deadline extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
-					+ description + "@" + " " + "@" + status;
+			return "@sDeadline@s" + uniqueID + "@s" + endTime.getTime() + "@s"
+					+ description + "@s" + " " + "@s" + status;
 		}
-		return "@Deadline@" + uniqueID + "@" + endTime.getTime() + "@"
-				+ description + "@" + place + "@" + status;
+		return "@sDeadline@s" + uniqueID + "@s" + endTime.getTime() + "@s"
+				+ description + "@s" + place + "@s" + status;
 	}
 	
 	public String outputStringForDisplay(){

@@ -174,6 +174,13 @@ public class ATCGUI extends JFrame implements WindowListener {
         jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
         jTextField1.requestFocus();
     }
+    
+    public void output(String text){
+    	
+    	jTextArea1.append(text);
+    	jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
+        jTextField1.requestFocus();
+    }
 
     @Override
     public void windowClosing(WindowEvent e) {

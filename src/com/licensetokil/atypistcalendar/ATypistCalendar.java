@@ -84,7 +84,7 @@ public class ATypistCalendar {
 			//reply = ac.toString();//kester using this to debug and try
 			// his parser
 			gui.outputWithNewline("Your Command: \n" + input + "\n");
-			gui.outputWithNewline(reply);
+			gui.output(reply);
 			return reply;
 
 		} catch (MalformedUserInputException muie) {

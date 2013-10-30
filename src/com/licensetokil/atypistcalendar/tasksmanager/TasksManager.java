@@ -7,12 +7,18 @@ import java.util.*;
 public class TasksManager {
 
 	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n";
-	
+
 	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n";
 	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n";
-	
+	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!";
+
 	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n";
 	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n";
+
+	private static final String MARK_UNSUCCESSFUL = "Mark was unsuccessful. Please try again!\n";
+	private static final String MARK_SUCCESSFUL = "Marked %s as %s\n";
+	
+	private static final String SEARCH_UNFOUND = "No search matches found!";
 
 	private static final String UNDO_DELETE_SUCCESSFUL = "Delete command successfully undone\n";
 	private static final String UNDO_MARK_SUCCESSFUL = "Mark command successfully undone\n";
@@ -23,6 +29,9 @@ public class TasksManager {
 	private static final String UNDO_MARK_UNSUCCESSFUL = "Undo Mark command unsuccessful. Please try again!\n";
 	private static final String UNDO_UPDATE_UNSUCCESSFUL = "Undo Update command unsuccessful. Please try again!\n";
 	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n";
+	
+	private static final String UNDONE = "undone";
+	private static final String DONE = "done";
 
 	private static TasksManager TM;
 
@@ -69,7 +78,7 @@ public class TasksManager {
 		return todo;
 	}
 
-	public ArrayList<Task> getAllTasks() {
+	public static ArrayList<Task> getAllTasks() {
 		ArrayList<Task> allTasks = new ArrayList<Task>();
 		allTasks.addAll(schedule);
 		allTasks.addAll(deadline);
@@ -89,6 +98,20 @@ public class TasksManager {
 	private TasksManager() {
 		initialize();
 	}
+	
+	/*private void convertFromDelimiters(){
+		for(Task t: getAllTasks()){
+			if((t.getDescription()).contains("?a!b$")){
+				String newDescription = (t.getDescription()).replaceAll("\\b?a!b$\\b", "@s");
+				t.setDescription(newDescription);
+			}
+			
+			if((t.getPlace()).contains("?a!b$")){
+				String newPlace = (t.getPlace()).replaceAll("\\b?a!b$\\b", "@s");
+				t.setPlace(newPlace);
+			}
+		}
+	}*/
 
 	private void initialize() {
 		try {
@@ -98,7 +121,7 @@ public class TasksManager {
 
 			// To import all tasks from file to ArrayList
 			while ((currLine = reader.readLine()) != null) {
-				st = new StringTokenizer(currLine, "@");
+				st = new StringTokenizer(currLine, "@s");
 				String token = st.nextToken();
 				if (token.equals("Schedule")) {
 					Schedule s = new Schedule(Integer.parseInt(st.nextToken()),
@@ -132,7 +155,8 @@ public class TasksManager {
 																	// reopened.
 				}
 			}
-
+			
+			//convertFromDelimiters();
 			fileSync();
 			reader.close();
 		} catch (Exception e) {
@@ -201,10 +225,10 @@ public class TasksManager {
 		if (action.getStartTime() == null) {
 			if (action.getEndTime() == null) {
 				t = new Todo(++uniqueID, action.getDescription(),
-						action.getPlace(), "undone");
+						action.getPlace(), UNDONE);
 			} else {
 				t = new Deadline(++uniqueID, action.getEndTime(),
-						action.getDescription(), action.getPlace(), "undone");
+						action.getDescription(), action.getPlace(), UNDONE);
 			}
 		} else {
 			t = new Schedule(++uniqueID, action.getStartTime(),
@@ -242,6 +266,18 @@ public class TasksManager {
 		}
 
 	}
+	
+	/*private static void checkForDelimiters(Task t){
+		if((t.getDescription()).contains("@s")){
+			String newDescription = (t.getDescription()).replaceAll("\\b@s\\b", "?a!b$");
+			t.setDescription(newDescription);
+		}
+		
+		if((t.getPlace()).contains("@s")){
+			String newPlace = (t.getPlace()).replaceAll("\\b@s\\b", "b?a!b$");
+			t.setPlace(newPlace);
+		}
+	}*/
 
 	private String addUndo() {
 		try {
@@ -368,7 +404,7 @@ public class TasksManager {
 		if (!toDo.isEmpty()) {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
-				output = output + count + ". " +  td.outputStringForDisplay();
+				output = output + count + ". " + td.outputStringForDisplay();
 				table.put(count, td);
 				count++;
 			}
@@ -382,19 +418,23 @@ public class TasksManager {
 	private String delete(DeleteAction ac) {
 
 		try {
-			for (Integer arr : ac.getReferenceNumber()) {
-				Task t = table.get(arr);
-				deletedTasks.add(t);
+			for (Integer num : ac.getReferenceNumber()) {
+				if (num <= table.size() && num > 0) {
+					Task t = table.get(num);
+					deletedTasks.add(t);
 
-				if (t instanceof Schedule) {
-					schedule.remove(t);
-					sch.remove(t);
-				} else if (t instanceof Deadline) {
-					deadline.remove(t);
-					dl.remove(t);
-				} else if (t instanceof Todo) {
-					todo.remove(t);
-					toDo.remove(t);
+					if (t instanceof Schedule) {
+						schedule.remove(t);
+						sch.remove(t);
+					} else if (t instanceof Deadline) {
+						deadline.remove(t);
+						dl.remove(t);
+					} else if (t instanceof Todo) {
+						todo.remove(t);
+						toDo.remove(t);
+					}
+				} else {
+					return INVALID_NUMBER_INPUT;
 				}
 			}
 
@@ -452,7 +492,8 @@ public class TasksManager {
 			return UPDATE_UNSUCCESSFUL;
 		}
 
-		return String.format(UPDATE_SUCCESSFUL, ac.getReferenceNumber(), t.getDescription());
+		return String.format(UPDATE_SUCCESSFUL, ac.getReferenceNumber(),
+				t.getDescription());
 	}
 
 	private String updateUndo() {
@@ -514,7 +555,7 @@ public class TasksManager {
 		output = "Search Matches: \n\n";
 
 		if (todo.isEmpty() && deadline.isEmpty() && schedule.isEmpty()) {
-			output = output + "None";
+			output = output + SEARCH_UNFOUND;
 		}
 
 		return displayOutput(output);
@@ -526,24 +567,28 @@ public class TasksManager {
 
 		try {
 			for (Integer num : ac.getReferenceNumber()) {
-				Task t = table.get(num);
-				markUndoList.add(t);
-				numbers = numbers + num + " ";
+				if (num <= table.size() && num > 0) {
+					Task t = table.get(num);
+					markUndoList.add(t);
+					numbers = numbers + num + " ";
 
-				if (t instanceof Deadline) {
-					((Deadline) t).setStatus(ac.getStatus());
-				} else if (t instanceof Todo) {
-					((Todo) t).setStatus(ac.getStatus());
+					if (t instanceof Deadline) {
+						((Deadline) t).setStatus(ac.getStatus());
+					} else if (t instanceof Todo) {
+						((Todo) t).setStatus(ac.getStatus());
+					}
 				}
+				else
+					return INVALID_NUMBER_INPUT;
 			}
 
 			fileSync();
 
 		} catch (Exception e) {
-			return "Mark was unsuccessful. Please try again \n";
+			return MARK_UNSUCCESSFUL;
 		}
 
-		return "Marked " + numbers + "as " + ac.getStatus();
+		return String.format(MARK_SUCCESSFUL, numbers, ac.getStatus());
 	}
 
 	public String markUndo() {
@@ -551,10 +596,10 @@ public class TasksManager {
 			String status = ((MarkAction) lastAction).getStatus();
 			String newStatus;
 
-			if (status.equals("done")) {
-				newStatus = "undone";
+			if (status.equals(DONE)) {
+				newStatus = UNDONE;
 			} else {
-				newStatus = "done";
+				newStatus = DONE;
 			}
 			for (Task t : markUndoList) {
 				if (t instanceof Deadline) {
@@ -572,7 +617,7 @@ public class TasksManager {
 		return UNDO_MARK_SUCCESSFUL;
 	}
 
-	public void fileSync() {
+	public static void fileSync() {
 		try {
 			BufferedWriter clearWriter = new BufferedWriter(
 					new FileWriter(file));
@@ -651,8 +696,14 @@ public class TasksManager {
 
 	public static void exit() {
 		try {
+			/*for(Task t: getAllTasks()){
+				checkForDelimiters(t);
+			}*/
+			
+			fileSync();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file,
 					true));
+			
 			writer.write("@uniqueID@" + uniqueID);
 			writer.newLine();
 			writer.close();
