@@ -7,6 +7,7 @@ public class AddAction extends LocalAction {
 	private Calendar startTime;
 	private Calendar endTime;
 	private String place;
+	private String remoteTaskId;
 	
 	public AddAction(){
 		type = LocalActionType.ADD;
@@ -14,6 +15,7 @@ public class AddAction extends LocalAction {
 		endTime = null;
 		description = new String();
 		place = new String();
+		remoteTaskId = null;
 	}
 	
 	public String toString(){
@@ -35,7 +37,8 @@ public class AddAction extends LocalAction {
 			    "Start Time	: " + stringStartTime + "\n" +
 		        "End Time	: " + stringEndTime + "\n" +
 		        "Description	: " + description + "\n" +
-		        "Place	: " + place + "\n");
+		        "Place	: " + place + "\n" +
+		        "RemoteTaskID	: " + remoteTaskId + "\n");
 	}
 	
 
@@ -59,6 +62,10 @@ public class AddAction extends LocalAction {
 		return type;
 	}
 
+	public String getRemoteTaskId(){
+		return remoteTaskId;
+	}
+	
 	public void setStartTime(Calendar newStartTime){
 		startTime = newStartTime;
 	}
@@ -73,6 +80,10 @@ public class AddAction extends LocalAction {
 
 	public void setPlace(String newPlace){
 		place = newPlace;
+	}
+	
+	public void setRemoteTaskId(String newRemoteTaskId){
+		remoteTaskId = newRemoteTaskId;
 	}
 	
 }

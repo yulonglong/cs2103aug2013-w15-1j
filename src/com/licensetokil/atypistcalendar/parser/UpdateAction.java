@@ -8,6 +8,7 @@ public class UpdateAction extends LocalAction{
 	private Calendar updatedStartTime;
 	private Calendar updatedEndTime;
 	private String updatedLocationQuery;
+	private String remoteTaskId;
 	
 	public UpdateAction(){
 		type = LocalActionType.UPDATE;
@@ -15,6 +16,7 @@ public class UpdateAction extends LocalAction{
 		updatedEndTime = null;
 		updatedQuery = new String();
 		updatedLocationQuery = new String();
+		remoteTaskId = null;
 	}
 	
 	public String toString(){
@@ -38,7 +40,8 @@ public class UpdateAction extends LocalAction{
 		        "Updated Start Time	: " + stringUpdatedStartTime + "\n" +
 		        "Updated End Time	: " + stringUpdatedEndTime + "\n" +
 		        "Updated Query		: " + updatedQuery + "\n" +
-		        "Updated Location Query	: " + updatedLocationQuery + "\n");
+		        "Updated Location Query	: " + updatedLocationQuery + "\n" +
+				"RemoteTaskID	: " + remoteTaskId + "\n");
 	}
 	
 	public Calendar getUpdatedStartTime(){
@@ -59,6 +62,10 @@ public class UpdateAction extends LocalAction{
 
 	public int getReferenceNumber(){
 		return referenceNumber;
+	}
+	
+	public String getRemoteTaskId(){
+		return remoteTaskId;
 	}
 	
 	public LocalActionType getType(){
@@ -85,4 +92,7 @@ public class UpdateAction extends LocalAction{
 		referenceNumber = newReferenceNumber;
 	}
 	
+	public void setRemoteTaskId(String newRemoteTaskId){
+		remoteTaskId = newRemoteTaskId;
+	}
 }
