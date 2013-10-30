@@ -1056,7 +1056,9 @@ public class Parser {
 		if((isStringToday(preposition))||(isStringTomorrow(preposition))){
 			st = addStringToTokenizer(st,preposition);
 		}
-		
+		else if(!isValidDayPreposition(preposition)){
+			throw new MalformedUserInputException(MESSAGE_INVALID);
+		}
 
 		// if there is no date field
 		if(!st.hasMoreTokens()){
@@ -1070,6 +1072,7 @@ public class Parser {
 		date = getStringDate(st, tempSt);
 		st = tempSt[INDEX_ST];
 		
+		//begin check if the date entered is valid
 		if(!Character.isDigit(date.charAt(FIRST_INDEX))){
 			getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
 		}
@@ -1079,8 +1082,9 @@ public class Parser {
 		if(!isValidDate(intStartDate)){
 			throw new MalformedUserInputException(MESSAGE_INVALID);
 		}
+		//end check if the date entered is valid
 		
-		
+		//if there is no time field (only date)
 		if(!st.hasMoreTokens()){
 			if((actionType==LocalActionType.DISPLAY)||(actionType==LocalActionType.SEARCH)){
 				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
@@ -1122,11 +1126,11 @@ public class Parser {
 			return;
 		}
 		
+		
+		//if there is time field
 		String prep = new String(st.nextToken());
 		if (!isValidTimePreposition(prep)) {
-			calendarArray[INDEX_START_TIME] = startTimeCal;
-			calendarArray[INDEX_END_TIME] = endTimeCal;
-			return;
+			throw new MalformedUserInputException(MESSAGE_INVALID);
 		}
 		
 		String startTime = new String(st.nextToken());
