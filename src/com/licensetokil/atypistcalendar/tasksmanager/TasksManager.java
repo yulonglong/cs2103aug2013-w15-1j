@@ -714,7 +714,7 @@ public class TasksManager {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file,
 					true));
 			
-			writer.write("@uniqueID@" + uniqueID);
+			writer.write("uniqueID@" + uniqueID);
 			writer.newLine();
 			writer.close();
 		} catch (Exception e) {
