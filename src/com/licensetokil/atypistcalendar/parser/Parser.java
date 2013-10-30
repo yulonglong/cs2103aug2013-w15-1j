@@ -798,7 +798,7 @@ public class Parser {
 			intTimeHour = intTimeHour - TIME_FORMAT_DIFF;
 		}
 		//if it's pm , add 12
-		else if (isPm(suffix)) {
+		else if ((isPm(suffix))&&(intTimeHour!=12)) {
 			intTimeHour = intTimeHour + TIME_FORMAT_DIFF;
 		}
 		else if(suffix.equals(EMPTY_STRING)){
