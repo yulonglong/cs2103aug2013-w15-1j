@@ -63,6 +63,7 @@ public class Parser {
 	private static final int MIN_DAY = 1;
 	private static final int MIN_MONTH = 0;
 	private static final int MIN_YEAR = 2000;
+	private static final int MIN_MILLISECOND = 0;
 	
 	private static final int MAX_HOUR = 23;
 	private static final int MAX_MINUTE = 59;
@@ -268,6 +269,7 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
+		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME] = null;
 		
 		setEndTimeMax(calendarArray);
@@ -358,6 +360,7 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
+		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME] = null;
 		String description = null;
 		String place = null;
@@ -407,6 +410,7 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
+		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME] = null;
 		
 		setEndTimeMax(calendarArray);
@@ -470,6 +474,7 @@ public class Parser {
 	
 	private static void setEndTimeMax (Calendar[] calendarArray) {
 		calendarArray[INDEX_END_TIME] = Calendar.getInstance();
+		calendarArray[INDEX_END_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
 		return;
 	}
@@ -867,6 +872,7 @@ public class Parser {
 	
 	private static void getDateFromDay(int[] intStartDate, String eventDay, int intEventTimeHours, int intEventTimeMinutes) throws MalformedUserInputException{
 		Calendar currentDate = Calendar.getInstance();
+		currentDate.set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		int intCurrentDayOfWeek = INVALID_INT_VALUE;
 		intCurrentDayOfWeek = currentDate.get(Calendar.DAY_OF_WEEK);
 		int intCurrentTimeHours = INVALID_INT_VALUE;
@@ -987,6 +993,11 @@ public class Parser {
 		String date = new String(st.nextToken());
 		
 		if(!st.hasMoreTokens()){
+			tempSt[INDEX_ST]=st;
+			return date;
+		}
+		
+		if(date.length()>2){
 			tempSt[INDEX_ST]=st;
 			return date;
 		}
@@ -1207,6 +1218,8 @@ public class Parser {
 			endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intEndHour, intEndMinute, MIN_SECOND);
 		}
 	
+		startTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		endTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_START_TIME] = startTimeCal;
 		calendarArray[INDEX_END_TIME] = endTimeCal;
 		return;
