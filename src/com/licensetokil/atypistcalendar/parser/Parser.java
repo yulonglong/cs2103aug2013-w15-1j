@@ -8,6 +8,7 @@ public class Parser {
 	
 	private static final String MESSAGE_INVALID = "Invalid input!";
 	private static final String MESSAGE_INVALID_REF_NUMBER = "Invalid Reference Number entered!";
+	private static final String MESSAGE_INVALID_TIME = "Invalid time entered!";
 	private static final String MESSAGE_INVALID_GCAL = "Invalid Google Calendar Command!";
 	
 	private static final int DELETE_ALL_REF_NUMBER = -1;
@@ -29,6 +30,7 @@ public class Parser {
 	private static final String PREP_AT = "at";
 	private static final String PREP_BY = "by";
 	private static final String PREP_FROM = "from";
+	private static final String PREP_TO = "to";
 	private static final String PREP_COMMA = ",";
 	private static final String PREP_DASH = "-";
 	private static final String PREP_UPDATE = ">>";
@@ -51,6 +53,7 @@ public class Parser {
 	private static final int COMPLETE_YEAR_LENGTH = 4;
 	private static final int DEFAULT_HOUR_LENGTH = 2;
 	private static final int DEFAULT_MINUTE_LENGTH = 2;
+	private static final int DEFAULT_TIME_LENGTH = 4;
 	private static final int DEFAULT_START_HOUR = 8;
 	private static final int DEFAULT_START_MINUTE = 0;
 	private static final int DEFAULT_START_SECOND = 0;
@@ -489,12 +492,7 @@ public class Parser {
 		return userAction;
 	}
 	
-	private static void setEndTimeMax (Calendar[] calendarArray) {
-		calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_END_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
-		calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
-		return;
-	}
+	
 	
 	private static String getStringAll(StringTokenizer st, StringTokenizer[] tempSt) {
 		String all = new String(st.nextToken());
@@ -601,61 +599,7 @@ public class Parser {
 		return referenceNumber;
 	}
 	
-	private static String getDescription(StringTokenizer st, StringTokenizer[] tempSt){
-
-		String tempDescription = new String();
-		String description = new String(st.nextToken());
-		
-		while(st.hasMoreTokens()){
-			tempDescription = new String(st.nextToken());
-			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
-				description = description + WHITE_SPACE + tempDescription;
-			}
-			else{
-				st = addStringToTokenizer(st,tempDescription);
-				break;
-			}
-		}
-		tempSt[INDEX_ST]=st;
-		return description;
-	}
 	
-	
-	
-	private static String getPlace(StringTokenizer st, StringTokenizer[] tempSt){
-		String prep = new String(st.nextToken());
-		String place = new String();
-
-		// check if place is included in user input
-		if (isValidPlacePreposition(prep)) {
-			place = new String(st.nextToken());
-		} else {
-			st = addStringToTokenizer(st,prep);
-			place = new String();
-			tempSt[INDEX_ST]=st;
-			return place;
-		}
-
-		// check for place name, separated by space, and incorporate the proper
-		// place name
-		if(st.hasMoreTokens()){
-			prep = new String(st.nextToken());
-			while (!isValidDayPreposition(prep)) {
-				place = place + WHITE_SPACE + prep;
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-				} else {
-					break;
-				}
-			}
-		}
-		
-		if(isValidDayPreposition(prep)){
-			st=addStringToTokenizer(st,prep);
-		}
-		tempSt[INDEX_ST]=st;
-		return place;
-	}
 
 	private static int getDayOfMonth(String month){
 		month=month.toLowerCase();
@@ -759,24 +703,33 @@ public class Parser {
 		return intTimeHour;
 	}
 	
-	private static int getTimeMinute24Hour(String time){
+	private static int getTimeMinute24Hour(String time) throws MalformedUserInputException {
 		int intTimeMinute = INIT_INT_VALUE;
 		int stringTimeLength = time.length();
+		//if there is no minute field return 0
 		if (stringTimeLength <= DEFAULT_MINUTE_LENGTH) {
-			return intTimeMinute;
-		} else {
+			return INIT_INT_VALUE;
+		}
+		else if (stringTimeLength == DEFAULT_TIME_LENGTH){
 			time = time.substring(THIRD_INDEX, FIFTH_INDEX);
 			intTimeMinute = Integer.parseInt(time);
 			return intTimeMinute;
 		}
+		else{
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
 	}
 	
-	private static int getTimeMinute12Hour(String time){
+	private static int getTimeMinute12Hour(String time) throws MalformedUserInputException {
 		int intTimeMinute = INIT_INT_VALUE;
 		int stringTimeLength = time.length();
 		int indexOfDelimiter = INIT_INT_VALUE;
 		// get the index of delimiter
 		indexOfDelimiter = getIndexOfDelimiter(time,FIRST_INDEX);
+		
+		if((indexOfDelimiter!=SECOND_INDEX)&&(indexOfDelimiter!=THIRD_INDEX)){
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
 		
 		if(indexOfDelimiter + 3 <= stringTimeLength){
 			time = time.substring(indexOfDelimiter + 1, indexOfDelimiter + 3);
@@ -788,7 +741,7 @@ public class Parser {
 		return intTimeMinute;
 	}
 	
-	private static int getTimeMinute(String time) {
+	private static int getTimeMinute(String time) throws MalformedUserInputException {
 		int intTimeMinute = INIT_INT_VALUE;
 		if (isAllDigits(time)) {
 			intTimeMinute = getTimeMinute24Hour(time);
@@ -800,7 +753,7 @@ public class Parser {
 		}
 	}
 	
-	private static int getTimeHour24Hour(String time){
+	private static int getTimeHour24Hour(String time) throws MalformedUserInputException {
 		int intTimeHour = INIT_INT_VALUE;
 		int stringTimeLength = time.length();
 		if (stringTimeLength <= DEFAULT_HOUR_LENGTH) {
@@ -808,14 +761,17 @@ public class Parser {
 			intTimeHour = getAdjustedHour(intTimeHour);
 			return intTimeHour;
 		}
-		else {
+		else if (stringTimeLength == DEFAULT_TIME_LENGTH){
 			time = time.substring(FIRST_INDEX, THIRD_INDEX);
 			intTimeHour = Integer.parseInt(time);
 			return intTimeHour;
 		}
+		else{
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
 	}
 	
-	private static int getTimeHour12Hour(String time){
+	private static int getTimeHour12Hour(String time) throws MalformedUserInputException{
 		String suffix = new String();
 		int stringTimeLength = time.length();
 		int intTimeHour = INIT_INT_VALUE;
@@ -829,9 +785,13 @@ public class Parser {
 		//get the index of hour and minute delimiter
 		indexOfDelimiter = getIndexOfDelimiter(time,FIRST_INDEX);
 		
+		if((indexOfDelimiter!=SECOND_INDEX)&&(indexOfDelimiter!=THIRD_INDEX)){
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
+		
 		time = time.substring(FIRST_INDEX, indexOfDelimiter);
 		intTimeHour = Integer.parseInt(time);
-		
+	
 		//if it's 12 am , convert to 00
 		if ((isAm(suffix))&&(intTimeHour==12)){
 			intTimeHour = intTimeHour - TIME_FORMAT_DIFF;
@@ -843,10 +803,11 @@ public class Parser {
 		else if(suffix.equals(EMPTY_STRING)){
 			intTimeHour = getAdjustedHour(intTimeHour);
 		}
+
 		return intTimeHour;
 	}
 
-	private static int getTimeHour(String time) {
+	private static int getTimeHour(String time) throws MalformedUserInputException{
 		int intTimeHour = INIT_INT_VALUE;
 		if (isAllDigits(time)) {
 			intTimeHour = getTimeHour24Hour(time);
@@ -857,36 +818,7 @@ public class Parser {
 			return intTimeHour;
 		}
 	}
-	
-	
-	private static void setDateToday(int[] intStartDate){
-		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE);
-		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
-		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
-		return;
-	}
-	private static void setDateTomorrow(int[] intStartDate){
-		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE)+1;
-		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
-		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
-		return;
-	}
-	private static void setDateNextWeek(int[] intStartDate){
-		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE)+7;
-		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
-		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
-		return;
-	}
-	private static void setDateWithDayDifference(int[] intStartDate, int dayDifference){
-		if(dayDifference<0){
-			dayDifference = dayDifference + 7;
-		}
-		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE) + dayDifference;
-		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
-		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
-		return;
-	}
-	
+
 	private static void getDateFromDay(int[] intStartDate, String eventDay, int intEventTimeHours, int intEventTimeMinutes) throws MalformedUserInputException{
 		Calendar currentDate = Calendar.getInstance();
 		currentDate.set(Calendar.MILLISECOND, MIN_MILLISECOND);
@@ -941,54 +873,6 @@ public class Parser {
 		return;
 	}
 	
-	private static void setDayDate(int[] intStartDate, String date, int indexOfDelimiter){
-		String strDay = new String();
-		strDay = date.substring(FIRST_INDEX, indexOfDelimiter);
-		intStartDate[INDEX_DAY] = Integer.parseInt(strDay);
-		return;
-	}
-	
-	private static void setMonthDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2){
-		String strMonth = new String();
-		if(indexOfDelimiter2 != INIT_INT_VALUE){
-			strMonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
-		}
-		else{
-			strMonth = date.substring(indexOfDelimiter + 1);
-		}
-		// Calendar in java, stores month starting from 0 (january) to 11 (december)
-		intStartDate[INDEX_MONTH] = Integer.parseInt(strMonth);
-		intStartDate[INDEX_MONTH]--; 
-		return;
-	}
-	private static void setYearDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2, LocalActionType type) {
-		String strYear = new String();
-		if (indexOfDelimiter2 != INIT_INT_VALUE) {
-			strYear = date.substring(indexOfDelimiter2 + 1);
-			
-			if(strYear.length()== DEFAULT_YEAR_LENGTH){
-				strYear = YEAR_PREFIX + strYear;
-			}
-			intStartDate[INDEX_YEAR] = Integer.parseInt(strYear);
-		}
-		//if there is no year (assume it is the current year if the date is valid, else next year);
-		else{			 
-			intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
-			
-			if(type==LocalActionType.ADD){
-				if(intStartDate[INDEX_MONTH]+1 == Calendar.getInstance().get(Calendar.MONTH)){
-					if(intStartDate[INDEX_DAY] < Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
-						intStartDate[INDEX_YEAR]++;
-					}
-				}
-				else if(intStartDate[INDEX_MONTH]+1 < Calendar.getInstance().get(Calendar.MONTH)){
-						intStartDate[INDEX_YEAR]++;
-				}
-			}
-		}
-		return;
-	}
-
 
 	private static void getDate(int[] intStartDate, String date, LocalActionType type){
 		//get the date start
@@ -1107,9 +991,6 @@ public class Parser {
 				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
 					getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
 				}
-				else{
-					getDate(intStartDate,date,actionType);
-				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MIN_HOUR, MIN_MINUTE, MIN_SECOND);
 				endTimeCal = Calendar.getInstance();
@@ -1120,9 +1001,6 @@ public class Parser {
 				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
 					getDateFromDay(intStartDate,date,DEFAULT_START_HOUR,DEFAULT_START_MINUTE);
 				}
-				else{
-					getDate(intStartDate,date,actionType);
-				}
 				startTimeCal = Calendar.getInstance();
 				startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], DEFAULT_START_HOUR, DEFAULT_START_MINUTE, DEFAULT_START_SECOND);
 				endTimeCal = Calendar.getInstance();
@@ -1131,9 +1009,6 @@ public class Parser {
 			else{
 				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
 					getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
-				}
-				else{
-					getDate(intStartDate,date,actionType);
 				}
 				endTimeCal = Calendar.getInstance();
 				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
@@ -1144,7 +1019,7 @@ public class Parser {
 		}
 		
 		
-		//if there is time field
+		//if there is time field, check for correct preposition
 		String prep = new String(st.nextToken());
 		if (!isValidTimePreposition(prep)) {
 			throw new MalformedUserInputException(MESSAGE_INVALID);
@@ -1165,14 +1040,16 @@ public class Parser {
 		
 		int intStartHour = getTimeHour(startTime);
 		int intStartMinute = getTimeMinute(startTime);
+		//check if time is valid
+		if(!isValidTime(intStartHour,intStartMinute)){
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
 
 		if(!Character.isDigit(date.charAt(FIRST_INDEX))){
 			getDateFromDay(intStartDate,date,intStartHour,intStartMinute);
 		}
-		else{
-			getDate(intStartDate,date,actionType);
-		}
 		
+		//if there is no end time field return the corresponding values
 		if(!st.hasMoreTokens()){
 			if(isValidDeadlinePreposition(preposition)){
 				endTimeCal = Calendar.getInstance();
@@ -1195,7 +1072,15 @@ public class Parser {
 			return;
 		}
 		
+		
+		//if there is end time
+		
 		prep = new String(st.nextToken());
+		
+		if((!isValidTimeDurationPreposition(prep))&&(!isValidTimeSecondPreposition(prep))){
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
+		
 		//if it is a duration time format
 		if(isValidTimeDurationPreposition(prep)){
 			String stringTime = new String();
@@ -1218,7 +1103,7 @@ public class Parser {
 			endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour+intHourDuration, intStartMinute+intMinuteDuration, MIN_SECOND);
 		}
 		//if it is another time format
-		else{
+		else if (isValidTimeSecondPreposition(prep)){
 			String endTime = new String(st.nextToken());
 			if(st.hasMoreTokens()){
 				temp = new String(st.nextToken());
@@ -1231,11 +1116,18 @@ public class Parser {
 			}
 			int intEndHour = getTimeHour(endTime);
 			int intEndMinute = getTimeMinute(endTime);
+			//check if it is a valid time
+			if(!isValidTime(intEndHour,intEndMinute)){
+				throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+			}
 			startTimeCal = Calendar.getInstance();
 			endTimeCal = Calendar.getInstance();
 
 			startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour, intStartMinute, MIN_SECOND);
 			endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intEndHour, intEndMinute, MIN_SECOND);
+		}
+		else{
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
 		}
 	
 		startTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
@@ -1244,6 +1136,61 @@ public class Parser {
 		calendarArray[INDEX_END_TIME] = endTimeCal;
 		return;
 	}
+
+	private static String getDescription(StringTokenizer st, StringTokenizer[] tempSt){
+
+		String tempDescription = new String();
+		String description = new String(st.nextToken());
+		
+		while(st.hasMoreTokens()){
+			tempDescription = new String(st.nextToken());
+			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))){
+				description = description + WHITE_SPACE + tempDescription;
+			}
+			else{
+				st = addStringToTokenizer(st,tempDescription);
+				break;
+			}
+		}
+		tempSt[INDEX_ST]=st;
+		return description;
+	}
+	
+	private static String getPlace(StringTokenizer st, StringTokenizer[] tempSt){
+		String prep = new String(st.nextToken());
+		String place = new String();
+
+		// check if place is included in user input
+		if (isValidPlacePreposition(prep)) {
+			place = new String(st.nextToken());
+		} else {
+			st = addStringToTokenizer(st,prep);
+			place = new String();
+			tempSt[INDEX_ST]=st;
+			return place;
+		}
+
+		// check for place name, separated by space, and incorporate the proper
+		// place name
+		if(st.hasMoreTokens()){
+			prep = new String(st.nextToken());
+			while (!isValidDayPreposition(prep)) {
+				place = place + WHITE_SPACE + prep;
+				if (st.hasMoreTokens()) {
+					prep = new String(st.nextToken());
+				} else {
+					break;
+				}
+			}
+		}
+		
+		if(isValidDayPreposition(prep)){
+			st=addStringToTokenizer(st,prep);
+		}
+		tempSt[INDEX_ST]=st;
+		return place;
+	}
+
 
 	private static String getRemainingTokens(StringTokenizer strRemaining) {
 		String strResult = new String();
@@ -1259,6 +1206,90 @@ public class Parser {
 		tempUserInput = tempString + WHITE_SPACE + tempUserInput;
 		return new StringTokenizer(tempUserInput);
 	}
+	
+	private static void setEndTimeMax (Calendar[] calendarArray) {
+		calendarArray[INDEX_END_TIME] = Calendar.getInstance();
+		calendarArray[INDEX_END_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
+		return;
+	}
+	
+	private static void setDateToday(int[] intStartDate){
+		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE);
+		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
+		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
+		return;
+	}
+	private static void setDateTomorrow(int[] intStartDate){
+		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE)+1;
+		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
+		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
+		return;
+	}
+	private static void setDateNextWeek(int[] intStartDate){
+		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE)+7;
+		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
+		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
+		return;
+	}
+	private static void setDateWithDayDifference(int[] intStartDate, int dayDifference){
+		if(dayDifference<0){
+			dayDifference = dayDifference + 7;
+		}
+		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE) + dayDifference;
+		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
+		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
+		return;
+	}
+
+	private static void setDayDate(int[] intStartDate, String date, int indexOfDelimiter){
+		String strDay = new String();
+		strDay = date.substring(FIRST_INDEX, indexOfDelimiter);
+		intStartDate[INDEX_DAY] = Integer.parseInt(strDay);
+		return;
+	}
+	
+	private static void setMonthDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2){
+		String strMonth = new String();
+		if(indexOfDelimiter2 != INIT_INT_VALUE){
+			strMonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
+		}
+		else{
+			strMonth = date.substring(indexOfDelimiter + 1);
+		}
+		// Calendar in java, stores month starting from 0 (january) to 11 (december)
+		intStartDate[INDEX_MONTH] = Integer.parseInt(strMonth);
+		intStartDate[INDEX_MONTH]--; 
+		return;
+	}
+	private static void setYearDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2, LocalActionType type) {
+		String strYear = new String();
+		if (indexOfDelimiter2 != INIT_INT_VALUE) {
+			strYear = date.substring(indexOfDelimiter2 + 1);
+			
+			if(strYear.length()== DEFAULT_YEAR_LENGTH){
+				strYear = YEAR_PREFIX + strYear;
+			}
+			intStartDate[INDEX_YEAR] = Integer.parseInt(strYear);
+		}
+		//if there is no year (assume it is the current year if the date is valid, else next year);
+		else{			 
+			intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
+			
+			if(type==LocalActionType.ADD){
+				if(intStartDate[INDEX_MONTH]+1 == Calendar.getInstance().get(Calendar.MONTH)){
+					if(intStartDate[INDEX_DAY] < Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
+						intStartDate[INDEX_YEAR]++;
+					}
+				}
+				else if(intStartDate[INDEX_MONTH]+1 < Calendar.getInstance().get(Calendar.MONTH)){
+						intStartDate[INDEX_YEAR]++;
+				}
+			}
+		}
+		return;
+	}
+
 	
 	private static boolean isAllDigits(String input){
 		for (int i = 0; i < input.length(); i++) {
@@ -1320,6 +1351,32 @@ public class Parser {
 		return false;
 	}
 	
+	private static boolean isStringSchedules(String task){
+		if ((task.equalsIgnoreCase(SCHEDULES))
+				|| (task.equalsIgnoreCase(SCHEDULES_SINGULAR))
+				|| (task.equalsIgnoreCase(SCHEDULES_SHORT))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringDeadlines(String task){
+		if ((task.equalsIgnoreCase(DEADLINES))
+				|| (task.equalsIgnoreCase(DEADLINES_SINGULAR))
+				|| (task.equalsIgnoreCase(DEADLINES_SHORT))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isStringTodos(String task){
+		if ( (task.equalsIgnoreCase(TODOS))
+				|| (task.equalsIgnoreCase(TODOS_SINGULAR))
+				|| (task.equalsIgnoreCase(TODOS_SHORT))) {
+			return true;
+		}
+		return false;
+	}
 	private static boolean isAm(String suffix){
 		if((suffix.equalsIgnoreCase(AM_SHORT))
 				||(suffix.equalsIgnoreCase(AM_LONG))){
@@ -1334,6 +1391,16 @@ public class Parser {
 			return true;
 		}
 		return false;
+	}
+	
+	private static boolean isValidTime(int intHour, int intMinute){
+		if((intHour<0)||(intHour>24)){
+			return false;
+		}
+		if((intMinute<0)||(intMinute>59)){
+			return false;
+		}
+		return true;
 	}
 	
 	private static boolean isValidDate(int[] intTime){
@@ -1362,33 +1429,6 @@ public class Parser {
 	private static boolean isValidStatus(String status){
 		if ((status.equalsIgnoreCase(DONE))
 				|| (status.equalsIgnoreCase(UNDONE))) {
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isStringSchedules(String task){
-		if ((task.equalsIgnoreCase(SCHEDULES))
-				|| (task.equalsIgnoreCase(SCHEDULES_SINGULAR))
-				|| (task.equalsIgnoreCase(SCHEDULES_SHORT))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isStringDeadlines(String task){
-		if ((task.equalsIgnoreCase(DEADLINES))
-				|| (task.equalsIgnoreCase(DEADLINES_SINGULAR))
-				|| (task.equalsIgnoreCase(DEADLINES_SHORT))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isStringTodos(String task){
-		if ( (task.equalsIgnoreCase(TODOS))
-				|| (task.equalsIgnoreCase(TODOS_SINGULAR))
-				|| (task.equalsIgnoreCase(TODOS_SHORT))) {
 			return true;
 		}
 		return false;
@@ -1451,6 +1491,14 @@ public class Parser {
 	
 	private static boolean isValidTimeDurationPreposition(String preposition){
 		if(preposition.equalsIgnoreCase(PREP_FOR)){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidTimeSecondPreposition(String preposition) {
+		if ((preposition.equalsIgnoreCase(PREP_TO))
+				|| (preposition.equalsIgnoreCase(PREP_DASH))) {
 			return true;
 		}
 		return false;

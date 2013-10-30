@@ -1005,6 +1005,38 @@ public class ParserJUnitTest {
 		assertEquals(expectedAc.toString(),ac.toString());
 		
 		
+		//update #2 >> sleep in my room on 21/1/2014 from 12am to 12pm
+		//multiple words description
+		//single word place
+		//dd/mm time format
+		newUc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newUc = new UpdateAction();
+		newUc.setUpdatedQuery("sleep");
+		newUc.setUpdatedLocationQuery("my room");
+		newUc.setReferenceNumber(2);
+		startTime = Calendar.getInstance();
+		startTime.set(2014,0,21,0,0,0);
+		endTime = Calendar.getInstance();
+		endTime.set(2014,0,21,12,0,0);
+		newUc.setUpdatedStartTime(startTime);
+		newUc.setUpdatedEndTime(endTime);
+		expectedAc = newUc;
+		try{
+			ac = Parser.parse("update #2 >> sleep in my room on 21/1/2014 from 12am to 12pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		
 		//update format after the ">>" delimiter is exactly the same as add
 		
 		//update #3 >> jogging at park
