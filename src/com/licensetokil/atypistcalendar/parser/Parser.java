@@ -966,10 +966,15 @@ public class Parser {
 		//get date end
 	}
 	
-	private static String getStringDate(StringTokenizer st, StringTokenizer[] tempSt){
+	private static String getStringDate(StringTokenizer st, StringTokenizer[] tempSt) throws MalformedUserInputException{
 		String date = new String(st.nextToken());
 		
 		if(!st.hasMoreTokens()){
+			tempSt[INDEX_ST]=st;
+			return date;
+		}
+		
+		if(date.length()>2){
 			tempSt[INDEX_ST]=st;
 			return date;
 		}
@@ -981,7 +986,7 @@ public class Parser {
 			date = date + SLASH + intMonth.toString();	
 		}
 		else{
-			st = addStringToTokenizer(st,stringMonth);
+			throw new MalformedUserInputException(MESSAGE_INVALID);
 		}
 		
 		if(!st.hasMoreTokens()){
@@ -995,7 +1000,7 @@ public class Parser {
 			date = date + SLASH + stringYear;
 		}
 		else{
-			st = addStringToTokenizer(st,stringYear);
+			st=addStringToTokenizer(st,stringYear);
 		}
 	
 		tempSt[INDEX_ST]=st;
