@@ -192,7 +192,6 @@ public class TasksManager {
 
 		Calendar cal = Calendar.getInstance();
 		cal.set(year, month, date, hour, min, sec);
-		cal.set(Calendar.MILLISECOND, 0);
 
 		return cal;
 	}
@@ -249,7 +248,7 @@ public class TasksManager {
 
 		return t;
 	}
-	
+
 	private String add(Task t) {
 
 		try {
