@@ -7,8 +7,10 @@ import java.util.StringTokenizer;
 public class Parser {
 	
 	private static final String MESSAGE_INVALID = "Invalid input!";
+	private static final String MESSAGE_INVALID_REF_NUMBER = "Invalid Reference Number entered!";
 	private static final String MESSAGE_INVALID_GCAL = "Invalid Google Calendar Command!";
 	
+	private static final int DELETE_ALL_REF_NUMBER = -1;
 
 	private static final int FIRST_INDEX = 0;
 	private static final int SECOND_INDEX = 1;
@@ -344,8 +346,23 @@ public class Parser {
 	// delete function : 100 %
 	private static DeleteAction deleteParser(StringTokenizer st) throws MalformedUserInputException{
 		DeleteAction userAction = new DeleteAction();
+		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		ArrayList<Integer> referenceNumber = null;
+		String expectAll = new String();
 		
+		if(!st.hasMoreTokens()){
+			throw new MalformedUserInputException(MESSAGE_INVALID_REF_NUMBER);
+		}
+
+		expectAll = getStringAll(st,tempSt);
+		st = tempSt[INDEX_ST];
+		if(isStringAll(expectAll)){
+			referenceNumber = new ArrayList<Integer>();
+			referenceNumber.add(DELETE_ALL_REF_NUMBER);
+			userAction.setReferenceNumber(referenceNumber);
+			return userAction;
+		}
+
 		//get the numbers
 		referenceNumber = getMultipleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);

@@ -893,6 +893,30 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		
+		
+		//delete all
+		//single delete command
+		newDelc=null;
+		intArrayList = null;
+		expectedAc=null;
+		ac=null;
+		
+		
+		newDelc = new DeleteAction();
+		intArrayList = new ArrayList<Integer>();
+		intArrayList.add(-1);
+		newDelc.setReferenceNumber(intArrayList);
+		expectedAc = newDelc;
+		try{
+			ac = Parser.parse("delete all");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());	
+
 		//.................. MARK TESTING ....................................
 		
 		//mark #3 as done
