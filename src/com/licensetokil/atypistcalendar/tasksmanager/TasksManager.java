@@ -112,7 +112,7 @@ public class TasksManager {
 			}
 		}
 	}*/
-
+	
 	private void initialize() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -390,7 +390,11 @@ public class TasksManager {
 
 	private String displayOutput(String output) {
 		int count = 1;
-
+		
+		Collections.sort(sch);
+		Collections.sort(dl);
+		Collections.sort(toDo);
+		
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
