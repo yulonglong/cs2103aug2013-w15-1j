@@ -72,10 +72,10 @@ public class Deadline extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "@sDeadline@s" + uniqueID + "@s" + endTime.getTime() + "@s"
+			return "Deadline@s" + uniqueID + "@s" + endTime.getTime() + "@s"
 					+ description + "@s" + " " + "@s" + status;
 		}
-		return "@sDeadline@s" + uniqueID + "@s" + endTime.getTime() + "@s"
+		return "Deadline@s" + uniqueID + "@s" + endTime.getTime() + "@s"
 				+ description + "@s" + place + "@s" + status;
 	}
 	
@@ -91,6 +91,6 @@ public class Deadline extends Task {
 			output = output+"Place: " + this.getPlace() + "\n";
 		}
 		
-		return output;
+		return output + "\n";
 	}
 }

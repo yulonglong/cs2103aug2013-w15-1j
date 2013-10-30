@@ -58,9 +58,9 @@ public class Todo extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "@sTodo@s" + uniqueID + "@s" + description + "@s" + " " + "@s" + status;
+			return "Todo@s" + uniqueID + "@s" + description + "@s" + " " + "@s" + status;
 		}
-		return "@sTodo@s" + uniqueID + "@s" + description + "@s" + place + "@s" + status;
+		return "Todo@s" + uniqueID + "@s" + description + "@s" + place + "@s" + status;
 	}
 	
 	public String outputStringForDisplay(){
@@ -71,6 +71,6 @@ public class Todo extends Task {
 			output = output+"Place: " + this.getPlace() + "\n";
 		}
 		
-		return output;
+		return output + "\n";
 	}
 }

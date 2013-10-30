@@ -73,10 +73,10 @@ public class Schedule extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "@sSchedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
+			return "Schedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
 					+ endTime.getTime() + "@s" + description + "@s" + " ";
 		}
-		return "@sSchedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
+		return "Schedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
 				+ endTime.getTime() + "@s" + description + "@s" + place ;
 	}
 	
@@ -93,6 +93,7 @@ public class Schedule extends Task {
 			output = output+"Place: " + this.getPlace() + "\n";
 		}
 		
-		return output;
+		
+		return output + "\n";
 	}
 }

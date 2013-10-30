@@ -117,29 +117,39 @@ public class TasksManager {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String currLine;
-			StringTokenizer st;
+			String[] data;
 
 			// To import all tasks from file to ArrayList
 			while ((currLine = reader.readLine()) != null) {
-				st = new StringTokenizer(currLine, "@s");
-				String token = st.nextToken();
-				if (token.equals("Schedule")) {
-					Schedule s = new Schedule(Integer.parseInt(st.nextToken()),
-							convertTimeFromStringToCalendar(st.nextToken()),
-							convertTimeFromStringToCalendar(st.nextToken()),
-							st.nextToken(), st.nextToken());
+				System.out.println("Before: " + currLine);
+				data = currLine.split("@s");
+				System.out.println(Arrays.toString(data));
+				if (data[0].equals("Schedule")) {			
+					Schedule s = new Schedule(Integer.parseInt(data[1]),
+							convertTimeFromStringToCalendar(data[2]),
+							convertTimeFromStringToCalendar(data[3]),
+							data[4], data[5]);
 					schedule.add(s);
-				} else if (token.equals("Deadline")) {
-					Deadline d = new Deadline(Integer.parseInt(st.nextToken()),
-							convertTimeFromStringToCalendar(st.nextToken()),
-							st.nextToken(), st.nextToken(), st.nextToken());
+					if(data[5].equals(" ")){
+						s.setPlace("");
+					}
+				} else if (data[0].equals("Deadline")) {
+					Deadline d = new Deadline(Integer.parseInt(data[1]),
+							convertTimeFromStringToCalendar(data[2]),
+							data[3], data[4], data[5]);
 					deadline.add(d);
-				} else if (token.equals("Todo")) {
-					Todo td = new Todo(Integer.parseInt(st.nextToken()),
-							st.nextToken(), st.nextToken(), st.nextToken());
+					if(data[4].equals(" ")){
+						d.setPlace("");
+					}
+				} else if (data[0].equals("Todo")) {
+					Todo td = new Todo(Integer.parseInt(data[1]),
+							data[2], data[3], data[4]);
 					todo.add(td);
-				} else if (token.equals("uniqueID")) {
-					uniqueID = Integer.parseInt(st.nextToken()); // the last
+					if(data[3].equals(" ")){
+						td.setPlace("");
+					}
+				} else if (data[0].equals("uniqueID")) {
+					uniqueID = Integer.parseInt(data[1]); // the last
 																	// uniqueID
 																	// is stored
 																	// at the
