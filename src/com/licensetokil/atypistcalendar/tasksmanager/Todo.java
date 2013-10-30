@@ -1,6 +1,6 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
-public class Todo extends Task {
+public class Todo extends Task implements Comparable<Todo> {
 	private String remoteID;
 	private String taskType;
 	private int uniqueID;
@@ -72,5 +72,9 @@ public class Todo extends Task {
 		}
 		
 		return output + "\n";
+	}
+	
+	public int compareTo(Todo td){
+		return description.compareTo(td.getDescription());
 	}
 }

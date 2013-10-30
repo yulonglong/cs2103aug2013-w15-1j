@@ -112,7 +112,7 @@ public class TasksManager {
 			}
 		}
 	}*/
-
+	
 	private void initialize() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -192,6 +192,7 @@ public class TasksManager {
 
 		Calendar cal = Calendar.getInstance();
 		cal.set(year, month, date, hour, min, sec);
+		cal.set(Calendar.MILLISECOND, 0);
 
 		return cal;
 	}
@@ -248,7 +249,7 @@ public class TasksManager {
 
 		return t;
 	}
-
+	
 	private String add(Task t) {
 
 		try {
@@ -389,7 +390,11 @@ public class TasksManager {
 
 	private String displayOutput(String output) {
 		int count = 1;
-
+		
+		Collections.sort(sch);
+		Collections.sort(dl);
+		Collections.sort(toDo);
+		
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
