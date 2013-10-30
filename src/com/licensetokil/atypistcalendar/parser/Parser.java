@@ -87,8 +87,14 @@ public class Parser {
 	
 	private static final String ALL = "all";
 	private static final String SCHEDULES = "schedules";
+	private static final String SCHEDULES_SINGULAR = "schedule";
+	private static final String SCHEDULES_SHORT = "sch";
 	private static final String DEADLINES = "deadlines";
+	private static final String DEADLINES_SINGULAR = "deadline";
+	private static final String DEADLINES_SHORT = "dl";
 	private static final String TODOS = "todos";
+	private static final String TODOS_SINGULAR = "todo";
+	private static final String TODOS_SHORT = "td";
 	private static final String UNDONE = "undone";
 	private static final String DONE = "done";
 	
@@ -1288,8 +1294,14 @@ public class Parser {
 
 	private static boolean isValidTask(String task) {
 		if ((task.equalsIgnoreCase(SCHEDULES))
+				|| (task.equalsIgnoreCase(SCHEDULES_SINGULAR))
+				|| (task.equalsIgnoreCase(SCHEDULES_SHORT))
 				|| (task.equalsIgnoreCase(DEADLINES))
-				|| (task.equalsIgnoreCase(TODOS))) {
+				|| (task.equalsIgnoreCase(DEADLINES_SINGULAR))
+				|| (task.equalsIgnoreCase(DEADLINES_SHORT))
+				|| (task.equalsIgnoreCase(TODOS))
+				|| (task.equalsIgnoreCase(TODOS_SINGULAR))
+				|| (task.equalsIgnoreCase(TODOS_SHORT))) {
 			return true;
 		}
 		return false;
