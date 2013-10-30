@@ -1,2 +1,21 @@
+Schedule@s1@sFri Nov 08 12:00:00 SGT 2013@sFri Nov 08 13:00:00 SGT 2013@sCS2106 Quiz 2@s 
+Schedule@s2@sThu Oct 31 18:00:00 SGT 2013@sThu Oct 31 19:00:00 SGT 2013@sHalloween performance@s 
+Schedule@s4@sWed Oct 30 21:00:00 SGT 2013@sWed Oct 30 22:00:00 SGT 2013@sJog@sPark
+Schedule@s6@sWed Oct 30 18:00:00 SGT 2013@sWed Oct 30 19:00:00 SGT 2013@sEat dinner with Thaddeus@s 
+Schedule@s7@sSat Nov 02 18:00:00 SGT 2013@sSat Nov 02 19:00:00 SGT 2013@sFamily dinner@s 
+Schedule@s9@sMon Nov 25 09:00:00 SGT 2013@sMon Nov 25 10:00:00 SGT 2013@sBSP1005 finals@s 
+Schedule@s10@sWed Nov 27 13:00:00 SGT 2013@sWed Nov 27 14:00:00 SGT 2013@sCS2103T finals@s 
+Schedule@s11@sFri Nov 29 09:00:00 SGT 2013@sFri Nov 29 10:00:00 SGT 2013@sGEM2900 finals@s 
+Schedule@s12@sFri Nov 29 14:30:00 SGT 2013@sFri Nov 29 15:30:00 SGT 2013@sCS2106 finals@s 
+Schedule@s13@sFri Nov 08 10:00:00 SGT 2013@sFri Nov 08 11:00:00 SGT 2013@sCS2101 OP2@s 
+Schedule@s14@sFri Nov 08 10:00:00 SGT 2013@sFri Nov 08 11:00:00 SGT 2013@sCS2101 OP2 conference@s 
+Schedule@s18@sTue Nov 05 20:00:00 SGT 2013@sTue Nov 05 21:00:00 SGT 2013@sdance@s 
+Deadline@s3@sFri Nov 15 23:59:59 SGT 2013@sdo CS2106 File Management project@s @sundone
+Deadline@s17@sFri Nov 01 23:59:59 SGT 2013@sCS2106 HW10@s @sundone
+Deadline@s19@sSat Nov 09 23:59:59 SGT 2013@sfinish studying oligopoly for BSP1005@s @sundone
 Todo@s1@sclean my room@s @sundone
-@uniqueID@0
+Todo@s5@slearn chess to defeat Ian@s @sundone
+Todo@s8@scatch up with Alyssa@s @sundone
+Todo@s15@sfind internship for summer next year@s @sundone
+Todo@s16@sbuy bread for breakfast@sBreadTalk@sundone
+@uniqueID@19
