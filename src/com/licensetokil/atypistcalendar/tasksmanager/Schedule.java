@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
 public class Schedule extends Task {
+	private String remoteID;
 	private String taskType;
 	private int uniqueID;
 	private Calendar startTime;
@@ -72,11 +73,11 @@ public class Schedule extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
-					+ endTime.getTime() + "@" + description + "@" + " ";
+			return "@sSchedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
+					+ endTime.getTime() + "@s" + description + "@s" + " ";
 		}
-		return "@Schedule@" + uniqueID + "@" + startTime.getTime() + "@"
-				+ endTime.getTime() + "@" + description + "@" + place ;
+		return "@sSchedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
+				+ endTime.getTime() + "@s" + description + "@s" + place ;
 	}
 	
 	public String outputStringForDisplay(){

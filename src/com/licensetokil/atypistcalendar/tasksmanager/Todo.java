@@ -1,6 +1,7 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 public class Todo extends Task {
+	private String remoteID;
 	private String taskType;
 	private int uniqueID;
 	private String description;
@@ -57,9 +58,9 @@ public class Todo extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "@Todo@" + uniqueID + "@" + description + "@" + " " + "@" + status;
+			return "@sTodo@s" + uniqueID + "@s" + description + "@s" + " " + "@s" + status;
 		}
-		return "@Todo@" + uniqueID + "@" + description + "@" + place + "@" + status;
+		return "@sTodo@s" + uniqueID + "@s" + description + "@s" + place + "@s" + status;
 	}
 	
 	public String outputStringForDisplay(){

@@ -1,6 +1,7 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 public abstract class Task {
+	protected String remoteID;
 	protected String taskType;
 	protected int uniqueID;
 	protected String place;
