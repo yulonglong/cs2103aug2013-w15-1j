@@ -63,7 +63,6 @@ public class Parser {
 	private static final int MIN_DAY = 1;
 	private static final int MIN_MONTH = 0;
 	private static final int MIN_YEAR = 2000;
-	private static final int MIN_MILLISECOND = 0;
 	
 	private static final int MAX_HOUR = 23;
 	private static final int MAX_MINUTE = 59;
@@ -269,7 +268,6 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME] = null;
 		
 		setEndTimeMax(calendarArray);
@@ -360,7 +358,6 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME] = null;
 		String description = null;
 		String place = null;
@@ -410,7 +407,6 @@ public class Parser {
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
 		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME] = null;
 		
 		setEndTimeMax(calendarArray);
@@ -474,7 +470,6 @@ public class Parser {
 	
 	private static void setEndTimeMax (Calendar[] calendarArray) {
 		calendarArray[INDEX_END_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_END_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_END_TIME].set(MAX_YEAR,MAX_MONTH,MAX_DAY,MAX_HOUR,MAX_MINUTE,MAX_SECOND);
 		return;
 	}
@@ -495,17 +490,6 @@ public class Parser {
 		if(!isValidTask(task)){
 			st = addStringToTokenizer(st,task);
 			task = new String();
-		}
-		else{
-			if(isStringSchedules(task)){
-				task = "schedules";
-			}
-			if(isStringDeadlines(task)){
-				task = "deadlines";
-			}
-			if(isStringTodos(task)){
-				task = "todos";
-			}
 		}
 		tempSt[INDEX_ST] = st;
 		return task;
@@ -872,7 +856,6 @@ public class Parser {
 	
 	private static void getDateFromDay(int[] intStartDate, String eventDay, int intEventTimeHours, int intEventTimeMinutes) throws MalformedUserInputException{
 		Calendar currentDate = Calendar.getInstance();
-		currentDate.set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		int intCurrentDayOfWeek = INVALID_INT_VALUE;
 		intCurrentDayOfWeek = currentDate.get(Calendar.DAY_OF_WEEK);
 		int intCurrentTimeHours = INVALID_INT_VALUE;
@@ -880,20 +863,14 @@ public class Parser {
 		int intCurrentTimeMinutes = INVALID_INT_VALUE;
 		intCurrentTimeMinutes = currentDate.get(Calendar.MINUTE);
 		
-		if(isStringToday(eventDay)){
-			setDateToday(intStartDate);
-			return;
-		}
-		else if (isStringTomorrow(eventDay)){
-			setDateTomorrow(intStartDate);
-			return;
-		}
-		
 		int intEventDayOfWeek = INVALID_INT_VALUE;
 		intEventDayOfWeek = getDayOfWeek(eventDay);
 		
-		if(intEventDayOfWeek==INVALID_INT_VALUE){
-			throw new MalformedUserInputException(MESSAGE_INVALID);
+		if(isStringToday(eventDay)){
+			setDateToday(intStartDate);
+		}
+		else if (isStringTomorrow(eventDay)){
+			setDateTomorrow(intStartDate);
 		}
 		//if the day stated is not the same as today's day
 		else if(intCurrentDayOfWeek!=intEventDayOfWeek){
@@ -997,11 +974,6 @@ public class Parser {
 			return date;
 		}
 		
-		if(date.length()>2){
-			tempSt[INDEX_ST]=st;
-			return date;
-		}
-		
 		//retrieve month (e.g. January february etc)
 		String stringMonth = new String(st.nextToken());
 		Integer intMonth = getDayOfMonth(stringMonth);
@@ -1057,7 +1029,6 @@ public class Parser {
 		if((isStringToday(preposition))||(isStringTomorrow(preposition))){
 			st = addStringToTokenizer(st,preposition);
 		}
-		
 
 		// if there is no date field
 		if(!st.hasMoreTokens()){
@@ -1070,17 +1041,6 @@ public class Parser {
 		//get String Date, convert (12 Jan) format to default format (12/1)
 		date = getStringDate(st, tempSt);
 		st = tempSt[INDEX_ST];
-		
-		if(!Character.isDigit(date.charAt(FIRST_INDEX))){
-			getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
-		}
-		else{
-			getDate(intStartDate,date,actionType);
-		}
-		if(!isValidDate(intStartDate)){
-			throw new MalformedUserInputException(MESSAGE_INVALID);
-		}
-		
 		
 		if(!st.hasMoreTokens()){
 			if((actionType==LocalActionType.DISPLAY)||(actionType==LocalActionType.SEARCH)){
@@ -1218,8 +1178,6 @@ public class Parser {
 			endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intEndHour, intEndMinute, MIN_SECOND);
 		}
 	
-		startTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
-		endTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		calendarArray[INDEX_START_TIME] = startTimeCal;
 		calendarArray[INDEX_END_TIME] = endTimeCal;
 		return;
@@ -1316,19 +1274,6 @@ public class Parser {
 		return false;
 	}
 	
-	private static boolean isValidDate(int[] intTime){
-		if((intTime[INDEX_YEAR]<2000)||(intTime[INDEX_YEAR]>2099)){
-			return false;
-		}
-		if((intTime[INDEX_MONTH]<0)||(intTime[INDEX_MONTH]>11)){
-			return false;
-		}
-		if((intTime[INDEX_DAY]<1)||(intTime[INDEX_DAY]>38)){
-			return false;
-		}
-		return true;
-	}
-	
 	private static boolean isValidTimeSuffix(String suffix){
 		if((suffix.equalsIgnoreCase(PM_SHORT))
 			||(suffix.equalsIgnoreCase(PM_LONG))
@@ -1342,33 +1287,6 @@ public class Parser {
 	private static boolean isValidStatus(String status){
 		if ((status.equalsIgnoreCase(DONE))
 				|| (status.equalsIgnoreCase(UNDONE))) {
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isStringSchedules(String task){
-		if ((task.equalsIgnoreCase(SCHEDULES))
-				|| (task.equalsIgnoreCase(SCHEDULES_SINGULAR))
-				|| (task.equalsIgnoreCase(SCHEDULES_SHORT))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isStringDeadlines(String task){
-		if ((task.equalsIgnoreCase(DEADLINES))
-				|| (task.equalsIgnoreCase(DEADLINES_SINGULAR))
-				|| (task.equalsIgnoreCase(DEADLINES_SHORT))){
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isStringTodos(String task){
-		if ( (task.equalsIgnoreCase(TODOS))
-				|| (task.equalsIgnoreCase(TODOS_SINGULAR))
-				|| (task.equalsIgnoreCase(TODOS_SHORT))) {
 			return true;
 		}
 		return false;

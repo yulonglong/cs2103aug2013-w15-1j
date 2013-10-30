@@ -3,7 +3,7 @@ package com.licensetokil.atypistcalendar.tasksmanager;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class Deadline extends Task implements Comparable<Deadline> {
+public class Deadline extends Task {
 	private String remoteID;
 	private String taskType;
 	private int uniqueID;
@@ -92,9 +92,5 @@ public class Deadline extends Task implements Comparable<Deadline> {
 		}
 		
 		return output + "\n";
-	}
-	
-	public int compareTo(Deadline d){
-		return endTime.compareTo(d.getEndTime());
 	}
 }
