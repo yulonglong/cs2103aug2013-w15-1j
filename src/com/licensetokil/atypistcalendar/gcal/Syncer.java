@@ -1,6 +1,7 @@
 package com.licensetokil.atypistcalendar.gcal;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -158,7 +159,7 @@ class Syncer extends Thread {
 
 			Deadline localDeadline = (Deadline)localTask;
 
-			requestBody.addProperty("summary", "Deadline:" + localDeadline.getDescription());
+			requestBody.addProperty("summary", "Deadline: " + localDeadline.getDescription());
 			requestBody.addProperty("description", localDeadline.getDescription());
 			requestBody.addProperty("location", localDeadline.getPlace());
 			requestBody.add("start", GoogleCalendarUtilities.createDateTimeObject(localDeadline.getEndTime()));
@@ -348,8 +349,29 @@ class Syncer extends Thread {
 				locationIsIdentical = localSchedule.getPlace().equals("");
 			}
 
-			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(GoogleCalendarUtilities.createDateTimeObject(localSchedule.getStartTime()));
-			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(GoogleCalendarUtilities.createDateTimeObject(localSchedule.getEndTime()));
+			boolean startTimeIsIdentical;
+			boolean endTimeIsIdentical;
+			try {
+				startTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("start")).equals(localSchedule.getStartTime());
+				endTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("end")).equals(localSchedule.getEndTime());
+
+				System.out.println("schedule");
+				System.out.print("google: ");
+				System.out.println(GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("start")).toString());
+				System.out.print("ours: ");
+				System.out.println(localSchedule.getStartTime());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				startTimeIsIdentical = false;
+				endTimeIsIdentical = false;
+				e.printStackTrace();
+			}
+
+			System.out.println(summaryIsIdentical);
+			System.out.println(descriptionIsIdentical);
+			System.out.println(locationIsIdentical);
+			System.out.println(startTimeIsIdentical);
+			System.out.println(endTimeIsIdentical);
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&
@@ -372,8 +394,24 @@ class Syncer extends Thread {
 				locationIsIdentical = localDeadline.getPlace().equals("");
 			}
 
-			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(GoogleCalendarUtilities.createDateTimeObject(localDeadline.getEndTime()));
-			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(GoogleCalendarUtilities.createDateTimeObject(localDeadline.getEndTime()));
+			boolean startTimeIsIdentical;
+			boolean endTimeIsIdentical;
+			try {
+				startTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("start")).equals(localDeadline.getEndTime());
+				endTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("end")).equals(localDeadline.getEndTime());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				startTimeIsIdentical = false;
+				endTimeIsIdentical = false;
+				e.printStackTrace();
+			}
+
+			System.out.println("deadline");
+			System.out.println(summaryIsIdentical);
+			System.out.println(descriptionIsIdentical);
+			System.out.println(locationIsIdentical);
+			System.out.println(startTimeIsIdentical);
+			System.out.println(endTimeIsIdentical);
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&
@@ -399,6 +437,14 @@ class Syncer extends Thread {
 			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 			final boolean recurrenceIsIdentical = remoteTask.get("recurrence").getAsJsonArray().equals(SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
+
+			System.out.println("todo");
+			System.out.println(summaryIsIdentical);
+			System.out.println(descriptionIsIdentical);
+			System.out.println(locationIsIdentical);
+			System.out.println(startTimeIsIdentical);
+			System.out.println(endTimeIsIdentical);
+			System.out.println(recurrenceIsIdentical);
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&
