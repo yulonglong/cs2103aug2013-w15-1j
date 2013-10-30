@@ -1,7 +1,9 @@
 package com.licensetokil.atypistcalendar.gcal.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -34,6 +36,24 @@ public class GoogleCalendarUtilities {
 		extendedProperties.add("private", privateExtendedProperties);
 
 		return extendedProperties;
+	}
+
+	public static Calendar getCalendarObjectFromDateTimeObject(JsonObject dateTimeObject)
+			throws ParseException {
+		return getCalendarObjectFromDateTimeObject(dateTimeObject, getRfc3339FormatWithoutMilliseconds());
+	}
+
+	//refactoring of names needed
+	public static Calendar getCalendarObjectFromDateTimeObject(JsonObject dateTimeObject, SimpleDateFormat format)
+			throws ParseException {
+		//Throw some kind exceptino for of ill-formatted JsonObject
+		String dateTimeString = dateTimeObject.get("dateTime").getAsString();
+		Date date = format.parse(dateTimeString);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+
+		return calendar;
 	}
 
 	public static JsonObject createDateTimeObject(Calendar date) {
