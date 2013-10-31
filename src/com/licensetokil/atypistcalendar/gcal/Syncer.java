@@ -1,7 +1,6 @@
 package com.licensetokil.atypistcalendar.gcal;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -14,8 +13,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.licensetokil.atypistcalendar.ATypistCalendar;
-import com.licensetokil.atypistcalendar.gcal.util.GoogleCalendarUtilities;
-import com.licensetokil.atypistcalendar.gcal.util.HttpsConnectionHelper;
 import com.licensetokil.atypistcalendar.tasksmanager.Deadline;
 import com.licensetokil.atypistcalendar.tasksmanager.Schedule;
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
@@ -105,11 +102,11 @@ class Syncer extends Thread {
 
 		JsonObject requestBody = createRemoteTaskRequestBody(addSyncAction.getLocalTask());
 
-		HttpsConnectionHelper.sendJsonRequest(
+		Util.sendJsonHttpsRequest(
 				"https://www.googleapis.com/calendar/v3/calendars/" +
 						SyncManager.getInstance().getRemoteCalendarId() +
 						"/events",
-				HttpsConnectionHelper.REQUEST_METHOD_POST,
+				Util.REQUEST_METHOD_POST,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
 				requestBody);
 	}
@@ -120,12 +117,12 @@ class Syncer extends Thread {
 
 		JsonObject requestBody = createRemoteTaskRequestBody(updateSyncAction.getLocalTask());
 
-		HttpsConnectionHelper.sendJsonRequest(
+		Util.sendJsonHttpsRequest(
 				"https://www.googleapis.com/calendar/v3/calendars/" +
 						SyncManager.getInstance().getRemoteCalendarId() +
 						"/events/" +
 						updateSyncAction.getRemoteTaskID(),
-				HttpsConnectionHelper.REQUEST_METHOD_PUT,
+				Util.REQUEST_METHOD_PUT,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
 				requestBody);
 	}
@@ -134,12 +131,12 @@ class Syncer extends Thread {
 			throws JsonParseException, IllegalStateException, IOException {
 		logger.fine("executeSyncAction(DeleteSyncAction currentSyncAction) called.");
 
-		HttpsConnectionHelper.sendJsonRequest(
+		Util.sendJsonHttpsRequest(
 				"https://www.googleapis.com/calendar/v3/calendars/" +
 						SyncManager.getInstance().getRemoteCalendarId() +
 						"/events/" +
 						deleteSyncAction.getRemoteTaskID(),
-				HttpsConnectionHelper.REQUEST_METHOD_DELETE,
+				Util.REQUEST_METHOD_DELETE,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
 				null);
 	}
@@ -163,9 +160,9 @@ class Syncer extends Thread {
 			requestBody.addProperty("summary", localSchedule.getDescription());
 			requestBody.addProperty("description", localSchedule.getDescription());
 			requestBody.addProperty("location", localSchedule.getPlace());
-			requestBody.add("start", GoogleCalendarUtilities.createDateTimeObject(localSchedule.getStartTime()));
-			requestBody.add("end", GoogleCalendarUtilities.createDateTimeObject(localSchedule.getEndTime()));
-			requestBody.add("extendedProperties", GoogleCalendarUtilities.createExtendedPropertiesObject(localSchedule.getUniqueID()));
+			requestBody.add("start", Util.createDateTimeObject(localSchedule.getStartTime()));
+			requestBody.add("end", Util.createDateTimeObject(localSchedule.getEndTime()));
+			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localSchedule.getUniqueID()));
 		}
 		else if(localTask instanceof Deadline) {
 			//TODO handle done/undone
@@ -175,9 +172,9 @@ class Syncer extends Thread {
 			requestBody.addProperty("summary", "Deadline: " + localDeadline.getDescription());
 			requestBody.addProperty("description", localDeadline.getDescription());
 			requestBody.addProperty("location", localDeadline.getPlace());
-			requestBody.add("start", GoogleCalendarUtilities.createDateTimeObject(localDeadline.getEndTime()));
-			requestBody.add("end", GoogleCalendarUtilities.createDateTimeObject(localDeadline.getEndTime()));
-			requestBody.add("extendedProperties", GoogleCalendarUtilities.createExtendedPropertiesObject(localDeadline.getUniqueID()));
+			requestBody.add("start", Util.createDateTimeObject(localDeadline.getEndTime()));
+			requestBody.add("end", Util.createDateTimeObject(localDeadline.getEndTime()));
+			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localDeadline.getUniqueID()));
 		}
 		else if(localTask instanceof Todo) {
 			//TODO handle done/undone
@@ -186,9 +183,9 @@ class Syncer extends Thread {
 			requestBody.addProperty("summary", "Todo: " + localTodo.getDescription());
 			requestBody.addProperty("description", localTodo.getDescription());
 			requestBody.addProperty("location", localTodo.getPlace());
-			requestBody.add("start", GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-			requestBody.add("end", GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-			requestBody.add("extendedProperties", GoogleCalendarUtilities.createExtendedPropertiesObject(localTodo.getUniqueID()));
+			requestBody.add("start", Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+			requestBody.add("end", Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localTodo.getUniqueID()));
 			requestBody.add("recurrence", SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 		}
 		else {
@@ -202,10 +199,10 @@ class Syncer extends Thread {
 			throws IOException, JsonParseException, IllegalStateException {
 		logger.fine("remoteCalendarExists() called.");
 
-		JsonObject serverReply = GoogleCalendarUtilities.parseToJsonObject(
-				HttpsConnectionHelper.sendJsonRequest(
+		JsonObject serverReply = Util.parseToJsonObject(
+				Util.sendJsonHttpsRequest(
 						"https://www.googleapis.com/calendar/v3/users/me/calendarList",
-						HttpsConnectionHelper.REQUEST_METHOD_GET,
+						Util.REQUEST_METHOD_GET,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
 						null)
 				);
@@ -214,6 +211,10 @@ class Syncer extends Thread {
 		Iterator<JsonElement> calendarListIterator = calendarList.iterator();
 		while(calendarListIterator.hasNext()) {
 			JsonObject calendarListElement = (JsonObject)calendarListIterator.next();
+
+			if(calendarListElement.get("summary") == null) {
+				continue;
+			}
 			if(calendarListElement.get("summary").getAsString().equals("A Typist's Calendar")) {
 				SyncManager.getInstance().setRemoteCalendarId(calendarListElement.get("id").getAsString());
 				return true;
@@ -231,11 +232,13 @@ class Syncer extends Thread {
 
 		JsonObject requestBody = new JsonObject();
 		requestBody.addProperty("summary", "A Typist's Calendar");
+		requestBody.addProperty("timeZone", Calendar.getInstance().getTimeZone().getID());
+		requestBody.addProperty("location", Calendar.getInstance().getTimeZone().getID());
 
-		JsonObject serverReply = GoogleCalendarUtilities.parseToJsonObject(
-				HttpsConnectionHelper.sendJsonRequest(
+		JsonObject serverReply = Util.parseToJsonObject(
+				Util.sendJsonHttpsRequest(
 						"https://www.googleapis.com/calendar/v3/calendars",
-						HttpsConnectionHelper.REQUEST_METHOD_POST,
+						Util.REQUEST_METHOD_POST,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
 						requestBody)
 				);
@@ -257,39 +260,7 @@ class Syncer extends Thread {
 		Iterator<JsonElement> remoteTasksListIterator = remoteTasksList.iterator();
 		while(remoteTasksListIterator.hasNext()) {
 			logger.info("Examining next remote task.");
-			JsonObject remoteTask = remoteTasksListIterator.next().getAsJsonObject();
-
-			String extendedPropertiesLocalTaskID = remoteTask
-					.getAsJsonObject("extendedProperties")
-					.getAsJsonObject("private")
-					.get("atc_localTaskID")
-					.getAsString();
-			logger.info("Checking if remote task was not created by ATC (i.e. by user, or other programs)");
-			if(extendedPropertiesLocalTaskID == null) {
-				logger.info("Remote task was not created by ATC. Inserting into local TasksManger.");
-				//TODO insert into tasksManager
-			}
-			else {
-				logger.info("Remote task was created by ATC. Searching for corresponding local task.");
-				Task currentLocalTask = searchForCorrespondingLocalTask(localTasks, extendedPropertiesLocalTaskID);
-				if(currentLocalTask != null) {
-					logger.info("Corresponding local task found, checking for discrepancies between local and remote copies.");
-					if(!isIdentical(remoteTask, currentLocalTask)) {
-						logger.info("Discrepancies between local and remote copies found. Enqueuing to update remote copy to match local one.");
-						GoogleCalendarManager.getInstance().updateRemoteTask(currentLocalTask, remoteTask.get("id").getAsString());
-					}
-					else {
-						logger.info("No discrepancies between local and remote copies found. Nothing to do as remote copy is sync'ed.");
-					}
-
-					logger.info("Removing corresponding local task from the local tasks list.");
-					localTasks.remove(currentLocalTask);
-				}
-				else {
-					logger.info("Corresponding local task not found, enqueuing to delete remote copy.");
-					GoogleCalendarManager.getInstance().deleteRemoteTask(remoteTask.get("id").getAsString());
-				}
-			}
+			examineRemoteTask(localTasks, remoteTasksListIterator.next().getAsJsonObject());
 		}
 		logger.info("Completed iterating through remote task list (for current page).");
 
@@ -306,6 +277,38 @@ class Syncer extends Thread {
 		}
 	}
 
+	private void examineRemoteTask(ArrayList<Task> localTasks, JsonObject remoteTask) {
+		logger.fine("examineRemoteTask(ArrayList<Task> localTasks, JsonObject remoteTask) called.");
+
+		String correspondingLocalTaskId = getCorrespondingLocalTaskId(remoteTask);
+		logger.info("Checking if remote task was not created by ATC (i.e. by user, or other programs)");
+		if(correspondingLocalTaskId == null) {
+			logger.info("Remote task was not created by ATC. Inserting into local TasksManger.");
+			//TODO insert into tasksManager
+		}
+		else {
+			logger.info("Remote task was created by ATC. Searching for corresponding local task.");
+			Task currentLocalTask = searchForCorrespondingLocalTask(localTasks, correspondingLocalTaskId);
+			if(currentLocalTask != null) {
+				logger.info("Corresponding local task found, checking for discrepancies between local and remote copies.");
+				if(!isIdentical(remoteTask, currentLocalTask)) {
+					logger.info("Discrepancies between local and remote copies found. Enqueuing to update remote copy to match local one.");
+					GoogleCalendarManager.getInstance().updateRemoteTask(currentLocalTask, remoteTask.get("id").getAsString());
+				}
+				else {
+					logger.info("No discrepancies between local and remote copies found. Nothing to do as remote copy is sync'ed.");
+				}
+
+				logger.info("Removing corresponding local task from the local tasks list.");
+				localTasks.remove(currentLocalTask);
+			}
+			else {
+				logger.info("Corresponding local task not found, enqueuing to delete remote copy.");
+				GoogleCalendarManager.getInstance().deleteRemoteTask(remoteTask.get("id").getAsString());
+			}
+		}
+	}
+
 	private JsonObject getRemoteTaskList(String pageToken)
 			throws IOException, JsonParseException, IllegalStateException {
 		logger.fine("getRemoteTaskList(String pageToken) called.");
@@ -317,12 +320,12 @@ class Syncer extends Thread {
 			formParameters.put("pageToken", pageToken);
 		}
 
-		JsonObject serverReply = GoogleCalendarUtilities.parseToJsonObject(
-				HttpsConnectionHelper.sendUrlencodedFormRequest(
+		JsonObject serverReply = Util.parseToJsonObject(
+				Util.sendUrlencodedFormHttpsRequest(
 						"https://www.googleapis.com/calendar/v3/calendars/" +
 								SyncManager.getInstance().getRemoteCalendarId() +
 								"/events",
-						HttpsConnectionHelper.REQUEST_METHOD_GET,
+						Util.REQUEST_METHOD_GET,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
 						formParameters)
 				);
@@ -345,37 +348,33 @@ class Syncer extends Thread {
 		return null;
 	}
 
+	private String getCorrespondingLocalTaskId(JsonObject remoteTask) {
+		if(remoteTask.getAsJsonObject("extendedProperties") == null) {
+			return null;
+		}
+		if(remoteTask.getAsJsonObject("extendedProperties").getAsJsonObject("private") == null) {
+			return null;
+		}
+		if(remoteTask.getAsJsonObject("extendedProperties").getAsJsonObject("private").get("atc_localTaskID") == null) {
+			return null;
+		}
+		return remoteTask.getAsJsonObject("extendedProperties").getAsJsonObject("private").get("atc_localTaskID").getAsString();
+	}
+
 	private boolean isIdentical(JsonObject remoteTask, Task localTask) {
 		logger.fine("isIdentical(JsonObject remoteTask, Task localTask) called.");
 
 		if(localTask instanceof Schedule) {
 			Schedule localSchedule = (Schedule)localTask;
 
-			final boolean summaryIsIdentical = remoteTask.get("summary").getAsString().equals(localSchedule.getDescription());
-			final boolean descriptionIsIdentical = remoteTask.get("description").getAsString().equals(localSchedule.getDescription());
+			final boolean summaryIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "summary").equals(localSchedule.getDescription());
+			final boolean descriptionIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localSchedule.getDescription());
+			final boolean locationIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localSchedule.getPlace());
 
-			final boolean locationIsIdentical;
-			if(remoteTask.get("location") != null) {
-				locationIsIdentical = remoteTask.get("location").getAsString().equals(localSchedule.getPlace());
-			}
-			else {
-				locationIsIdentical = localSchedule.getPlace().equals("");
-			}
-
-			boolean startTimeIsIdentical;
-			boolean endTimeIsIdentical;
-			try {
-				//TODO temp vars
-				localSchedule.getStartTime().set(Calendar.MILLISECOND, 0); //temp
-				localSchedule.getEndTime().set(Calendar.MILLISECOND, 0); //temp
-				startTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("start")).equals(localSchedule.getStartTime());
-				endTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("end")).equals(localSchedule.getEndTime());
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				startTimeIsIdentical = false;
-				endTimeIsIdentical = false;
-				e.printStackTrace();
-			}
+			localSchedule.getStartTime().set(Calendar.MILLISECOND, 0); //temp
+			localSchedule.getEndTime().set(Calendar.MILLISECOND, 0); //temp
+			boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(Util.createDateTimeObject(localSchedule.getStartTime()));
+			boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(Util.createDateTimeObject(localSchedule.getEndTime()));
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&
@@ -387,30 +386,13 @@ class Syncer extends Thread {
 			//TODO handle done/undone
 			Deadline localDeadline = (Deadline)localTask;
 
-			final boolean summaryIsIdentical = remoteTask.get("summary").getAsString().equals("Deadline: " + localDeadline.getDescription());
-			final boolean descriptionIsIdentical = remoteTask.get("description").getAsString().equals(localDeadline.getDescription());
+			final boolean summaryIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "summary").equals("Deadline: " + localDeadline.getDescription());
+			final boolean descriptionIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localDeadline.getDescription());
+			final boolean locationIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localDeadline.getPlace());
 
-			final boolean locationIsIdentical;
-			if(remoteTask.get("location") != null) {
-				locationIsIdentical = remoteTask.get("location").getAsString().equals(localDeadline.getPlace());
-			}
-			else {
-				locationIsIdentical = localDeadline.getPlace().equals("");
-			}
-
-			boolean startTimeIsIdentical;
-			boolean endTimeIsIdentical;
-			try {
-				//TODO temp vars
-				localDeadline.getEndTime().set(Calendar.MILLISECOND, 0); //temp
-				startTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("start")).equals(localDeadline.getEndTime());
-				endTimeIsIdentical = GoogleCalendarUtilities.getCalendarObjectFromDateTimeObject(remoteTask.getAsJsonObject("end")).equals(localDeadline.getEndTime());
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				startTimeIsIdentical = false;
-				endTimeIsIdentical = false;
-				e.printStackTrace();
-			}
+			localDeadline.getEndTime().set(Calendar.MILLISECOND, 0); //temp
+			boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(Util.createDateTimeObject(localDeadline.getEndTime()));
+			boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(Util.createDateTimeObject(localDeadline.getEndTime()));
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&
@@ -422,20 +404,20 @@ class Syncer extends Thread {
 			//TODO handle done/undone
 			Todo localTodo = (Todo)localTask;
 
-			final boolean summaryIsIdentical = remoteTask.get("summary").getAsString().equals("Todo: " + localTodo.getDescription());
-			final boolean descriptionIsIdentical = remoteTask.get("description").getAsString().equals(localTodo.getDescription());
+			final boolean summaryIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "summary").equals("Todo: " + localTodo.getDescription());
+			final boolean descriptionIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localTodo.getDescription());
+			final boolean locationIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localTodo.getPlace());
 
-			final boolean locationIsIdentical;
-			if(remoteTask.get("location") != null) {
-				locationIsIdentical = remoteTask.get("location").getAsString().equals(localTodo.getPlace());
+			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+
+			final boolean recurrenceIsIdentical;
+			if(remoteTask.get("recurrence") != null) {
+				recurrenceIsIdentical = remoteTask.get("recurrence").getAsJsonArray().equals(SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 			}
 			else {
-				locationIsIdentical = localTodo.getPlace().equals("");
+				recurrenceIsIdentical = false;
 			}
-
-			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(GoogleCalendarUtilities.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-			final boolean recurrenceIsIdentical = remoteTask.get("recurrence").getAsJsonArray().equals(SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 
 			return summaryIsIdentical &&
 					descriptionIsIdentical &&
@@ -447,6 +429,15 @@ class Syncer extends Thread {
 		else {
 			assert false;
 			return false;
+		}
+	}
+
+	private String getJsonObjectValueOrEmptyString(JsonObject jsonObject, String key) {
+		if(jsonObject.get(key) != null) {
+			return jsonObject.get(key).getAsString();
+		}
+		else {
+			return "";
 		}
 	}
 }

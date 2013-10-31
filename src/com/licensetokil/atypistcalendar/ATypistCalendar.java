@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.GoogleAction;
 import com.licensetokil.atypistcalendar.parser.LocalAction;
 import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
 import com.licensetokil.atypistcalendar.parser.Parser;
@@ -91,19 +92,29 @@ public class ATypistCalendar {
 
 	public static void userInput(String input) {
 		String reply = "";
+		Action action;
 		try {
-			Action ac = Parser.parse(input);
-
-			reply = TasksManager.getInstance().executeCommand((LocalAction) ac);
-
-			gui.outputWithNewline("Your Command: \n" + input + "\n");
-			gui.outputWithNewline(reply);
-
-			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
-			GoogleCalendarManager.getInstance().doCompleteSync();
+			action = Parser.parse(input);
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
+			return;
 		}
+
+		if(action instanceof LocalAction) {
+			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
+			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
+			GoogleCalendarManager.getInstance().doCompleteSync();
+		}
+		else if(action instanceof GoogleAction) {
+			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
+		}
+		else {
+			//logger.servere("Unknown sub-class of Action returned from Parser!");
+			assert false;
+		}
+
+		gui.outputWithNewline("Your Command: " + input + "\n");
+		gui.outputWithNewline(reply);
 	}
 
 	public ArrayList<Task> getCopyOfAllLocalTasks() {

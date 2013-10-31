@@ -1,4 +1,4 @@
-package com.licensetokil.atypistcalendar.gcal.util;
+package com.licensetokil.atypistcalendar.gcal;
 
 import static org.junit.Assert.*;
 
@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class HttpsConnectionHelperJUnitTest {
+public class UtilitiesJUnitTest {
 
 	@Before
 	public void setUp() throws Exception {
@@ -24,9 +24,9 @@ public class HttpsConnectionHelperJUnitTest {
 	@Test
 	public void testGetNoArgument() {
 		try {
-			String reply = HttpsConnectionHelper.sendJsonRequest(
+			String reply = Util.sendJsonHttpsRequest(
 					"https://httpbin.org/get",
-					HttpsConnectionHelper.REQUEST_METHOD_GET,
+					Util.REQUEST_METHOD_GET,
 					null,
 					null);
 			//System.out.println(reply);
@@ -43,9 +43,9 @@ public class HttpsConnectionHelperJUnitTest {
 	@Test
 	public void testPostNoArgument() {
 		try {
-			String reply = HttpsConnectionHelper.sendJsonRequest(
+			String reply = Util.sendJsonHttpsRequest(
 					"https://httpbin.org/post",
-					HttpsConnectionHelper.REQUEST_METHOD_POST,
+					Util.REQUEST_METHOD_POST,
 					null,
 					null);
 			//System.out.println(reply);
@@ -62,9 +62,9 @@ public class HttpsConnectionHelperJUnitTest {
 	@Test
 	public void testDeleteNoArgument() {
 		try {
-			String reply = HttpsConnectionHelper.sendJsonRequest(
+			String reply = Util.sendJsonHttpsRequest(
 					"https://httpbin.org/delete",
-					HttpsConnectionHelper.REQUEST_METHOD_DELETE,
+					Util.REQUEST_METHOD_DELETE,
 					null,
 					null);
 			//System.out.println(reply);
@@ -81,9 +81,9 @@ public class HttpsConnectionHelperJUnitTest {
 	@Test
 	public void testPutNoArgument() {
 		try {
-			String reply = HttpsConnectionHelper.sendJsonRequest(
+			String reply = Util.sendJsonHttpsRequest(
 					"https://httpbin.org/put",
-					HttpsConnectionHelper.REQUEST_METHOD_PUT,
+					Util.REQUEST_METHOD_PUT,
 					null,
 					null);
 			//System.out.println(reply);
@@ -103,9 +103,9 @@ public class HttpsConnectionHelperJUnitTest {
 			HashMap<String, String> parameters = new HashMap<>();
 			parameters.put("argone", "helloworld");
 			
-			String reply = HttpsConnectionHelper.sendUrlencodedFormRequest(
+			String reply = Util.sendUrlencodedFormHttpsRequest(
 					"https://httpbin.org/post",
-					HttpsConnectionHelper.REQUEST_METHOD_POST,
+					Util.REQUEST_METHOD_POST,
 					null,
 					parameters);
 			System.out.println(reply);
