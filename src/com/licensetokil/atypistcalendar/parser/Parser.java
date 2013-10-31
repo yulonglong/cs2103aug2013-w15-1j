@@ -297,6 +297,7 @@ public class Parser {
 		st= tempSt[INDEX_ST];
 		userAction.setDescription(all);
 		
+		
 		if(!st.hasMoreTokens()){
 			calendarArray[INDEX_START_TIME].set(MIN_YEAR,MIN_MONTH,MIN_DAY,MIN_HOUR,MIN_MINUTE,MIN_SECOND);
 			userAction.setStartTime(calendarArray[INDEX_START_TIME]);
@@ -307,6 +308,9 @@ public class Parser {
 		status=getStatus(st,tempSt);
 		st= tempSt[INDEX_ST];
 		userAction.setStatus(status);
+		if((userAction.getDescription().equals(EMPTY_STRING))&&(status.equals(EMPTY_STRING))){
+			userAction.setDescription(ALL);
+		}
 		
 		//if no more elements
 		if(!st.hasMoreTokens()){
@@ -319,6 +323,7 @@ public class Parser {
 		if(!task.equals(EMPTY_STRING)){
 			userAction.setDescription(task);
 		}
+		
 		
 		if(!st.hasMoreTokens()){
 			return userAction;
@@ -440,6 +445,10 @@ public class Parser {
 		String description = new String();
 		String place = new String();
 		
+		if(!st.hasMoreTokens()){
+			throw new MalformedUserInputException(MESSAGE_INVALID);
+		}
+		
 		//get the task description / query
 		description = getDescription(st,tempSt);
 		st = tempSt[INDEX_ST];
@@ -461,7 +470,6 @@ public class Parser {
 		getCompleteDate(calendarArray,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
-		
 		return userAction;
 	}
 
@@ -969,6 +977,7 @@ public class Parser {
 			calendarArray[INDEX_END_TIME] = endTimeCal;
 			return;
 		}
+		
 		//get String Date, convert (12 Jan) format to default format (12/1)
 		date = getStringDate(st, tempSt);
 		st = tempSt[INDEX_ST];
@@ -985,7 +994,7 @@ public class Parser {
 		}
 		//end check if the date entered is valid
 		
-		//if there is no time field (only date)
+		//if there is only one date field
 		if(!st.hasMoreTokens()){
 			if((actionType==LocalActionType.DISPLAY)||(actionType==LocalActionType.SEARCH)){
 				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
@@ -1018,6 +1027,38 @@ public class Parser {
 			return;
 		}
 		
+		if(isStringFrom(preposition)){
+			//if there is time field, check for correct preposition
+			String prep = new String(st.nextToken());
+			if (!isValidTimeSecondPreposition(prep)) {
+				throw new MalformedUserInputException(MESSAGE_INVALID);
+			}
+			
+			
+			//get String Date, convert (12 Jan) format to default format (12/1)
+			date = getStringDate(st, tempSt);
+			st = tempSt[INDEX_ST];
+			
+			//begin check if the date entered is valid
+			if(!Character.isDigit(date.charAt(FIRST_INDEX))){
+				getDateFromDay(intEndDate,date,MIN_HOUR,MIN_MINUTE);
+			}
+			else{
+				getDate(intEndDate,date,actionType);
+			}
+			if(!isValidDate(intEndDate)){
+				throw new MalformedUserInputException(MESSAGE_INVALID);
+			}
+			//end check if the date entered is valid
+			
+			startTimeCal = Calendar.getInstance();
+			startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MIN_HOUR, MIN_MINUTE, MIN_SECOND);
+			endTimeCal = Calendar.getInstance();
+			endTimeCal.set(intEndDate[INDEX_YEAR], intEndDate[INDEX_MONTH], intEndDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
+			calendarArray[INDEX_START_TIME] = startTimeCal;
+			calendarArray[INDEX_END_TIME] = endTimeCal;
+			return;
+		}
 		
 		//if there is time field, check for correct preposition
 		String prep = new String(st.nextToken());
@@ -1140,7 +1181,7 @@ public class Parser {
 	private static String getDescription(StringTokenizer st, StringTokenizer[] tempSt){
 
 		String tempDescription = new String();
-		String description = new String(st.nextToken());
+		String description = new String();
 		
 		while(st.hasMoreTokens()){
 			tempDescription = new String(st.nextToken());
@@ -1151,6 +1192,9 @@ public class Parser {
 				st = addStringToTokenizer(st,tempDescription);
 				break;
 			}
+		}
+		if(!description.equals(EMPTY_STRING)){
+			description = description.substring(SECOND_INDEX); // remove the white space
 		}
 		tempSt[INDEX_ST]=st;
 		return description;
@@ -1298,6 +1342,13 @@ public class Parser {
 			}
 		}
 		return true;
+	}
+	
+	private static boolean isStringFrom(String input){
+		if(input.equals(PREP_FROM)){
+			return true;
+		}
+		return false;
 	}
 	
 	private static boolean isStringHex(String input){
@@ -1482,6 +1533,7 @@ public class Parser {
 		if ((preposition.equalsIgnoreCase(PREP_ON))
 				|| (preposition.equalsIgnoreCase(PREP_BY))
 				|| (preposition.equalsIgnoreCase(PREP_COMMA))
+				|| (preposition.equalsIgnoreCase(PREP_FROM))
 				|| (isStringToday(preposition))
 				|| (isStringTomorrow(preposition))){
 			return true;
