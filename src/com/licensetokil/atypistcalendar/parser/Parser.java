@@ -938,6 +938,60 @@ public class Parser {
 		return date;
 	}
 	
+	private static String getValidDateAndCheck(StringTokenizer st, StringTokenizer[] tempSt, int[] intDate, LocalActionType actionType)  throws MalformedUserInputException {
+		String date = new String();
+		date = getStringDate(st, tempSt);
+		st = tempSt[INDEX_ST];
+		
+		//begin check if the date entered is valid
+		if(!Character.isDigit(date.charAt(FIRST_INDEX))){
+			getDateFromDay(intDate,date,MIN_HOUR,MIN_MINUTE);
+		}
+		else{
+			getDate(intDate,date,actionType);
+		}
+		if(!isValidDate(intDate)){
+			throw new MalformedUserInputException(MESSAGE_INVALID);
+		}
+		
+		tempSt[INDEX_ST]=st;
+		return date;
+	}
+
+	private static Calendar getCalendarUpperBoundary(int[] intDate){
+		Calendar timeCal = Calendar.getInstance();
+		timeCal.set(intDate[INDEX_YEAR], intDate[INDEX_MONTH], intDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
+		timeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		return timeCal;
+	}	
+	
+	private static Calendar getCalendarLowerBoundary(int[] intDate){
+		Calendar timeCal = Calendar.getInstance();
+		timeCal.set(intDate[INDEX_YEAR], intDate[INDEX_MONTH], intDate[INDEX_DAY], MIN_HOUR, MIN_MINUTE, MIN_SECOND);
+		timeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		return timeCal;
+	}
+	
+	private static Calendar getCalendarDefaultStart(int[] intDate){
+		Calendar timeCal = Calendar.getInstance();
+		timeCal.set(intDate[INDEX_YEAR], intDate[INDEX_MONTH], intDate[INDEX_DAY], DEFAULT_START_HOUR, DEFAULT_START_MINUTE, DEFAULT_START_SECOND);
+		timeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		return timeCal;
+	}
+	
+	private static Calendar getCalendarDefaultEnd(int[] intDate){
+		Calendar timeCal = Calendar.getInstance();
+		timeCal.set(intDate[INDEX_YEAR], intDate[INDEX_MONTH], intDate[INDEX_DAY], DEFAULT_END_HOUR, DEFAULT_END_MINUTE, DEFAULT_END_SECOND);
+		timeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		return timeCal;
+	}
+	
+	private static Calendar getCalendarSpecifiedTime(int[] intDate,int intHour, int intMinute, int intSecond) {
+		Calendar timeCal = Calendar.getInstance();
+		timeCal.set(intDate[INDEX_YEAR], intDate[INDEX_MONTH], intDate[INDEX_DAY], intHour, intMinute, intSecond);
+		timeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		return timeCal;
+	}
 	//<time> format is fully functional
 	//e.g. 5 pm, 5pm, 12pm, 1a.m., 1200, 0800, etc
 
@@ -971,59 +1025,34 @@ public class Parser {
 
 		// if there is no date field
 		if(!st.hasMoreTokens()){
-			endTimeCal = Calendar.getInstance();
-			endTimeCal.set(intEndDate[INDEX_YEAR], intEndDate[INDEX_MONTH], intEndDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
-			calendarArray[INDEX_START_TIME] = startTimeCal;
-			calendarArray[INDEX_END_TIME] = endTimeCal;
+			endTimeCal = getCalendarUpperBoundary(intEndDate);
+			setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 			return;
 		}
 		
 		//get String Date, convert (12 Jan) format to default format (12/1)
-		date = getStringDate(st, tempSt);
+		date = getValidDateAndCheck(st,tempSt,intStartDate,actionType);
 		st = tempSt[INDEX_ST];
-		
-		//begin check if the date entered is valid
-		if(!Character.isDigit(date.charAt(FIRST_INDEX))){
-			getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
-		}
-		else{
-			getDate(intStartDate,date,actionType);
-		}
-		if(!isValidDate(intStartDate)){
-			throw new MalformedUserInputException(MESSAGE_INVALID);
-		}
 		//end check if the date entered is valid
 		
 		//if there is only one date field
 		if(!st.hasMoreTokens()){
 			if((actionType==LocalActionType.DISPLAY)||(actionType==LocalActionType.SEARCH)){
-				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
-					getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
-				}
-				startTimeCal = Calendar.getInstance();
-				startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MIN_HOUR, MIN_MINUTE, MIN_SECOND);
-				endTimeCal = Calendar.getInstance();
-				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
+				startTimeCal = getCalendarLowerBoundary(intStartDate);
+				endTimeCal = getCalendarUpperBoundary(intStartDate);
 			}
 			//if it is add or update schedule
 			else if(((actionType==LocalActionType.ADD)||(actionType==LocalActionType.UPDATE))&&(!isValidDeadlinePreposition(preposition))){
 				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
 					getDateFromDay(intStartDate,date,DEFAULT_START_HOUR,DEFAULT_START_MINUTE);
 				}
-				startTimeCal = Calendar.getInstance();
-				startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], DEFAULT_START_HOUR, DEFAULT_START_MINUTE, DEFAULT_START_SECOND);
-				endTimeCal = Calendar.getInstance();
-				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], DEFAULT_END_HOUR , DEFAULT_END_MINUTE,  DEFAULT_END_SECOND);
+				startTimeCal = getCalendarDefaultStart(intStartDate);
+				endTimeCal = getCalendarDefaultEnd(intStartDate);
 			}
 			else{
-				if(!Character.isDigit(date.charAt(FIRST_INDEX))){
-					getDateFromDay(intStartDate,date,MIN_HOUR,MIN_MINUTE);
-				}
-				endTimeCal = Calendar.getInstance();
-				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
+				endTimeCal = getCalendarUpperBoundary(intStartDate);
 			}
-			calendarArray[INDEX_START_TIME] = startTimeCal;
-			calendarArray[INDEX_END_TIME] = endTimeCal;
+			setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 			return;
 		}
 		
@@ -1033,30 +1062,14 @@ public class Parser {
 			if (!isValidTimeSecondPreposition(prep)) {
 				throw new MalformedUserInputException(MESSAGE_INVALID);
 			}
-			
-			
 			//get String Date, convert (12 Jan) format to default format (12/1)
-			date = getStringDate(st, tempSt);
+			date = getValidDateAndCheck(st,tempSt,intStartDate,actionType);
 			st = tempSt[INDEX_ST];
-			
-			//begin check if the date entered is valid
-			if(!Character.isDigit(date.charAt(FIRST_INDEX))){
-				getDateFromDay(intEndDate,date,MIN_HOUR,MIN_MINUTE);
-			}
-			else{
-				getDate(intEndDate,date,actionType);
-			}
-			if(!isValidDate(intEndDate)){
-				throw new MalformedUserInputException(MESSAGE_INVALID);
-			}
 			//end check if the date entered is valid
 			
-			startTimeCal = Calendar.getInstance();
-			startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MIN_HOUR, MIN_MINUTE, MIN_SECOND);
-			endTimeCal = Calendar.getInstance();
-			endTimeCal.set(intEndDate[INDEX_YEAR], intEndDate[INDEX_MONTH], intEndDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
-			calendarArray[INDEX_START_TIME] = startTimeCal;
-			calendarArray[INDEX_END_TIME] = endTimeCal;
+			startTimeCal = getCalendarLowerBoundary(intStartDate);
+			endTimeCal = getCalendarUpperBoundary(intEndDate);
+			setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 			return;
 		}
 		
@@ -1067,20 +1080,13 @@ public class Parser {
 		}
 		
 		String startTime = new String(st.nextToken());
-		String temp = new String();
 		
-		if(st.hasMoreTokens()){
-			temp = new String(st.nextToken());
-			if(isValidTimeSuffix(temp)){
-				startTime = startTime + temp;
-			}
-			else{
-				st = addStringToTokenizer(st,temp);
-			}
-		}
+		startTime = addSuffixToTime(st,tempSt,startTime);
+		st = tempSt[INDEX_ST];
 		
 		int intStartHour = getTimeHour(startTime);
 		int intStartMinute = getTimeMinute(startTime);
+		
 		//check if time is valid
 		if(!isValidTime(intStartHour,intStartMinute)){
 			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
@@ -1093,23 +1099,17 @@ public class Parser {
 		//if there is no end time field return the corresponding values
 		if(!st.hasMoreTokens()){
 			if(isValidDeadlinePreposition(preposition)){
-				endTimeCal = Calendar.getInstance();
-				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour, intStartMinute, MIN_SECOND);
+				endTimeCal = getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
 			}
 			else if((actionType==LocalActionType.ADD)||(actionType==LocalActionType.UPDATE)){
-				startTimeCal = Calendar.getInstance();
-				startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour, intStartMinute, MIN_SECOND);
-				endTimeCal = Calendar.getInstance();
-				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour + DEFAULT_DURATION_HOUR, intStartMinute, MIN_SECOND);
+				startTimeCal = getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
+				endTimeCal = getCalendarSpecifiedTime(intStartDate,intStartHour + DEFAULT_DURATION_HOUR,intStartMinute,MIN_SECOND);
 			}
 			else{
-				startTimeCal = Calendar.getInstance();
-				startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour, intStartMinute, MIN_SECOND);
-				endTimeCal = Calendar.getInstance();
-				endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], MAX_HOUR, MAX_MINUTE, MAX_SECOND);
+				startTimeCal = getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
+				endTimeCal = getCalendarUpperBoundary(intStartDate);
 			}
-			calendarArray[INDEX_START_TIME] = startTimeCal;
-			calendarArray[INDEX_END_TIME] = endTimeCal;
+			setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 			return;
 		}
 		
@@ -1137,44 +1137,30 @@ public class Parser {
 					intMinuteDuration = Integer.parseInt(stringTime);
 				}
 			}
-			startTimeCal = Calendar.getInstance();
-			endTimeCal = Calendar.getInstance();
-
-			startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour, intStartMinute, MIN_SECOND);
-			endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour+intHourDuration, intStartMinute+intMinuteDuration, MIN_SECOND);
+			startTimeCal =  getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
+			endTimeCal =  getCalendarSpecifiedTime(intStartDate,intStartHour+intHourDuration,intStartMinute+intMinuteDuration,MIN_SECOND);
 		}
 		//if it is another time format
 		else if (isValidTimeSecondPreposition(prep)){
 			String endTime = new String(st.nextToken());
-			if(st.hasMoreTokens()){
-				temp = new String(st.nextToken());
-				if(isValidTimeSuffix(temp)){
-					endTime = endTime + temp;
-				}
-				else{
-					st = addStringToTokenizer(st,temp);
-				}
-			}
+			
+			startTime = addSuffixToTime(st,tempSt,startTime);
+			st = tempSt[INDEX_ST];
+			
 			int intEndHour = getTimeHour(endTime);
 			int intEndMinute = getTimeMinute(endTime);
 			//check if it is a valid time
 			if(!isValidTime(intEndHour,intEndMinute)){
 				throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
 			}
-			startTimeCal = Calendar.getInstance();
-			endTimeCal = Calendar.getInstance();
-
-			startTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intStartHour, intStartMinute, MIN_SECOND);
-			endTimeCal.set(intStartDate[INDEX_YEAR], intStartDate[INDEX_MONTH], intStartDate[INDEX_DAY], intEndHour, intEndMinute, MIN_SECOND);
+			startTimeCal =  getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
+			endTimeCal =  getCalendarSpecifiedTime(intStartDate,intEndHour,intEndMinute,MIN_SECOND);
 		}
 		else{
 			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
 		}
 	
-		startTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
-		endTimeCal.set(Calendar.MILLISECOND, MIN_MILLISECOND);
-		calendarArray[INDEX_START_TIME] = startTimeCal;
-		calendarArray[INDEX_END_TIME] = endTimeCal;
+		setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 		return;
 	}
 
@@ -1244,11 +1230,31 @@ public class Parser {
 		return strResult;
 	}
 	
+	private static String addSuffixToTime(StringTokenizer st, StringTokenizer[] tempSt, String time){
+		String temp = new String();
+		if(st.hasMoreTokens()){
+			temp = new String(st.nextToken());
+			if(isValidTimeSuffix(temp)){
+				time = time + temp;
+			}
+			else{
+				st = addStringToTokenizer(st,temp);
+			}
+		}
+		tempSt[INDEX_ST] = st;
+		return time;
+	}
+	
 	private static StringTokenizer addStringToTokenizer(StringTokenizer st, String tempString){
 		String tempUserInput = new String();
 		tempUserInput = getRemainingTokens(st);
 		tempUserInput = tempString + WHITE_SPACE + tempUserInput;
 		return new StringTokenizer(tempUserInput);
+	}
+
+	private static void setCalendarArray(Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal){
+		calendarArray[INDEX_START_TIME] = startTimeCal;
+		calendarArray[INDEX_END_TIME] = endTimeCal;
 	}
 	
 	private static void setEndTimeMax (Calendar[] calendarArray) {
