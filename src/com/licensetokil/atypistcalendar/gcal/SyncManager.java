@@ -2,6 +2,9 @@ package com.licensetokil.atypistcalendar.gcal;
 
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
@@ -9,6 +12,9 @@ import com.licensetokil.atypistcalendar.tasksmanager.Task;
 
 class SyncManager {
 	private static SyncManager instance = null;
+
+	private Lock goToSleepLock = new ReentrantLock();
+	private Condition goToSleepCondition = goToSleepLock.newCondition();
 
 	private ConcurrentLinkedQueue<SyncAction> queue;
 	private Syncer syncer;
@@ -66,10 +72,16 @@ class SyncManager {
 
 	private void runSyncer() {
 		if(syncer == null || !syncer.isAlive()) {
+			System.out.println("creating new lalalla");
 			syncer = new Syncer();
 			syncer.start();
 		}
-		//else, Syncer is alive, do nothing
+		else {
+			//Signaling... if needed.
+			goToSleepLock.lock();
+			goToSleepCondition.signal();
+			goToSleepLock.unlock();
+		}
 	}
 
 	protected ConcurrentLinkedQueue<SyncAction> getQueue() {
@@ -82,5 +94,13 @@ class SyncManager {
 
 	protected void setRemoteCalendarId(String remoteCalendarId) {
 		this.remoteCalendarId = remoteCalendarId;
+	}
+
+	protected Lock getGoToSleepLock() {
+		return goToSleepLock;
+	}
+
+	protected Condition getGoToSleepCondition() {
+		return goToSleepCondition;
 	}
 }
