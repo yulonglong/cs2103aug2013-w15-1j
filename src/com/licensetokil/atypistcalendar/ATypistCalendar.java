@@ -101,7 +101,7 @@ public class ATypistCalendar {
 		}
 
 		if(action instanceof LocalAction) {
-			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
+			reply = TasksManager.getInstance().executeCommand((LocalAction)action, true);
 			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
 			GoogleCalendarManager.getInstance().doCompleteSync();
 		}
@@ -113,7 +113,7 @@ public class ATypistCalendar {
 			assert false;
 		}
 
-		gui.outputWithNewline("Your Command: " + input + "\n");
+		gui.outputUserInput("Your Command: " + input);
 		gui.outputWithNewline(reply);
 	}
 
