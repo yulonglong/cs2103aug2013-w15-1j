@@ -1,11 +1,15 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 public abstract class Task{
-	protected String remoteID;
+	protected String remoteId;
 	protected String taskType;
-	protected int uniqueID;
+	protected int uniqueId;
 	protected String place;
 	protected String description;
+	
+	public String getRemoteId(){
+		return remoteId;
+	}
 
 	public String getTaskType(){
 		return taskType;
@@ -15,8 +19,8 @@ public abstract class Task{
 		return description;
 	}
 	
-	public int getUniqueID(){
-		return uniqueID;
+	public int getUniqueId(){
+		return uniqueId;
 	}
 	
 	public String getPlace(){
@@ -29,6 +33,10 @@ public abstract class Task{
 	
 	public void setDescription(String description){
 		this.description = description;
+	}
+	
+	public void setRemoteId(String remoteId){
+		this.remoteId = remoteId;
 	}
 	
 	public String toString(){

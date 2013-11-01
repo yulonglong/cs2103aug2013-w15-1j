@@ -1,15 +1,15 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 public class Todo extends Task implements Comparable<Todo> {
-	private String remoteID;
+	private String remoteId;
 	private String taskType;
-	private int uniqueID;
+	private int uniqueId;
 	private String description;
 	private String place;
 	private String status;
 
-	public Todo(int uniqueID, String description, String place, String status) {
-		this.uniqueID = uniqueID;
+	public Todo(int uniqueId, String description, String place, String status) {
+		this.uniqueId = uniqueId;
 		this.taskType = "todo";
 		this.description = description;
 		this.place = place;
@@ -20,12 +20,16 @@ public class Todo extends Task implements Comparable<Todo> {
 		this.taskType = "deadline";
 		this.description = td.getDescription();
 		this.place = td.getPlace();
-		this.uniqueID = td.getUniqueID();
+		this.uniqueId = td.getUniqueId();
 		this.status = td.getStatus();
 	}
+	
+	public String getRemoteId(){
+		return remoteId;
+	}
 
-	public int getUniqueID() {
-		return uniqueID;
+	public int getUniqueId() {
+		return uniqueId;
 	}
 	
 	public String getTaskType(){
@@ -55,12 +59,16 @@ public class Todo extends Task implements Comparable<Todo> {
 	public void setStatus(String s){
 		this.status = s;
 	}
+	
+	public void setRemoteId(String remoteId){
+		this.remoteId = remoteId;
+	}
 
 	public String toString() {
 		if(place.equals("")){
-			return "Todo@s" + uniqueID + "@s" + description + "@s" + " " + "@s" + status;
+			return "Todo@s" + uniqueId + "@s" + description + "@s" + " " + "@s" + status;
 		}
-		return "Todo@s" + uniqueID + "@s" + description + "@s" + place + "@s" + status;
+		return "Todo@s" + uniqueId + "@s" + description + "@s" + place + "@s" + status;
 	}
 	
 	public String outputStringForDisplay(){

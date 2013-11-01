@@ -10,7 +10,7 @@ public class TasksManager {
 
 	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n";
 	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n";
-	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!";
+	private static final String INVALId_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!";
 
 	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n";
 	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n";
@@ -54,7 +54,7 @@ public class TasksManager {
 
 	private static Hashtable<Integer, Task> table = new Hashtable<Integer, Task>();
 
-	private static int uniqueID = 0;
+	private static int uniqueId = 0;
 
 	private static File file = new File("ATC.txt");
 
@@ -148,9 +148,9 @@ public class TasksManager {
 					if(data[3].equals(" ")){
 						td.setPlace("");
 					}
-				} else if (data[0].equals("uniqueID")) {
-					uniqueID = Integer.parseInt(data[1]); // the last
-																	// uniqueID
+				} else if (data[0].equals("uniqueId")) {
+					uniqueId = Integer.parseInt(data[1]); // the last
+																	// uniqueId
 																	// is stored
 																	// at the
 																	// end of
@@ -235,14 +235,14 @@ public class TasksManager {
 		Task t;
 		if (action.getStartTime() == null) {
 			if (action.getEndTime() == null) {
-				t = new Todo(++uniqueID, action.getDescription(),
+				t = new Todo(++uniqueId, action.getDescription(),
 						action.getPlace(), UNDONE);
 			} else {
-				t = new Deadline(++uniqueID, action.getEndTime(),
+				t = new Deadline(++uniqueId, action.getEndTime(),
 						action.getDescription(), action.getPlace(), UNDONE);
 			}
 		} else {
-			t = new Schedule(++uniqueID, action.getStartTime(),
+			t = new Schedule(++uniqueId, action.getStartTime(),
 					action.getEndTime(), action.getDescription(),
 					action.getPlace());
 		}
@@ -449,7 +449,7 @@ public class TasksManager {
 						toDo.remove(t);
 					}
 				} else {
-					return INVALID_NUMBER_INPUT;
+					return INVALId_NUMBER_INPUT;
 				}
 			}
 
@@ -466,7 +466,7 @@ public class TasksManager {
 	private String deleteUndo() {
 		try {
 			for (Task t : deletedTasks) {
-				uniqueID--;
+				uniqueId--;
 				if (t instanceof Schedule) {
 					schedule.add((Schedule) t);
 				} else if (t instanceof Deadline) {
@@ -514,17 +514,17 @@ public class TasksManager {
 	private String updateUndo() {
 		try {
 			for (Schedule s : schedule) {
-				if (s.getUniqueID() == updateOriginalTask.getUniqueID()) {
+				if (s.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					s = (Schedule) updateOriginalTask;
 				}
 			}
 			for (Deadline d : deadline) {
-				if (d.getUniqueID() == updateOriginalTask.getUniqueID()) {
+				if (d.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					d = (Deadline) updateOriginalTask;
 				}
 			}
 			for (Todo td : todo) {
-				if (td.getUniqueID() == updateOriginalTask.getUniqueID()) {
+				if (td.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					td = (Todo) updateOriginalTask;
 				}
 			}
@@ -544,7 +544,7 @@ public class TasksManager {
 		String output = new String("");
 
 		for (Schedule s : schedule) {
-			if (s.getDescription().contains(ac.getQuery())) {
+			if (((s.getDescription()).toLowerCase()).contains((ac.getQuery().toLowerCase()))) {
 				if (s.getStartTime().after(ac.getStartTime())
 						&& s.getEndTime().before(ac.getEndTime())) {
 					sch.add(s);
@@ -553,7 +553,7 @@ public class TasksManager {
 		}
 
 		for (Deadline d : deadline) {
-			if (d.getDescription().contains(ac.getQuery())) {
+			if (((d.getDescription()).toLowerCase()).contains((ac.getQuery().toLowerCase()))) {
 				if (d.getEndTime().after(ac.getStartTime())
 						&& d.getEndTime().before(ac.getEndTime())) {
 					dl.add(d);
@@ -562,7 +562,7 @@ public class TasksManager {
 		}
 
 		for (Todo td : todo) {
-			if (td.getDescription().contains(ac.getQuery())) {
+			if (((td.getDescription()).toLowerCase()).contains((ac.getQuery().toLowerCase()))) {
 				toDo.add(td);
 			}
 		}
@@ -594,7 +594,7 @@ public class TasksManager {
 					}
 				}
 				else
-					return INVALID_NUMBER_INPUT;
+					return INVALId_NUMBER_INPUT;
 			}
 
 			fileSync();
@@ -719,7 +719,7 @@ public class TasksManager {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file,
 					true));
 			
-			writer.write("uniqueID@" + uniqueID);
+			writer.write("uniqueId@" + uniqueId);
 			writer.newLine();
 			writer.close();
 		} catch (Exception e) {
