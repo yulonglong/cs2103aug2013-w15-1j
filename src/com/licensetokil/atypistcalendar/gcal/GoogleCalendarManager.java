@@ -37,13 +37,13 @@ public class GoogleCalendarManager {
 		AuthenticationManager.getInstance().readAuthenticationDetailsFromFile();
 
 		logger.info("Checking if user is previously authenticated (from file), else authenticate through OAuth2.");
-		if(!userIsAuthenticated()) {
+		if(!AuthenticationManager.getInstance().isAuthenticated()) {
 			logger.info("User is not authenticated (from file), authenticating.");
-			authenticateUser();
+			AuthenticationManager.getInstance().authenticateUser();
 		}
 
 		logger.info("Checking if user is authenticated...");
-		if(userIsAuthenticated()) {
+		if(AuthenticationManager.getInstance().isAuthenticated()) {
 			logger.info("User is authenticated. Initialising remote calender, and then doing complete sync.");
 			initialiseRemoteCalendar();
 			doCompleteSync();
@@ -82,54 +82,61 @@ public class GoogleCalendarManager {
 
 	private String executeGoogleAction(AddGoogleAction action)
 			throws IllegalStateException, JsonParseException, IOException {
-		//TODO check if logged in
-		HashMap<String, String> formParameters = new HashMap<>();
+		if(AuthenticationManager.getInstance().isAuthenticated()) {
+			HashMap<String, String> formParameters = new HashMap<>();
 
-		formParameters.put("calendarId", SyncManager.getInstance().getRemoteCalendarId());
-		formParameters.put("text", action.getUserInput());
+			formParameters.put("calendarId", SyncManager.getInstance().getRemoteCalendarId());
+			formParameters.put("text", action.getUserInput());
 
-//		JsonObject serverReply = Util.parseToJsonObject(
-				String serverReply = Util.sendUrlencodedFormHttpsRequest(
-						"https://www.googleapis.com/calendar/v3/calendars/" +
-								SyncManager.getInstance().getRemoteCalendarId() +
-								"/events/quickAdd",
-						Util.REQUEST_METHOD_POST,
-						AuthenticationManager.getInstance().getAuthorizationHeader(),
-						formParameters
-//				)
-		);
+//			JsonObject serverReply = Util.parseToJsonObject(
+					String serverReply = Util.sendUrlencodedFormHttpsRequest(
+							"https://www.googleapis.com/calendar/v3/calendars/" +
+									SyncManager.getInstance().getRemoteCalendarId() +
+									"/events/quickAdd",
+							Util.REQUEST_METHOD_POST,
+							AuthenticationManager.getInstance().getAuthorizationHeader(),
+							formParameters
+//					)
+			);
 
-		System.out.println("lol okay");
-		System.out.println(serverReply);
+			System.out.println("lol okay");
+			System.out.println(serverReply);
 
-		return "lol okay";
+			return "lol okay";
+		}
+		else {
+			return "You are currently not logged in! You will need to Login first before you can use Google's Quick Add feature.";
+		}
 	}
 
 	private String executeGoogleAction(SyncGoogleAction action) {
-		//TODO check if logged in
-		doCompleteSync();
-		return "Synchorinzation with Google Calendar has been initiated. This will take place in the background.";
+		if(AuthenticationManager.getInstance().isAuthenticated()) {
+			doCompleteSync();
+			return "Synchorinzation with Google Calendar has been initiated. This will take place in the background.";
+		}
+		else {
+			return "You are currently not logged in! You will need to Login first before you can synchornise your tasks to Google Calendar.";
+		}
 	}
 
 	private String executeGoogleAction(LoginGoogleAction action) {
-		return "";
+		if(AuthenticationManager.getInstance().isAuthenticated()) {
+			return "You are already logged in!";
+		}
+		else {
+			AuthenticationManager.getInstance().authenticateUser();
+			return "Logging in...";
+		}
 	}
 
 	private String executeGoogleAction(LogoutGoogleAction action) {
-		return "";
-	}
-
-
-	//TODO Do we still need this?
-	public void authenticateUser() {
-		logger.fine("authenticateUser() called.");
-		AuthenticationManager.getInstance().authenticateUser();
-	}
-
-	//TODO Do we still need this?
-	public boolean userIsAuthenticated() {
-		logger.fine("userIsAuthenticated() called.");
-		return AuthenticationManager.getInstance().isAuthenticated();
+		if(AuthenticationManager.getInstance().isAuthenticated()) {
+			AuthenticationManager.getInstance().forgetAuthenticationDetails();
+			return "You have been logged out.";
+		}
+		else {
+			return "You are currently not logged in!";
+		}
 	}
 
 	public void initialiseRemoteCalendar() {

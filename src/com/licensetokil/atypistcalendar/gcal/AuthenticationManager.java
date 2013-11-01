@@ -74,6 +74,13 @@ class AuthenticationManager {
 		//TODO what to do? what to do?!?!
 	}
 
+	protected void forgetAuthenticationDetails() {
+		authenticationToken = "";
+		accessToken = "";
+		refreshToken = "";
+		accessTokenExpiry = null;
+	}
+
 	protected HashMap<String, String> getAuthorizationHeader()
 			throws IllegalStateException, JsonParseException, IOException {
 		HashMap<String, String> header = new HashMap<>();

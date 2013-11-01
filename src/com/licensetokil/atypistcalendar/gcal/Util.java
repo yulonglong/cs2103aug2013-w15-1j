@@ -107,14 +107,14 @@ public class Util {
 		httpsConnection.setRequestProperty("Content-Type", CONTENT_TYPE_JSON);
 
 		if(additionalHeaders != null) {
-			Util.addHeaders(httpsConnection, additionalHeaders);
+			addHeaders(httpsConnection, additionalHeaders);
 		}
 
 		if(requestBody != null) {
-			return Util.sendAndReceiveRequest(httpsConnection, requestBody.toString());
+			return sendAndReceiveRequest(httpsConnection, requestBody.toString());
 		}
 		else {
-			return Util.sendAndReceiveRequest(httpsConnection, null);
+			return sendAndReceiveRequest(httpsConnection, null);
 		}
 	}
 
@@ -147,14 +147,14 @@ public class Util {
 		httpsConnection.setRequestProperty("Content-Type", CONTENT_TYPE_WWW_FORM_URLENCODED);
 
 		if(additionalHeaders != null) {
-			Util.addHeaders(httpsConnection, additionalHeaders);
+			addHeaders(httpsConnection, additionalHeaders);
 		}
 
 		if(requestMethod == REQUEST_METHOD_POST) {
-			return Util.sendAndReceiveRequest(httpsConnection, formParametersAsString);
+			return sendAndReceiveRequest(httpsConnection, formParametersAsString);
 		}
 		else {
-			return Util.sendAndReceiveRequest(httpsConnection, null);
+			return sendAndReceiveRequest(httpsConnection, null);
 		}
 	}
 
@@ -186,5 +186,14 @@ public class Util {
 		}
 		serverReplyBufferedInputStream.close();
 		return serverReplyStringBuilder.toString();
+	}
+
+	public static String getJsonObjectValueOrEmptyString(JsonObject jsonObject, String key) {
+		if(jsonObject.get(key) != null) {
+			return jsonObject.get(key).getAsString();
+		}
+		else {
+			return "";
+		}
 	}
 }

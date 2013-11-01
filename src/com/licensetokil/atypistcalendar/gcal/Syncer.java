@@ -162,7 +162,7 @@ class Syncer extends Thread {
 			requestBody.addProperty("location", localSchedule.getPlace());
 			requestBody.add("start", Util.createDateTimeObject(localSchedule.getStartTime()));
 			requestBody.add("end", Util.createDateTimeObject(localSchedule.getEndTime()));
-			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localSchedule.getUniqueID()));
+			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localSchedule.getUniqueId()));
 		}
 		else if(localTask instanceof Deadline) {
 			//TODO handle done/undone
@@ -174,7 +174,7 @@ class Syncer extends Thread {
 			requestBody.addProperty("location", localDeadline.getPlace());
 			requestBody.add("start", Util.createDateTimeObject(localDeadline.getEndTime()));
 			requestBody.add("end", Util.createDateTimeObject(localDeadline.getEndTime()));
-			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localDeadline.getUniqueID()));
+			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localDeadline.getUniqueId()));
 		}
 		else if(localTask instanceof Todo) {
 			//TODO handle done/undone
@@ -185,7 +185,7 @@ class Syncer extends Thread {
 			requestBody.addProperty("location", localTodo.getPlace());
 			requestBody.add("start", Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 			requestBody.add("end", Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localTodo.getUniqueID()));
+			requestBody.add("extendedProperties", Util.createExtendedPropertiesObject(localTodo.getUniqueId()));
 			requestBody.add("recurrence", SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 		}
 		else {
@@ -341,7 +341,7 @@ class Syncer extends Thread {
 		while(localTasksIterator.hasNext()) {
 			Task currentLocalTask = localTasksIterator.next();
 
-			if(extendedPropertiesLocalTaskIDAsInt == currentLocalTask.getUniqueID()) {
+			if(extendedPropertiesLocalTaskIDAsInt == currentLocalTask.getUniqueId()) {
 				return currentLocalTask;
 			}
 		}
@@ -367,9 +367,9 @@ class Syncer extends Thread {
 		if(localTask instanceof Schedule) {
 			Schedule localSchedule = (Schedule)localTask;
 
-			final boolean summaryIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "summary").equals(localSchedule.getDescription());
-			final boolean descriptionIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localSchedule.getDescription());
-			final boolean locationIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localSchedule.getPlace());
+			final boolean summaryIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "summary").equals(localSchedule.getDescription());
+			final boolean descriptionIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localSchedule.getDescription());
+			final boolean locationIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localSchedule.getPlace());
 
 			localSchedule.getStartTime().set(Calendar.MILLISECOND, 0); //temp
 			localSchedule.getEndTime().set(Calendar.MILLISECOND, 0); //temp
@@ -386,9 +386,9 @@ class Syncer extends Thread {
 			//TODO handle done/undone
 			Deadline localDeadline = (Deadline)localTask;
 
-			final boolean summaryIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "summary").equals("Deadline: " + localDeadline.getDescription());
-			final boolean descriptionIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localDeadline.getDescription());
-			final boolean locationIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localDeadline.getPlace());
+			final boolean summaryIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "summary").equals("Deadline: " + localDeadline.getDescription());
+			final boolean descriptionIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localDeadline.getDescription());
+			final boolean locationIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localDeadline.getPlace());
 
 			localDeadline.getEndTime().set(Calendar.MILLISECOND, 0); //temp
 			boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(Util.createDateTimeObject(localDeadline.getEndTime()));
@@ -404,9 +404,9 @@ class Syncer extends Thread {
 			//TODO handle done/undone
 			Todo localTodo = (Todo)localTask;
 
-			final boolean summaryIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "summary").equals("Todo: " + localTodo.getDescription());
-			final boolean descriptionIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localTodo.getDescription());
-			final boolean locationIsIdentical = getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localTodo.getPlace());
+			final boolean summaryIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "summary").equals("Todo: " + localTodo.getDescription());
+			final boolean descriptionIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "description").equals(localTodo.getDescription());
+			final boolean locationIsIdentical = Util.getJsonObjectValueOrEmptyString(remoteTask, "location").equals(localTodo.getPlace());
 
 			final boolean startTimeIsIdentical = remoteTask.getAsJsonObject("start").equals(Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 			final boolean endTimeIsIdentical = remoteTask.getAsJsonObject("end").equals(Util.createDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
@@ -429,15 +429,6 @@ class Syncer extends Thread {
 		else {
 			assert false;
 			return false;
-		}
-	}
-
-	private String getJsonObjectValueOrEmptyString(JsonObject jsonObject, String key) {
-		if(jsonObject.get(key) != null) {
-			return jsonObject.get(key).getAsString();
-		}
-		else {
-			return "";
 		}
 	}
 }
