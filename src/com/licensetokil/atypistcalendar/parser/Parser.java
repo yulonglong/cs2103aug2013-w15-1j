@@ -18,9 +18,11 @@ public class Parser {
 	private static final int THIRD_INDEX = 2;
 	private static final int FOURTH_INDEX = 3;
 	private static final int FIFTH_INDEX = 4;
+	private static final int SIXTH_INDEX = 5;
 	private static final String WHITE_SPACE = " ";
 	private static final String SLASH = "/";
 	private static final String HEX = "#";
+	private static final String NEXT = "next";
 	private static final String EMPTY_STRING ="";
 	
 	private static final String PREP_FOR = "for";
@@ -828,7 +830,9 @@ public class Parser {
 	}
 
 	private static void getDateFromDay(int[] intStartDate, String eventDay, int intEventTimeHours, int intEventTimeMinutes) throws MalformedUserInputException{
+		boolean isNext = false;
 		Calendar currentDate = Calendar.getInstance();
+		
 		currentDate.set(Calendar.MILLISECOND, MIN_MILLISECOND);
 		int intCurrentDayOfWeek = INVALID_INT_VALUE;
 		intCurrentDayOfWeek = currentDate.get(Calendar.DAY_OF_WEEK);
@@ -836,6 +840,7 @@ public class Parser {
 		intCurrentTimeHours = currentDate.get(Calendar.HOUR);
 		int intCurrentTimeMinutes = INVALID_INT_VALUE;
 		intCurrentTimeMinutes = currentDate.get(Calendar.MINUTE);
+		
 		if(isStringToday(eventDay)){
 			setDateToday(intStartDate);
 			return;
@@ -845,8 +850,20 @@ public class Parser {
 			return;
 		}
 		
+		
+		
 		int intEventDayOfWeek = INVALID_INT_VALUE;
 		intEventDayOfWeek = getDayOfWeek(eventDay);
+		
+		if(intEventDayOfWeek==INVALID_INT_VALUE){
+			if(eventDay.length()>4){
+				if(isStringNext(eventDay.substring(FIRST_INDEX,FIFTH_INDEX))){
+					isNext = true;
+					eventDay = eventDay.substring(SIXTH_INDEX);
+					intEventDayOfWeek = getDayOfWeek(eventDay);
+				}
+			}
+		}
 		
 		if(intEventDayOfWeek==INVALID_INT_VALUE){
 			throw new MalformedUserInputException(MESSAGE_INVALID);
@@ -854,12 +871,16 @@ public class Parser {
 		//if the day stated is not the same as today's day
 		else if(intCurrentDayOfWeek!=intEventDayOfWeek){
 			int dayDifference = intEventDayOfWeek - intCurrentDayOfWeek;
-			setDateWithDayDifference(intStartDate,dayDifference);	
+			setDateWithDayDifference(intStartDate,dayDifference,isNext);	
 		}
 		//if the day input is the same as today
 		else if (intCurrentDayOfWeek==intEventDayOfWeek) {
+			//if it is next week
+			if(isNext){
+				setDateNextWeek(intStartDate);
+			}
 			//compare hours whether time has passed
-			if(intEventTimeHours==intCurrentTimeHours){
+			else if(intEventTimeHours==intCurrentTimeHours){
 				//compare minutes whether time has passed
 				if(intEventTimeMinutes<=intCurrentTimeMinutes){
 					setDateNextWeek(intStartDate);
@@ -899,6 +920,15 @@ public class Parser {
 	
 	private static String getStringDate(StringTokenizer st, StringTokenizer[] tempSt) throws MalformedUserInputException{
 		String date = new String(st.nextToken());
+		
+		if(isStringNext(date)){
+			if(!st.hasMoreTokens()){
+				throw new MalformedUserInputException(MESSAGE_INVALID);
+			}
+			else{
+				date = date + " " + st.nextToken();
+			}
+		}
 		
 		if(!st.hasMoreTokens()){
 			tempSt[INDEX_ST]=st;
@@ -1282,9 +1312,19 @@ public class Parser {
 		intStartDate[INDEX_YEAR] = Calendar.getInstance().get(Calendar.YEAR);
 		return;
 	}
-	private static void setDateWithDayDifference(int[] intStartDate, int dayDifference){
-		if(dayDifference<0){
-			dayDifference = dayDifference + 7;
+	private static void setDateWithDayDifference(int[] intStartDate, int dayDifference,boolean isNext){
+		if(!isNext){
+			if(dayDifference<0){
+				dayDifference = dayDifference + 7;
+			}
+		}
+		else{
+			if(dayDifference<0){
+				dayDifference = dayDifference + 14;
+			}
+			else if(dayDifference<7){
+				dayDifference = dayDifference + 7;
+			}
 		}
 		intStartDate[INDEX_DAY] = Calendar.getInstance().get(Calendar.DATE) + dayDifference;
 		intStartDate[INDEX_MONTH] = Calendar.getInstance().get(Calendar.MONTH);
@@ -1348,6 +1388,13 @@ public class Parser {
 			}
 		}
 		return true;
+	}
+	
+	private static boolean isStringNext(String input){
+		if(input.equals(NEXT)){
+			return true;
+		}
+		return false;
 	}
 	
 	private static boolean isStringFrom(String input){

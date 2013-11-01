@@ -717,6 +717,87 @@ public class ParserJUnitTest {
 		assertEquals(expectedAc.toString(),ac.toString());		
 		
 		
+		//display all on friday
+		//done status
+		//no time, assuming current time until the end of the world 31/12/2099 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("all");
+		startTime = Calendar.getInstance();
+		dayDifference = 0;
+		dayDifference = 6 - startTime.get(Calendar.DAY_OF_WEEK);
+		if(dayDifference==0){
+			if(0==startTime.get(Calendar.HOUR)){
+				if(0<=startTime.get(Calendar.MINUTE)){
+				}
+				else{
+					dayDifference = dayDifference+7;
+				}
+			}
+			else if(0<startTime.get(Calendar.HOUR)){
+				dayDifference = dayDifference+7;
+			}
+		}
+		if(dayDifference<0){
+			dayDifference = dayDifference+7;
+		}
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 0, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display all on friday");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		//display schedules on next friday
+		//done status
+		//no time, assuming current time until the end of the world 31/12/2099 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("schedules");
+		startTime = Calendar.getInstance();
+		dayDifference = 0;
+		dayDifference = 6 - startTime.get(Calendar.DAY_OF_WEEK);
+		if(dayDifference>=0){
+			dayDifference = 7;
+		}
+		else if(dayDifference<0){
+			dayDifference = dayDifference+14;
+		}
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 0, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + dayDifference, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display schedules on next friday");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());	
+		
+		
+		
 		//........SEARCH TESTING...............................................
 		
 		
