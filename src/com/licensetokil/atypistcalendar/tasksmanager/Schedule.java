@@ -7,19 +7,21 @@ public class Schedule extends Task implements Comparable<Schedule>{
 	private String remoteId;
 	private String taskType;
 	private int uniqueId;
+	private Calendar lastModifiedDate;
 	private Calendar startTime;
 	private Calendar endTime;
 	private String description;
 	private String place;
 
 	public Schedule(int uniqueId, Calendar startTime, Calendar endTime,
-			String description, String place) {
+			String description, String place, Calendar lastModifiedDate) {
 		this.taskType = "schedule";
 		this.uniqueId = uniqueId;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.description = description;
 		this.place = place;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 	
 	public Schedule(Schedule s){
@@ -41,6 +43,10 @@ public class Schedule extends Task implements Comparable<Schedule>{
 	
 	public int getUniqueId() {
 		return uniqueId;
+	}
+	
+	public Calendar getLastModifiedDate(){
+		return lastModifiedDate;
 	}
 
 	public Calendar getStartTime() {
@@ -78,14 +84,18 @@ public class Schedule extends Task implements Comparable<Schedule>{
 	public void setPlace(String p){
 		this.place = p;
 	}
+	
+	public void setLastModifiedDate(Calendar lastModifiedDate){
+		this.lastModifiedDate = lastModifiedDate;
+	}
 
 	public String toString() {
 		if(place.equals("")){
 			return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
-					+ endTime.getTime() + "@s" + description + "@s" + " ";
+					+ endTime.getTime() + "@s" + description + "@s" + " " + "@s" + lastModifiedDate.getTime();
 		}
 		return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
-				+ endTime.getTime() + "@s" + description + "@s" + place ;
+				+ endTime.getTime() + "@s" + description + "@s" + place + "@s" + lastModifiedDate.getTime();
 	}
 	
 	public String outputStringForDisplay(){

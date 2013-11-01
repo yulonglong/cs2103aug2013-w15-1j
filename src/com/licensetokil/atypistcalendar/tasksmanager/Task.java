@@ -1,9 +1,12 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
+import java.util.Calendar;
+
 public abstract class Task{
 	protected String remoteId;
 	protected String taskType;
 	protected int uniqueId;
+	protected Calendar lastModifiedDate;
 	protected String place;
 	protected String description;
 	
@@ -23,6 +26,10 @@ public abstract class Task{
 		return uniqueId;
 	}
 	
+	public Calendar getLastModifiedDate(){
+		return lastModifiedDate;
+	}
+	
 	public String getPlace(){
 		return place;
 	}
@@ -37,6 +44,10 @@ public abstract class Task{
 	
 	public void setRemoteId(String remoteId){
 		this.remoteId = remoteId;
+	}
+	
+	public void setLastModifiedDate(Calendar lastModifiedDate){
+		this.lastModifiedDate = lastModifiedDate;
 	}
 	
 	public String toString(){

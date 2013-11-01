@@ -7,12 +7,13 @@ public class Deadline extends Task implements Comparable<Deadline> {
 	private String remoteId;
 	private String taskType;
 	private int uniqueId;
+	private Calendar lastModifiedDate;
 	private Calendar endTime;
 	private String description;
 	private String place;
 	private String status;
 
-	public Deadline(int uniqueId, Calendar endTime, String description, String place, String status) {
+	public Deadline(int uniqueId, Calendar endTime, String description, String place, String status, Calendar lastModifiedDate) {
 		this.taskType = "deadline";
 		this.endTime = endTime;
 		this.description = description;
@@ -40,6 +41,10 @@ public class Deadline extends Task implements Comparable<Deadline> {
 	
 	public String getTaskType(){
 		return taskType;
+	}
+	
+	public Calendar getLastModifiedDate(){
+		return lastModifiedDate;
 	}
 
 	public Calendar getEndTime() {
@@ -77,14 +82,18 @@ public class Deadline extends Task implements Comparable<Deadline> {
 	public void setRemoteId(String remoteId){
 		this.remoteId = remoteId;
 	}
+	
+	public void setLastModifiedDate(Calendar lastModifiedDate){
+		this.lastModifiedDate = lastModifiedDate;
+	}
 
 	public String toString() {
 		if(place.equals("")){
 			return "Deadline@s" + uniqueId + "@s" + endTime.getTime() + "@s"
-					+ description + "@s" + " " + "@s" + status;
+					+ description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime();
 		}
 		return "Deadline@s" + uniqueId + "@s" + endTime.getTime() + "@s"
-				+ description + "@s" + place + "@s" + status;
+				+ description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime();
 	}
 	
 	public String outputStringForDisplay(){

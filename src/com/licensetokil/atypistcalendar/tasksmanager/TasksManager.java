@@ -10,14 +10,14 @@ public class TasksManager {
 
 	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n";
 	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n";
-	private static final String INVALId_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!";
+	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!";
 
 	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n";
 	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n";
 
 	private static final String MARK_UNSUCCESSFUL = "Mark was unsuccessful. Please try again!\n";
 	private static final String MARK_SUCCESSFUL = "Marked %s as %s\n";
-	
+
 	private static final String SEARCH_UNFOUND = "No search matches found!";
 
 	private static final String UNDO_DELETE_SUCCESSFUL = "Delete command successfully undone\n";
@@ -29,7 +29,9 @@ public class TasksManager {
 	private static final String UNDO_MARK_UNSUCCESSFUL = "Undo Mark command unsuccessful. Please try again!\n";
 	private static final String UNDO_UPDATE_UNSUCCESSFUL = "Undo Update command unsuccessful. Please try again!\n";
 	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n";
-	
+
+	private static final String UNDO_DISALLOWED = "Undo command is not allowed";
+
 	private static final String UNDONE = "undone";
 	private static final String DONE = "done";
 
@@ -98,21 +100,18 @@ public class TasksManager {
 	private TasksManager() {
 		initialize();
 	}
-	
-	/*private void convertFromDelimiters(){
-		for(Task t: getAllTasks()){
-			if((t.getDescription()).contains("?a!b$")){
-				String newDescription = (t.getDescription()).replaceAll("\\b?a!b$\\b", "@s");
-				t.setDescription(newDescription);
-			}
-			
-			if((t.getPlace()).contains("?a!b$")){
-				String newPlace = (t.getPlace()).replaceAll("\\b?a!b$\\b", "@s");
-				t.setPlace(newPlace);
-			}
-		}
-	}*/
-	
+
+	/*
+	 * private void convertFromDelimiters(){ for(Task t: getAllTasks()){
+	 * if((t.getDescription()).contains("?a!b$")){ String newDescription =
+	 * (t.getDescription()).replaceAll("\\b?a!b$\\b", "@s");
+	 * t.setDescription(newDescription); }
+	 * 
+	 * if((t.getPlace()).contains("?a!b$")){ String newPlace =
+	 * (t.getPlace()).replaceAll("\\b?a!b$\\b", "@s"); t.setPlace(newPlace); } }
+	 * }
+	 */
+
 	private void initialize() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -124,49 +123,51 @@ public class TasksManager {
 				System.out.println("Before: " + currLine);
 				data = currLine.split("@s");
 				System.out.println(Arrays.toString(data));
-				if (data[0].equals("Schedule")) {			
+				if (data[0].equals("Schedule")) {
 					Schedule s = new Schedule(Integer.parseInt(data[1]),
 							convertTimeFromStringToCalendar(data[2]),
-							convertTimeFromStringToCalendar(data[3]),
-							data[4], data[5]);
+							convertTimeFromStringToCalendar(data[3]), data[4],
+							data[5], convertTimeFromStringToCalendar(data[6]));
 					schedule.add(s);
-					if(data[5].equals(" ")){
+					if (data[5].equals(" ")) {
 						s.setPlace("");
 					}
 				} else if (data[0].equals("Deadline")) {
 					Deadline d = new Deadline(Integer.parseInt(data[1]),
-							convertTimeFromStringToCalendar(data[2]),
-							data[3], data[4], data[5]);
+							convertTimeFromStringToCalendar(data[2]), data[3],
+							data[4], data[5],
+							convertTimeFromStringToCalendar(data[6]));
 					deadline.add(d);
-					if(data[4].equals(" ")){
+					if (data[4].equals(" ")) {
 						d.setPlace("");
 					}
 				} else if (data[0].equals("Todo")) {
-					Todo td = new Todo(Integer.parseInt(data[1]),
-							data[2], data[3], data[4]);
+					Todo td = new Todo(Integer.parseInt(data[1]), data[2],
+							data[3], data[4],
+							convertTimeFromStringToCalendar(data[5]));
 					todo.add(td);
-					if(data[3].equals(" ")){
+					if (data[3].equals(" ")) {
 						td.setPlace("");
 					}
 				} else if (data[0].equals("uniqueId")) {
 					uniqueId = Integer.parseInt(data[1]); // the last
-																	// uniqueId
-																	// is stored
-																	// at the
-																	// end of
-																	// the file
-																	// and hence
-																	// needs to
-																	// be
-																	// retrieved
-																	// when the
-																	// application
-																	// is
-																	// reopened.
+															// uniqueId
+															// is stored
+															// at the
+															// end of
+															// the file
+															// and hence
+															// needs to
+															// be
+															// retrieved
+															// when the
+															// application
+															// is
+															// reopened.
 				}
 			}
-			
-			//convertFromDelimiters();
+
+			// convertFromDelimiters();
 			fileSync();
 			reader.close();
 		} catch (Exception e) {
@@ -236,20 +237,21 @@ public class TasksManager {
 		if (action.getStartTime() == null) {
 			if (action.getEndTime() == null) {
 				t = new Todo(++uniqueId, action.getDescription(),
-						action.getPlace(), UNDONE);
+						action.getPlace(), UNDONE, Calendar.getInstance());
 			} else {
 				t = new Deadline(++uniqueId, action.getEndTime(),
-						action.getDescription(), action.getPlace(), UNDONE);
+						action.getDescription(), action.getPlace(), UNDONE,
+						Calendar.getInstance());
 			}
 		} else {
 			t = new Schedule(++uniqueId, action.getStartTime(),
 					action.getEndTime(), action.getDescription(),
-					action.getPlace());
+					action.getPlace(), Calendar.getInstance());
 		}
 
 		return t;
 	}
-	
+
 	private String add(Task t) {
 
 		try {
@@ -277,18 +279,17 @@ public class TasksManager {
 		}
 
 	}
-	
-	/*private static void checkForDelimiters(Task t){
-		if((t.getDescription()).contains("@s")){
-			String newDescription = (t.getDescription()).replaceAll("\\b@s\\b", "?a!b$");
-			t.setDescription(newDescription);
-		}
-		
-		if((t.getPlace()).contains("@s")){
-			String newPlace = (t.getPlace()).replaceAll("\\b@s\\b", "b?a!b$");
-			t.setPlace(newPlace);
-		}
-	}*/
+
+	/*
+	 * private static void checkForDelimiters(Task t){
+	 * if((t.getDescription()).contains("@s")){ String newDescription =
+	 * (t.getDescription()).replaceAll("\\b@s\\b", "?a!b$");
+	 * t.setDescription(newDescription); }
+	 * 
+	 * if((t.getPlace()).contains("@s")){ String newPlace =
+	 * (t.getPlace()).replaceAll("\\b@s\\b", "b?a!b$"); t.setPlace(newPlace); }
+	 * }
+	 */
 
 	private String addUndo() {
 		try {
@@ -390,11 +391,11 @@ public class TasksManager {
 
 	private String displayOutput(String output) {
 		int count = 1;
-		
+
 		Collections.sort(sch);
 		Collections.sort(dl);
 		Collections.sort(toDo);
-		
+
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
@@ -448,8 +449,10 @@ public class TasksManager {
 						todo.remove(t);
 						toDo.remove(t);
 					}
+
+					t.setLastModifiedDate(Calendar.getInstance());
 				} else {
-					return INVALId_NUMBER_INPUT;
+					return INVALID_NUMBER_INPUT;
 				}
 			}
 
@@ -474,6 +477,8 @@ public class TasksManager {
 				} else if (t instanceof Todo) {
 					todo.add((Todo) t);
 				}
+
+				t.setLastModifiedDate(Calendar.getInstance());
 			}
 			fileSync();
 		} catch (Exception e) {
@@ -500,6 +505,7 @@ public class TasksManager {
 
 			t.setPlace(ac.getUpdatedLocationQuery());
 			t.setDescription(ac.getUpdatedQuery());
+			t.setLastModifiedDate(Calendar.getInstance());
 
 			fileSync();
 
@@ -516,16 +522,19 @@ public class TasksManager {
 			for (Schedule s : schedule) {
 				if (s.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					s = (Schedule) updateOriginalTask;
+					s.setLastModifiedDate(Calendar.getInstance());
 				}
 			}
 			for (Deadline d : deadline) {
 				if (d.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					d = (Deadline) updateOriginalTask;
+					d.setLastModifiedDate(Calendar.getInstance());
 				}
 			}
 			for (Todo td : todo) {
 				if (td.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					td = (Todo) updateOriginalTask;
+					td.setLastModifiedDate(Calendar.getInstance());
 				}
 			}
 			fileSync();
@@ -544,7 +553,8 @@ public class TasksManager {
 		String output = new String("");
 
 		for (Schedule s : schedule) {
-			if (((s.getDescription()).toLowerCase()).contains((ac.getQuery().toLowerCase()))) {
+			if (((s.getDescription()).toLowerCase()).contains((ac.getQuery()
+					.toLowerCase()))) {
 				if (s.getStartTime().after(ac.getStartTime())
 						&& s.getEndTime().before(ac.getEndTime())) {
 					sch.add(s);
@@ -553,7 +563,8 @@ public class TasksManager {
 		}
 
 		for (Deadline d : deadline) {
-			if (((d.getDescription()).toLowerCase()).contains((ac.getQuery().toLowerCase()))) {
+			if (((d.getDescription()).toLowerCase()).contains((ac.getQuery()
+					.toLowerCase()))) {
 				if (d.getEndTime().after(ac.getStartTime())
 						&& d.getEndTime().before(ac.getEndTime())) {
 					dl.add(d);
@@ -562,7 +573,8 @@ public class TasksManager {
 		}
 
 		for (Todo td : todo) {
-			if (((td.getDescription()).toLowerCase()).contains((ac.getQuery().toLowerCase()))) {
+			if (((td.getDescription()).toLowerCase()).contains((ac.getQuery()
+					.toLowerCase()))) {
 				toDo.add(td);
 			}
 		}
@@ -592,9 +604,10 @@ public class TasksManager {
 					} else if (t instanceof Todo) {
 						((Todo) t).setStatus(ac.getStatus());
 					}
-				}
-				else
-					return INVALId_NUMBER_INPUT;
+
+					t.setLastModifiedDate(Calendar.getInstance());
+				} else
+					return INVALID_NUMBER_INPUT;
 			}
 
 			fileSync();
@@ -622,6 +635,7 @@ public class TasksManager {
 				} else {
 					((Todo) t).setStatus(newStatus);
 				}
+				t.setLastModifiedDate(Calendar.getInstance());
 			}
 
 			fileSync();
@@ -661,7 +675,24 @@ public class TasksManager {
 		}
 	}
 
-	public String executeCommand(LocalAction ac) {
+	private Task findTaskFromUniqueId(int uniqueId)
+			throws TaskNotFoundException {
+		for (Task t : getAllTasks()) {
+			if (t.getUniqueId() == uniqueId) {
+				return t;
+			}
+		}
+
+		throw new TaskNotFoundException("Task not found");
+	}
+
+	public void updateCorrespondingTaskRemoteId(int uniqueId, String remoteId)
+			throws TaskNotFoundException {
+		Task t = findTaskFromUniqueId(uniqueId);
+		t.setRemoteId(remoteId);
+	}
+
+	public String executeCommand(LocalAction ac, boolean undoable) {
 		if (ac.getType() == LocalActionType.ADD) {
 			Task t = classify((AddAction) ac);
 			lastAction = ac;
@@ -694,15 +725,19 @@ public class TasksManager {
 		}
 
 		else if (ac.getType() == LocalActionType.UNDO) {
-
-			if (lastAction instanceof AddAction) {
-				return addUndo();
-			} else if (lastAction instanceof UpdateAction) {
-				return updateUndo();
-			} else if (lastAction instanceof DeleteAction) {
-				return deleteUndo();
-			} else if (lastAction instanceof MarkAction) {
-				return markUndo();
+			if (undoable) {
+				if (lastAction instanceof AddAction) {
+					return addUndo();
+				} else if (lastAction instanceof UpdateAction) {
+					return updateUndo();
+				} else if (lastAction instanceof DeleteAction) {
+					return deleteUndo();
+				} else if (lastAction instanceof MarkAction) {
+					return markUndo();
+				}
+			}
+			else{
+				return UNDO_DISALLOWED;
 			}
 		}
 		return "ERROR";
@@ -711,14 +746,14 @@ public class TasksManager {
 
 	public static void exit() {
 		try {
-			/*for(Task t: getAllTasks()){
-				checkForDelimiters(t);
-			}*/
-			
+			/*
+			 * for(Task t: getAllTasks()){ checkForDelimiters(t); }
+			 */
+
 			fileSync();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file,
 					true));
-			
+
 			writer.write("uniqueId@" + uniqueId);
 			writer.newLine();
 			writer.close();
