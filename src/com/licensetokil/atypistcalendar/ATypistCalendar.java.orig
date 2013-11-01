@@ -1,14 +1,31 @@
 package com.licensetokil.atypistcalendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.parser.*;
+import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.GoogleAction;
+import com.licensetokil.atypistcalendar.parser.LocalAction;
+import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
+import com.licensetokil.atypistcalendar.parser.Parser;
+import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
 
 public class ATypistCalendar {
+	private static ATypistCalendar instance = null;
 	public static ATCGUI gui;
+
+	private ATypistCalendar() {
+	}
+
+	public static ATypistCalendar getInstance() {
+		if(instance == null) {
+			instance = new ATypistCalendar();
+		}
+		return instance;
+	}
 
 	public static void main(String[] args) {
 		TasksManager TM = TasksManager.getInstance();
@@ -73,24 +90,34 @@ public class ATypistCalendar {
 
 	}
 
-	public static String userInput(String input, TasksManager TM) {
-		String reply="";
+	public static void userInput(String input) {
+		String reply = "";
+		Action action;
 		try {
-
-			Action ac = Parser.parse(input);
-
-			reply = TM.executeCommand((LocalAction) ac);
-
-			//reply = ac.toString();//kester using this to debug and try
-			// his parser
-			gui.outputWithNewline("Your Command: \n" + input + "\n");
-			gui.output(reply);
-			return reply;
-
+			action = Parser.parse(input);
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
+			return;
 		}
 
-		return reply;
+		if(action instanceof LocalAction) {
+			reply = TasksManager.getInstance().executeCommand((LocalAction)action, true);
+			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
+			GoogleCalendarManager.getInstance().doCompleteSync();
+		}
+		else if(action instanceof GoogleAction) {
+			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
+		}
+		else {
+			//logger.servere("Unknown sub-class of Action returned from Parser!");
+			assert false;
+		}
+
+		gui.outputUserInput("Your Command: " + input);
+		gui.outputWithNewline(reply);
+	}
+
+	public ArrayList<Task> getCopyOfAllLocalTasks() {
+		return TasksManager.getInstance().getAllTasks();
 	}
 }

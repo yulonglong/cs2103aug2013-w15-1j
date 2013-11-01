@@ -1,18 +1,34 @@
 package com.licensetokil.atypistcalendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-//import com.licensetokil.atypistcalendar.gcal.AuthenticationManager;
+
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
-import com.licensetokil.atypistcalendar.parser.*;
+import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.GoogleAction;
+import com.licensetokil.atypistcalendar.parser.LocalAction;
+import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
+import com.licensetokil.atypistcalendar.parser.Parser;
+import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
-import java.awt.Color;
 
 public class ATypistCalendar {
+	private static ATypistCalendar instance = null;
 	public static ATCGUI gui;
 
+	private ATypistCalendar() {
+	}
+
+	public static ATypistCalendar getInstance() {
+		if(instance == null) {
+			instance = new ATypistCalendar();
+		}
+		return instance;
+	}
+
 	public static void main(String[] args) {
-		TasksManager.fileToArray();
+		TasksManager TM = TasksManager.getInstance();
 		Calendar calendar = Calendar.getInstance();
 
 		gui = new ATCGUI();
@@ -22,13 +38,9 @@ public class ATypistCalendar {
 		gui.outputWithNewline("Current time:");
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
-		
-		//GoogleCalendarManager.getInstance().authenticateUser();
-		//AuthenticationManager.debug();
-		//System.out.println(GoogleCalendarManager.getInstance().remoteCalendarExists());
-		//GoogleCalendarManager.getInstance().createRemoteCalendar();
 
-		
+		GoogleCalendarManager.getInstance().initialise();
+
 		/*
 		 userInput("add swimming on 30/12 from 1300 to 1400");
 		 userInput("add swimming at CommunityClub on 21/11 from 1400 to 1500");
@@ -44,7 +56,7 @@ public class ATypistCalendar {
 		 userInput("add clean my room");
 		 userInput("add reply janet by 12/1");
 		 userInput("add reply Mary by 1/12 at 5 pm");
-		
+
 		 userInput("display"); userInput("display schedules at Bukit Batok");
 		 userInput("display all on 10/6");
 		 userInput("display all in Korea on 10/12");
@@ -54,17 +66,17 @@ public class ATypistCalendar {
 		 userInput("display schedules on 5/3 from 3pm to 1900");
 		 userInput("display todos"); userInput("display schedules");
 		 userInput("display undone"); userInput("display done");
-		 
+
 		 userInput("abcd");
-		 
+
 		 userInput("mark #1 as done"); userInput("mark #1 #2 as done");
-		 
+
 		 userInput("delete #1 #2 #4");
-		 
+
 		 userInput("undo");
 		 userInput("search swimming tgt at bt batok on 10/6");
 		 userInput("search badminton on 5/3 from 3pm to 1900");
-		 
+
 		 userInput("update #3 >> badminton with Ian on 2/1 from 1200 to 1300");
 		*/
 
@@ -78,54 +90,34 @@ public class ATypistCalendar {
 
 	}
 
-	public static String userInput(String input) {
-		String reply="";
+	public static void userInput(String input) {
+		String reply = "";
+		Action action;
 		try {
-
-			Action ac = Parser.parse(input);
-
-				if (ac.getClass().getName().contains("AddAction")) {
-					reply = TasksManager.executeCommand((AddAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("DeleteAction")) {
-					reply = TasksManager.executeCommand((DeleteAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("DisplayAction")) {
-					reply = TasksManager.executeCommand((DisplayAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("UpdateAction")) {
-					reply = TasksManager.executeCommand((UpdateAction) ac);
-				}
-
-				else if (ac.getClass().getName().contains("MarkAction")) {
-					reply = TasksManager.executeCommand((MarkAction) ac);
-				}	
-
-				else if (ac.getClass().getName().contains("SearchAction")) {
-					reply = TasksManager.executeCommand((SearchAction) ac);
-				}
-				
-				else if(ac.getClass().getName().contains("UndoAction")){
-					reply = TasksManager.executeUndo();
-				}
-
-				else {
-					reply = ac.getClass().getName();
-				}
-
-			//reply = ac.toString();//kester using this to debug and try
-			// his parser
-			gui.outputWithNewline("Your Command: \n" + input + "\n");
-			gui.outputWithNewline(reply);
-			return reply;
-
+			action = Parser.parse(input);
 		} catch (MalformedUserInputException muie) {
 			gui.outputWithNewline(muie.getMessage());
+			return;
 		}
-		
-		return reply;
+
+		if(action instanceof LocalAction) {
+			reply = TasksManager.getInstance().executeCommand((LocalAction)action, true);
+			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
+			GoogleCalendarManager.getInstance().doCompleteSync();
+		}
+		else if(action instanceof GoogleAction) {
+			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
+		}
+		else {
+			//logger.servere("Unknown sub-class of Action returned from Parser!");
+			assert false;
+		}
+
+		gui.outputUserInput("Your Command: " + input);
+		gui.outputWithNewline(reply);
+	}
+
+	public ArrayList<Task> getCopyOfAllLocalTasks() {
+		return TasksManager.getInstance().getAllTasks();
 	}
 }
