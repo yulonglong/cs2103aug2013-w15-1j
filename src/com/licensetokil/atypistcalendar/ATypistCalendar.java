@@ -17,6 +17,9 @@ public class ATypistCalendar {
 	private static ATypistCalendar instance = null;
 	public static ATCGUI gui;
 
+	public static boolean RECORD_FOR_UNDO = true;
+	public static boolean DO_NOT_RECORD_FOR_UNDO = false;
+
 	private ATypistCalendar() {
 	}
 
@@ -28,7 +31,6 @@ public class ATypistCalendar {
 	}
 
 	public static void main(String[] args) {
-		TasksManager TM = TasksManager.getInstance();
 		Calendar calendar = Calendar.getInstance();
 
 		gui = new ATCGUI();
@@ -101,7 +103,7 @@ public class ATypistCalendar {
 		}
 
 		if(action instanceof LocalAction) {
-			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
+			reply = TasksManager.getInstance().executeCommand((LocalAction)action, RECORD_FOR_UNDO);
 			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
 			GoogleCalendarManager.getInstance().doCompleteSync();
 		}
