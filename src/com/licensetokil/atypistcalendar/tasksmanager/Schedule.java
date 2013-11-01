@@ -3,19 +3,19 @@ package com.licensetokil.atypistcalendar.tasksmanager;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
-public class Schedule extends Task {
-	private String remoteID;
+public class Schedule extends Task implements Comparable<Schedule>{
+	private String remoteId;
 	private String taskType;
-	private int uniqueID;
+	private int uniqueId;
 	private Calendar startTime;
 	private Calendar endTime;
 	private String description;
 	private String place;
 
-	public Schedule(int uniqueID, Calendar startTime, Calendar endTime,
+	public Schedule(int uniqueId, Calendar startTime, Calendar endTime,
 			String description, String place) {
 		this.taskType = "schedule";
-		this.uniqueID = uniqueID;
+		this.uniqueId = uniqueId;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.description = description;
@@ -27,16 +27,20 @@ public class Schedule extends Task {
 		this.endTime = s.getEndTime();
 		this.description = s.getDescription();
 		this.place = s.getPlace();
-		this.uniqueID = s.getUniqueID();
+		this.uniqueId = s.getUniqueId();
 		this.startTime = s.getStartTime();
+	}
+	
+	public String getRemoteId(){
+		return remoteId;
 	}
 	
 	public String getTaskType() {
 		return taskType;
 	}
 	
-	public int getUniqueID() {
-		return uniqueID;
+	public int getUniqueId() {
+		return uniqueId;
 	}
 
 	public Calendar getStartTime() {
@@ -53,6 +57,10 @@ public class Schedule extends Task {
 
 	public String getPlace() {
 		return place;
+	}
+	
+	public void setRemoteId(String remoteId){
+		this.remoteId = remoteId;
 	}
 	
 	public void setStartTime(Calendar st){
@@ -73,10 +81,10 @@ public class Schedule extends Task {
 
 	public String toString() {
 		if(place.equals("")){
-			return "Schedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
+			return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
 					+ endTime.getTime() + "@s" + description + "@s" + " ";
 		}
-		return "Schedule@s" + uniqueID + "@s" + startTime.getTime() + "@s"
+		return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
 				+ endTime.getTime() + "@s" + description + "@s" + place ;
 	}
 	
@@ -95,5 +103,9 @@ public class Schedule extends Task {
 		
 		
 		return output + "\n";
+	}
+	
+	public int compareTo(Schedule s){
+		return startTime.compareTo(s.getStartTime());
 	}
 }
