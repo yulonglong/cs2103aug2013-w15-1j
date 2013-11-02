@@ -355,7 +355,6 @@ public class Parser {
 		getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
-	
 		return userAction;
 	}
 
@@ -1321,7 +1320,7 @@ public class Parser {
 			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
 		}
 		//get String Date, convert (12 Jan) format to default format (12/1)
-		date = getValidDateAndCheck(st,tempSt,intStartDate,actionType);
+		date = getValidDateAndCheck(st,tempSt,intEndDate,actionType);
 		st = tempSt[INDEX_ST];
 		//end check if the date entered is valid
 		

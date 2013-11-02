@@ -662,6 +662,35 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		
+		//display schedules from 21/3 to 24/3
+		//schedules description
+		//dd/mm date format
+		//from time to (null), assuming until the end of the day 23.59.59
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("schedules");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR),2,21, 0, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR),2,24, 23, 59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display schedules from 21/3 to 24/3");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
 		//display undone todos
 		//todos description
 		//undone status
@@ -830,6 +859,35 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		
+		//search swim in BBCC from 10/6 to 9/9
+		//multiple words description
+		//single word place
+		//dd/mm time format
+		newSc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newSc = new SearchAction();
+		newSc.setQuery("swim");
+		newSc.setLocationQuery("BBCC");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR),5,10,0,0,0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR),8,9,23,59,59);
+		newSc.setStartTime(startTime);
+		newSc.setEndTime(endTime);
+		expectedAc = newSc;
+		try{
+			ac = Parser.parse("search swim in BBCC from 10/6 to 9/9");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
 		
 		
 		//search sports on mon from 1pm to 9pm
