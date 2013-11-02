@@ -34,11 +34,8 @@ public class ATypistCalendar {
 		gui = new ATCGUI();
 		gui.setVisible(true);
 
-		gui.outputWithNewline("Welcome to a Typist Calendar!\n");
-		gui.outputWithNewline("Current time:");
-		gui.outputWithNewline(calendar.getTime().toString());
-		gui.outputWithNewline("");
-
+		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
+		
 		//GoogleCalendarManager.getInstance().initialise();
 
 		/*
