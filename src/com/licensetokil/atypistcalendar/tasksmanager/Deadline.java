@@ -20,6 +20,7 @@ public class Deadline extends Task implements Comparable<Deadline> {
 		this.place = place;
 		this.uniqueId = uniqueId;
 		this.status = status;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 	
 	public Deadline(Deadline d){

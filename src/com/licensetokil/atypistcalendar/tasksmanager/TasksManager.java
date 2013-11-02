@@ -655,6 +655,7 @@ public class TasksManager {
 		try {
 			BufferedWriter clearWriter = new BufferedWriter(
 					new FileWriter(file));
+			clearWriter.write("");
 			BufferedWriter appendWriter = new BufferedWriter(new FileWriter(
 					file, true));
 
@@ -664,10 +665,12 @@ public class TasksManager {
 			}
 
 			for (Deadline d : deadline) {
+
 				appendWriter.write(d.toString());
 				appendWriter.newLine();
 			}
 
+			System.out.println("Todo: " + todo);
 			for (Todo td : todo) {
 				appendWriter.write(td.toString());
 				appendWriter.newLine();
@@ -676,7 +679,7 @@ public class TasksManager {
 			clearWriter.close();
 			appendWriter.close();
 		} catch (Exception e) {
-
+			System.out.println(e.getMessage() + " in file");
 		}
 	}
 

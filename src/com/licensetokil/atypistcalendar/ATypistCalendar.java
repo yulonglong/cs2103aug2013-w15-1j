@@ -39,7 +39,7 @@ public class ATypistCalendar {
 		gui.outputWithNewline(calendar.getTime().toString());
 		gui.outputWithNewline("");
 
-		GoogleCalendarManager.getInstance().initialise();
+		//GoogleCalendarManager.getInstance().initialise();
 
 		/*
 		 userInput("add swimming on 30/12 from 1300 to 1400");
@@ -103,11 +103,11 @@ public class ATypistCalendar {
 		if(action instanceof LocalAction) {
 			reply = TasksManager.getInstance().executeCommand((LocalAction)action, true);
 			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
-			GoogleCalendarManager.getInstance().doCompleteSync();
+			//GoogleCalendarManager.getInstance().doCompleteSync();
 		}
-		else if(action instanceof GoogleAction) {
-			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
-		}
+//		else if(action instanceof GoogleAction) {
+//			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
+//		}
 		else {
 			//logger.servere("Unknown sub-class of Action returned from Parser!");
 			assert false;
