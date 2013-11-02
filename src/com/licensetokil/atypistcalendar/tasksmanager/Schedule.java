@@ -99,20 +99,16 @@ public class Schedule extends Task implements Comparable<Schedule>{
 	}
 	
 	public String outputStringForDisplay(){
-		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
 		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
 		
-		String output = "Event: " + this.getDescription()
-				+ "\n" + "Day: " + formatDay.format(this.getStartTime().getTime())
-				+ "\n" + "Starting Time: " + formatTime.format(this.getStartTime().getTime())
-				+ "\n" + "Ending Time: " + formatTime.format(this.getEndTime().getTime())
-				+ "\n";
+		String output = "[" + formatDay.format(startTime.getTime()) + "] [" + formatTime.format(startTime.getTime()) + " - " + formatTime.format(endTime.getTime()) + "] " + 
+							description;
 		if(!place.equals("")){
-			output = output+"Place: " + this.getPlace() + "\n";
+			output = output+" at " + this.getPlace();
 		}
-		
-		
-		return output + "\n";
+				
+		return output;
 	}
 	
 	public int compareTo(Schedule s){

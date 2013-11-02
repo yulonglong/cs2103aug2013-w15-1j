@@ -84,14 +84,14 @@ public class Todo extends Task implements Comparable<Todo> {
 	}
 	
 	public String outputStringForDisplay(){
-		String output = "Event: " + this.getDescription() 
-				+ "\nStatus: " + this.getStatus()
-				+ "\n";
+		String output = description; 
 		if(!place.equals("")){
-			output = output+"Place: " + this.getPlace() + "\n";
+			output = output+" at " + this.getPlace();
 		}
 		
-		return output + "\n";
+		output = output + " [Status: " + status + "]";
+		
+		return output;
 	}
 	
 	public int compareTo(Todo td){

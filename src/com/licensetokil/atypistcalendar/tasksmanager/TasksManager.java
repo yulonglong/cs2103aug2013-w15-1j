@@ -267,7 +267,7 @@ public class TasksManager {
 				todo.add((Todo) t);
 			}
 
-			output = "Added: \n" + t.outputStringForDisplay();
+			output = "Added: \n" + t.outputStringForDisplay() + "\n";
 
 			lastTaskCreated = t;
 			fileSync();
@@ -275,6 +275,7 @@ public class TasksManager {
 			return output;
 
 		} catch (Exception e) {
+			System.out.println("exception error: " + e.getMessage());
 			return ADD_UNSUCCESSFUL;
 		}
 
@@ -296,6 +297,7 @@ public class TasksManager {
 			schedule.remove(lastTaskCreated);
 			deadline.remove(lastTaskCreated);
 			todo.remove(lastTaskCreated);
+
 			fileSync();
 		} catch (Exception e) {
 			return UNDO_ADD_UNSUCCESSFUL;
@@ -399,7 +401,8 @@ public class TasksManager {
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
-				output = output + count + ". " + s.outputStringForDisplay();
+				output = output + count + ". " + s.outputStringForDisplay()
+						+ "\n";
 				table.put(count, s);
 				count++;
 			}
@@ -409,7 +412,8 @@ public class TasksManager {
 		if (!dl.isEmpty()) {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
-				output = output + count + ". " + d.outputStringForDisplay();
+				output = output + count + ". " + d.outputStringForDisplay()
+						+ "\n";
 				table.put(count, d);
 				count++;
 			}
@@ -420,7 +424,8 @@ public class TasksManager {
 		if (!toDo.isEmpty()) {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
-				output = output + count + ". " + td.outputStringForDisplay();
+				output = output + count + ". " + td.outputStringForDisplay()
+						+ "\n";
 				table.put(count, td);
 				count++;
 			}
@@ -735,8 +740,7 @@ public class TasksManager {
 				} else if (lastAction instanceof MarkAction) {
 					return markUndo();
 				}
-			}
-			else{
+			} else {
 				return UNDO_DISALLOWED;
 			}
 		}
