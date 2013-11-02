@@ -113,7 +113,7 @@ public class ATypistCalendar {
 			assert false;
 		}
 
-		gui.outputUserInput("Your Command: " + input);
+		gui.outputUserInput("Your previous command: " + input);
 		gui.outputWithNewline(reply);
 	}
 

@@ -97,18 +97,17 @@ public class Deadline extends Task implements Comparable<Deadline> {
 	}
 	
 	public String outputStringForDisplay(){
-		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
 		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
 		
-		String output = "Event: " + this.getDescription()
-				+ "\n" + "Day: " + formatDay.format(this.getEndTime().getTime())
-				+ "\n" + "Due by: " + formatTime.format(this.getEndTime().getTime())
-				+ "\n";
+		String output = "[" + formatDay.format(endTime.getTime()) + "] [by " + formatTime.format(endTime.getTime()) + "] " + description;
 		if(!place.equals("")){
-			output = output+"Place: " + this.getPlace() + "\n";
+			output = output+" at " + this.getPlace();
 		}
 		
-		return output + "\n";
+		output = output + " [Status: " + status + "]";
+		
+		return output;
 	}
 	
 	public int compareTo(Deadline d){
