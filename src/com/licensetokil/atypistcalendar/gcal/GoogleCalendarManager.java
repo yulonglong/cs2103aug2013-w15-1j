@@ -15,7 +15,7 @@ import com.licensetokil.atypistcalendar.tasksmanager.Task;
 public class GoogleCalendarManager {
 	private static GoogleCalendarManager instance = null;
 
-	private static Logger logger = Logger.getLogger("com.atypistscalendar.gcal.googlecalendarmanager");
+	private static Logger logger = Logger.getLogger(GoogleCalendarManager.class.getName());
 
 	private GoogleCalendarManager() {
 		logger.fine("Constructor of GoogleCalendarManager called");

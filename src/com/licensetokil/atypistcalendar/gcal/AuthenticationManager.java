@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 
@@ -22,6 +23,9 @@ class AuthenticationManager {
 	private static final File AUTHENTICATION_SAVE_FILE = new File("ATC_AUTH.txt");
 
 	private static AuthenticationManager instance = null;
+
+	private static Logger logger = Logger.getLogger(AuthenticationManager.class.getName());
+
 	private String authenticationToken;
 	private String accessToken;
 	private String refreshToken;
@@ -197,7 +201,7 @@ class AuthenticationManager {
 	private String getAccessToken() throws IllegalStateException, JsonParseException, IOException {
 		assert isAuthenticated();
 
-		if(accessToken == null) {
+		if(accessToken.equals("")) {
 			fetchAccessTokenUsingAuthenticationToken();
 			writeAuthenticationDetailsToFile();
 		}

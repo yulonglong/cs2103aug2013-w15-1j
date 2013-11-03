@@ -19,7 +19,7 @@ import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.Todo;
 
 class Syncer extends Thread {
-	private static Logger logger = Logger.getLogger("com.atypistscalendar.gcal.syncmanger.syncer");
+	private static Logger logger = Logger.getLogger(Syncer.class.getName());
 
 	public Syncer() {
 		logger.fine("Constructor of Syncer called.");
