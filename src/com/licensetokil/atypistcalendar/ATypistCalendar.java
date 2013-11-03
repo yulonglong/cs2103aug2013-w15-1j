@@ -98,7 +98,7 @@ public class ATypistCalendar {
 		}
 
 		if(action instanceof LocalAction) {
-			reply = TasksManager.getInstance().executeCommand((LocalAction)action, true);
+			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
 			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
 			//GoogleCalendarManager.getInstance().doCompleteSync();
 		}

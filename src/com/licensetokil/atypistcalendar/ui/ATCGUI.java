@@ -86,7 +86,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 		jScrollPane1.setMaximumSize(jPanel1.getMaximumSize());
 		jScrollPane1.setMinimumSize(jPanel1.getMinimumSize());
 		jScrollPane1.setViewportView(jTextPane1);
-
+	
 		jScrollPane2.setBorder(null);
 		jScrollPane2
 				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);

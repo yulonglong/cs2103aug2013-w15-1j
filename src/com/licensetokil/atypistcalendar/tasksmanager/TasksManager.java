@@ -685,9 +685,19 @@ public class TasksManager {
 
 	private Task findTaskFromUniqueId(int uniqueId)
 			throws TaskNotFoundException {
-		for (Task t : getAllTasks()) {
-			if (t.getUniqueId() == uniqueId) {
-				return t;
+		for(Schedule s: schedule){
+			if(s.getUniqueId() == uniqueId){
+				return s;
+			}
+		}
+		for(Deadline d: deadline){
+			if(d.getUniqueId() == uniqueId){
+				return d;
+			}
+		}
+		for(Todo td: todo){
+			if(td.getUniqueId() == uniqueId){
+				return td;
 			}
 		}
 
@@ -700,7 +710,7 @@ public class TasksManager {
 		t.setRemoteId(remoteId);
 	}
 
-	public String executeCommand(LocalAction ac, boolean undoable) {
+	public String executeCommand(LocalAction ac) {
 		if (ac.getType() == LocalActionType.ADD) {
 			Task t = classify((AddAction) ac);
 			lastAction = ac;
@@ -733,22 +743,58 @@ public class TasksManager {
 		}
 
 		else if (ac.getType() == LocalActionType.UNDO) {
-			if (undoable) {
-				if (lastAction instanceof AddAction) {
-					return addUndo();
-				} else if (lastAction instanceof UpdateAction) {
-					return updateUndo();
-				} else if (lastAction instanceof DeleteAction) {
-					return deleteUndo();
-				} else if (lastAction instanceof MarkAction) {
-					return markUndo();
-				}
+			if (lastAction instanceof AddAction) {
+				return addUndo();
+			} else if (lastAction instanceof UpdateAction) {
+				return updateUndo();
+			} else if (lastAction instanceof DeleteAction) {
+				return deleteUndo();
+			} else if (lastAction instanceof MarkAction) {
+				return markUndo();
 			} else {
 				return UNDO_DISALLOWED;
 			}
 		}
 		return "ERROR";
 
+	}
+	
+	public int addGoogleTask(Task t){
+		add(t);
+		return t.getUniqueId();
+	}
+	
+	public void deleteGoogleTask(int uniqueId) throws TaskNotFoundException{
+		Task t = findTaskFromUniqueId(uniqueId);
+		if(t.getTaskType().equals("schedule")){
+			schedule.remove(t);
+		}
+		else if(t.getTaskType().equals("deadline")){
+			deadline.remove(t);
+		}
+		else if(t.getTaskType().equals("todo")){
+			todo.remove(t);
+		}
+		else{
+			throw new TaskNotFoundException();
+		}
+		fileSync();
+	}
+	
+	public void updateGoogleTask(Task t) throws TaskNotFoundException{
+		Task updateTask = findTaskFromUniqueId(t.getUniqueId());
+		if(t.getTaskType().equals("schedule")){
+			schedule.set(schedule.indexOf(updateTask), (Schedule) t);
+		}
+		else if(t.getTaskType().equals("deadline")){
+			deadline.set(deadline.indexOf(updateTask), (Deadline) t);
+		}
+		else if(t.getTaskType().equals("todo")){
+			todo.set(todo.indexOf(updateTask), (Todo) t);
+		}
+		else {
+			throw new TaskNotFoundException();
+		}
 	}
 
 	public static void exit() {
