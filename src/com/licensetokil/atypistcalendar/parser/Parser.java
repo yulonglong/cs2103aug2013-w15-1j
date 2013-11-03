@@ -273,6 +273,8 @@ public class Parser {
 		}
 		
 		//get the timeframe of the task
+		assert calendarArray[INDEX_START_TIME] == null;
+		assert calendarArray[INDEX_START_TIME] == null;
 		getCompleteDate(calendarArray,st,LocalActionType.ADD);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
@@ -359,7 +361,8 @@ public class Parser {
 		}
 		//get place end
 		
-		
+		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_END_TIME] != null;
 		getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
@@ -393,6 +396,7 @@ public class Parser {
 			return userAction;
 		}
 
+		assert referenceNumber == null;
 		//get the numbers
 		referenceNumber = getMultipleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);
@@ -451,6 +455,9 @@ public class Parser {
 			return userAction;
 		}
 
+		
+		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_END_TIME] == null;
 		getCompleteDate(calendarArray,st,LocalActionType.UPDATE);
 		userAction.setUpdatedStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setUpdatedEndTime(calendarArray[INDEX_END_TIME]);
@@ -504,6 +511,8 @@ public class Parser {
 			return userAction;
 		}
 		
+		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_END_TIME] != null;
 		getCompleteDate(calendarArray,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
@@ -521,6 +530,7 @@ public class Parser {
 		ArrayList<Integer> referenceNumber = null;
 		String status = new String();
 		
+		assert referenceNumber == null;
 		//get reference number array list
 		referenceNumber = getMultipleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);
