@@ -1263,5 +1263,715 @@ public class ParserJUnitTest {
 
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		
+		//.............. ERROR HANDLING TESTING ...................
+		
+		
+		
+		boolean exceptionCaught;
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("Google asdf blah blah");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("addd blah blah");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+	
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday at 3as");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday a 3pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday from 3pm to 122pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday from 3pm to 1222pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday from 3pm to 5pm.");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday from 3pm twe 4pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on tues from 3pm - 400");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on mon , 32pm - 1500");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday, 12pm - 1500");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday at 12pm for 39 minsss");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday at 12pm for 2 hors 3 min");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on monday at 12pm fro 2 hours 3 min");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on mnoday");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 4dec");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on sdfec");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 4 dec 2403");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 4 dec2013");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on thursdy");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 21/21/2013");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 2/2/3");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 2/13");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 2//13");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add swimming on 2//13 from");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add reply mary by from 3pm to 4 pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add reply mary by mon 3pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add reply mary by mon at 4432");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("display all on mon at 4432");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("display as");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("display undon on mon");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("display onn tues");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("display on tues a 5");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("delete 3");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("delete @3");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("delete #3#4");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("delete #3 , #2");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("delete #3 #2 ##1");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("update #1 >> task blah on mon at 332");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("update #1 to task blah on mon at 332");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("update 1 >> task blah on mon at 3");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("update !21 >> task blah on mon at 3");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("mark #1 3 as done");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("mark #1 ##3 as done");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("mark #1 #3 ass done");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("mark #1 as donee");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("mark #1 as 123done");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("mark #1 as uundone");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("search sw from adfsd");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("search sw on 3/3/12 at three");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
 	}
 }

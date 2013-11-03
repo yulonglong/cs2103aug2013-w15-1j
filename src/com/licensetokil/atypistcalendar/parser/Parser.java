@@ -18,6 +18,7 @@ public class Parser {
 	private static final String MESSAGE_INVALID_SEARCH_QUERY = "No search query detected!";
 	private static final String MESSAGE_INVALID_REF_NUMBER = "Invalid Reference Number entered!";
 	private static final String MESSAGE_INVALID_TIME = "Invalid time entered!";
+	private static final String MESSAGE_INVALID_TIME_DURATION = "Invalid time duration entered!";
 	private static final String MESSAGE_INVALID_PREP = "Invalid preposition entered!";
 	private static final String MESSAGE_INVALID_UPDATE_DELIM = "Invalid update delimiter is entered! Please enter '>>' as delimiter";
 	private static final String MESSAGE_INVALID_GOOGLE = "Invalid Google Calendar Command!";
@@ -652,91 +653,91 @@ public class Parser {
 	
 	private static void getCompleteDate(Calendar[] calendarArray, StringTokenizer st, LocalActionType actionType) throws MalformedUserInputException {
 		logger.log(Level.INFO, "Get date start process"); 	
-			
-			StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
-			Calendar startTimeCal = calendarArray[INDEX_START_TIME];
-			Calendar endTimeCal = calendarArray[INDEX_END_TIME];
-			int[] intStartDate = new int[DEFAULT_DATE_ARR_SIZE];
-			int[] intEndDate = new int[DEFAULT_DATE_ARR_SIZE];
-			int[] intStartTime = new int[DEFAULT_TIME_ARR_SIZE];
-			intStartDate[INDEX_YEAR] = MIN_YEAR;
-			intStartDate[INDEX_MONTH] = MIN_MONTH;
-			intStartDate[INDEX_DAY] = MIN_DAY;
-			intEndDate[INDEX_YEAR] = MAX_YEAR;
-			intEndDate[INDEX_MONTH] = MAX_MONTH;
-			intEndDate[INDEX_DAY] = MAX_DAY;
-			String date = new String();
-			String prep = new String();
-			String preposition = new String(st.nextToken());
-			
-			//return back the day/date if it's "today" or "tomorrow"
-			if((isStringToday(preposition))||(isStringTomorrow(preposition))){
-				st = addStringToTokenizer(st,preposition);
-			}
-			else if(!isValidDayPreposition(preposition)){
-				logger.log(Level.WARNING, "Get date processing error"); 
-				throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
-			}
-	
-			// if there is no date field
-			if(!st.hasMoreTokens()){
-				endTimeCal = getCalendarUpperBoundary(intEndDate);
-				setCalendarArray(calendarArray,startTimeCal,endTimeCal);
-				logger.log(Level.INFO, "Get date 1 end process"); 
-				return;
-			}
-			
-			//get String Date, convert (12 Jan) format to default format (12/1)
-			date = getValidDateAndCheck(st,tempSt,intStartDate,actionType);
-			st = tempSt[INDEX_ST];
-			//end check if the date entered is valid
-			
-			//if there is only one date field
-			if(!st.hasMoreTokens()){
-				doFirstCompleteDateCheck(intStartDate, calendarArray, startTimeCal, endTimeCal, date, preposition, actionType);
-				logger.log(Level.INFO, "Get date 2 end process"); 
-				return;
-			}
-			
-			if(isStringFrom(preposition)){
-				doDateEndSet(st, tempSt, intStartDate, intEndDate, calendarArray, startTimeCal, endTimeCal, date, actionType);
-				logger.log(Level.INFO, "Get date 3 end process"); 
-				return;
-			}
-			
-			//if there is time field, check for correct preposition
-			doTimeStartSet(st, tempSt, intStartDate, intStartTime, date);
-			st=tempSt[INDEX_ST];
-			//get end time end
-			
-			//if there is no end time field return the corresponding values
-			if(!st.hasMoreTokens()){
-				doSecondCompleteDateCheck(intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR],intStartTime[INDEX_MINUTE], preposition, actionType);
-				logger.log(Level.INFO, "Get date 4 end process"); 
-				return;
-			}
-			
-			//if there is end time
-			prep = new String(st.nextToken());
-			if((!isValidTimeDurationPreposition(prep))&&(!isValidTimeSecondPreposition(prep))){
-				logger.log(Level.WARNING, "Get date processing error"); 
-				throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
-			}
-			
-			//if it is a duration time format
-			if(isValidTimeDurationPreposition(prep)){
-				doTimeDurationSet(st, intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR], intStartTime[INDEX_MINUTE]);
-			}
-			//if it is another time format
-			else if (isValidTimeSecondPreposition(prep)){
-				doTimeEndSet(st, tempSt, intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR], intStartTime[INDEX_MINUTE]);
-			}
-			else{
-				logger.log(Level.WARNING, "Get date processing error"); 
-				throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
-			}
-			logger.log(Level.INFO, "Get date 5 complete end process"); 
+		
+		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
+		Calendar startTimeCal = calendarArray[INDEX_START_TIME];
+		Calendar endTimeCal = calendarArray[INDEX_END_TIME];
+		int[] intStartDate = new int[DEFAULT_DATE_ARR_SIZE];
+		int[] intEndDate = new int[DEFAULT_DATE_ARR_SIZE];
+		int[] intStartTime = new int[DEFAULT_TIME_ARR_SIZE];
+		intStartDate[INDEX_YEAR] = MIN_YEAR;
+		intStartDate[INDEX_MONTH] = MIN_MONTH;
+		intStartDate[INDEX_DAY] = MIN_DAY;
+		intEndDate[INDEX_YEAR] = MAX_YEAR;
+		intEndDate[INDEX_MONTH] = MAX_MONTH;
+		intEndDate[INDEX_DAY] = MAX_DAY;
+		String date = new String();
+		String prep = new String();
+		String preposition = new String(st.nextToken());
+		
+		//return back the day/date if it's "today" or "tomorrow"
+		if((isStringToday(preposition))||(isStringTomorrow(preposition))){
+			st = addStringToTokenizer(st,preposition);
+		}
+		else if(!isValidDayPreposition(preposition)){
+			logger.log(Level.WARNING, "Get date processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
+		}
+
+		// if there is no date field
+		if(!st.hasMoreTokens()){
+			endTimeCal = getCalendarUpperBoundary(intEndDate);
+			setCalendarArray(calendarArray,startTimeCal,endTimeCal);
+			logger.log(Level.INFO, "Get date 1 end process"); 
 			return;
+		}
+		
+		//get String Date, convert (12 Jan) format to default format (12/1)
+		date = getValidDateAndCheck(st,tempSt,intStartDate,actionType);
+		st = tempSt[INDEX_ST];
+		//end check if the date entered is valid
+		
+		//if there is only one date field
+		if(!st.hasMoreTokens()){
+			doFirstCompleteDateCheck(intStartDate, calendarArray, startTimeCal, endTimeCal, date, preposition, actionType);
+			logger.log(Level.INFO, "Get date 2 end process"); 
+			return;
+		}
+		
+		if(isStringFrom(preposition)){
+			doDateEndSet(st, tempSt, intStartDate, intEndDate, calendarArray, startTimeCal, endTimeCal, date, actionType);
+			logger.log(Level.INFO, "Get date 3 end process"); 
+			return;
+		}
+		
+		//if there is time field, check for correct preposition
+		doTimeStartSet(st, tempSt, intStartDate, intStartTime, date);
+		st=tempSt[INDEX_ST];
+		//get end time end
+		
+		//if there is no end time field return the corresponding values
+		if(!st.hasMoreTokens()){
+			doSecondCompleteDateCheck(intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR],intStartTime[INDEX_MINUTE], preposition, actionType);
+			logger.log(Level.INFO, "Get date 4 end process"); 
+			return;
+		}
+		
+		//if there is end time
+		prep = new String(st.nextToken());
+		if((!isValidTimeDurationPreposition(prep))&&(!isValidTimeSecondPreposition(prep))){
+			logger.log(Level.WARNING, "Get date processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
+		}
+		
+		//if it is a duration time format
+		if(isValidTimeDurationPreposition(prep)){
+			doTimeDurationSet(st, intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR], intStartTime[INDEX_MINUTE]);
+		}
+		//if it is another time format
+		else if (isValidTimeSecondPreposition(prep)){
+			doTimeEndSet(st, tempSt, intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR], intStartTime[INDEX_MINUTE]);
+		}
+		else{
+			logger.log(Level.WARNING, "Get date processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
+		}
+		logger.log(Level.INFO, "Get date 5 complete end process"); 
+		return;
 	}
 
 	private static String getStringAll(StringTokenizer st, StringTokenizer[] tempSt) {
@@ -1048,6 +1049,10 @@ public class Parser {
 		else if(suffix.equals(EMPTY_STRING)){
 			intTimeHour = getAdjustedHour(intTimeHour);
 		}
+		else if((!isAm(suffix))&&(!isPm(suffix))){
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
+		
 
 		return intTimeHour;
 	}
@@ -1136,7 +1141,7 @@ public class Parser {
 	}
 	
 
-	private static void getDate(int[] intStartDate, String date, LocalActionType type) {
+	private static void getDate(int[] intStartDate, String date, LocalActionType type) throws MalformedUserInputException {
 		//get the date start
 		int indexOfDelimiter = INIT_INT_VALUE;
 		int indexOfDelimiter2 = INIT_INT_VALUE;
@@ -1290,7 +1295,7 @@ public class Parser {
 		setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 	}
 	
-	private static void doTimeDurationSet(StringTokenizer st, int[] intStartDate, Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal, int intStartHour, int intStartMinute){
+	private static void doTimeDurationSet(StringTokenizer st, int[] intStartDate, Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal, int intStartHour, int intStartMinute) throws MalformedUserInputException {
 		String stringTime = new String();
 		int intHourDuration = INIT_INT_VALUE;
 		int intMinuteDuration = INIT_INT_VALUE;
@@ -1300,8 +1305,11 @@ public class Parser {
 			if(isStringHour(timeUnit)){
 				intHourDuration = Integer.parseInt(stringTime);
 			}
-			if(isStringMinute(timeUnit)){
+			else if(isStringMinute(timeUnit)){
 				intMinuteDuration = Integer.parseInt(stringTime);
+			}
+			else{
+				throw new MalformedUserInputException(MESSAGE_INVALID_TIME_DURATION);
 			}
 		}
 		startTimeCal =  getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
@@ -1432,18 +1440,23 @@ public class Parser {
 		return;
 	}
 	
-	private static void setMonthDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2){
-		String strMonth = new String();
-		if(indexOfDelimiter2 != INIT_INT_VALUE){
-			strMonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
+	private static void setMonthDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2) throws MalformedUserInputException{
+		try{
+			String strMonth = new String();
+			if(indexOfDelimiter2 != INIT_INT_VALUE){
+				strMonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
+			}
+			else{
+				strMonth = date.substring(indexOfDelimiter + 1);
+			}
+			// Calendar in java, stores month starting from 0 (january) to 11 (december)
+			intStartDate[INDEX_MONTH] = Integer.parseInt(strMonth);
+			intStartDate[INDEX_MONTH]--; 
+			return;
 		}
-		else{
-			strMonth = date.substring(indexOfDelimiter + 1);
+		catch (Exception ex){
+			throw new MalformedUserInputException(MESSAGE_INVALID_MONTH);
 		}
-		// Calendar in java, stores month starting from 0 (january) to 11 (december)
-		intStartDate[INDEX_MONTH] = Integer.parseInt(strMonth);
-		intStartDate[INDEX_MONTH]--; 
-		return;
 	}
 	
 	private static void setYearDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2, LocalActionType type) {
