@@ -5,7 +5,6 @@ import java.util.Calendar;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.Action;
-import com.licensetokil.atypistcalendar.parser.GoogleAction;
 import com.licensetokil.atypistcalendar.parser.LocalAction;
 import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
 import com.licensetokil.atypistcalendar.parser.Parser;
@@ -35,8 +34,8 @@ public class ATypistCalendar {
 		gui.setVisible(true);
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
-		
-		//GoogleCalendarManager.getInstance().initialise();
+
+		GoogleCalendarManager.getInstance().initialise();
 
 		/*
 		 userInput("add swimming on 30/12 from 1300 to 1400");

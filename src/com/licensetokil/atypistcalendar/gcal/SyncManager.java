@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
@@ -12,6 +13,8 @@ import com.licensetokil.atypistcalendar.tasksmanager.Task;
 
 class SyncManager {
 	private static SyncManager instance = null;
+
+	private static Logger logger = Logger.getLogger(SyncManager.class.getName());
 
 	private Lock goToSleepLock = new ReentrantLock();
 	private Condition goToSleepCondition = goToSleepLock.newCondition();
