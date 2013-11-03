@@ -805,7 +805,7 @@ public class ParserJUnitTest {
 		dayDifference = 0;
 		dayDifference = 6 - startTime.get(Calendar.DAY_OF_WEEK);
 		if(dayDifference>=0){
-			dayDifference = 7;
+			dayDifference = dayDifference + 7;
 		}
 		else if(dayDifference<0){
 			dayDifference = dayDifference+14;
