@@ -120,7 +120,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 														.addComponent(
 																jScrollPane1,
 																javax.swing.GroupLayout.DEFAULT_SIZE,
-																460,
+																601,
 																Short.MAX_VALUE)
 														.addComponent(
 																jTextField1)
@@ -203,7 +203,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 		else {
 			if (text.contains("Schedules: \n")) {
 				text = text.replaceAll("\\r|\\n", "<br>");
-				reader = new StringReader(text + "<hr><br>");
+				reader = new StringReader("<div align = 'justify'>" + text + "</div><hr><br>");
 
 			} 
 			else {
