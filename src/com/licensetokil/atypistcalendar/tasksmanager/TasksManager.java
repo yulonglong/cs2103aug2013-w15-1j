@@ -125,7 +125,6 @@ public class TasksManager {
 
 	// private constructor
 	private TasksManager() {
-		initialize();
 	}
 
 	/*
@@ -139,7 +138,7 @@ public class TasksManager {
 	 * }
 	 */
 
-	private void initialize() {
+	public void initialize() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String currLine;
