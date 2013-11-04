@@ -146,14 +146,14 @@ public class ParserJUnitTest {
 		newAc.setDescription("thanksgiving festival");
 		startTime = Calendar.getInstance();
 		newAc.setPlace("home");
-		startTime.set(2014, 10, 1, 19, 0, 0);
+		startTime.set(2014, 10, 1, 19, 30, 0);
 		endTime = Calendar.getInstance();
-		endTime.set(2014, 10, 1, 20, 0, 0);
+		endTime.set(2014, 10, 1, 20, 30, 0);
 		newAc.setStartTime(startTime);
 		newAc.setEndTime(endTime);
 		expectedAc = newAc;
 		try{
-			ac = Parser.parse("add thanksgiving festival at home on 1/11/14 at 7pm");
+			ac = Parser.parse("add thanksgiving festival at home on 1/11/14 at 7:30");
 		}
 		catch(MalformedUserInputException muie){
 			System.out.println(muie);
@@ -482,6 +482,33 @@ public class ParserJUnitTest {
 		expectedAc = newAc;
 		try{
 			ac = Parser.parse("add prepare cv by 12 february 2014");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
+		
+		//add apply leave before 31 DEC 2014
+		//deadline
+		//multiple words description
+		//day month year, date format
+		newAc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newAc = new AddAction();
+		newAc.setDescription("apply leave");
+		endTime = Calendar.getInstance();
+		endTime.set(2014, 11, 31 , 23, 59, 59);
+		newAc.setStartTime(startTime);
+		newAc.setEndTime(endTime);
+		expectedAc = newAc;
+		try{
+			ac = Parser.parse("add apply leave before 31 DEC 2014");
 		}
 		catch(MalformedUserInputException muie){
 			System.out.println(muie);
@@ -1663,7 +1690,21 @@ public class ParserJUnitTest {
 		exceptionCaught=false;
 		ac=null;
 		try{
-			ac = Parser.parse("add reply mary by mon at 4432");
+			ac = Parser.parse("add reply mary before mondy 3pm");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
+		
+		
+		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add reply mary before mon at 4432");
 			System.out.println(ac);
 		}
 		catch(MalformedUserInputException muie){

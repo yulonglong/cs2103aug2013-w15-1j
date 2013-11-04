@@ -48,6 +48,7 @@ public class Parser {
 	private static final String PREP_IN = "in";
 	private static final String PREP_AT = "at";
 	private static final String PREP_BY = "by";
+	private static final String PREP_BEFORE = "before";
 	private static final String PREP_FROM = "from";
 	private static final String PREP_TO = "to";
 	private static final String PREP_COMMA = ",";
@@ -1706,7 +1707,8 @@ public class Parser {
 	}
 	
 	private static boolean isValidDeadlinePreposition(String preposition){
-		if (preposition.equalsIgnoreCase(PREP_BY)){
+		if ((preposition.equalsIgnoreCase(PREP_BY))
+			||(preposition.equalsIgnoreCase(PREP_BEFORE))){
 			return true;
 		}
 		return false;
@@ -1715,6 +1717,7 @@ public class Parser {
 	private static boolean isValidDayPreposition(String preposition) {
 		if ((preposition.equalsIgnoreCase(PREP_ON))
 				|| (preposition.equalsIgnoreCase(PREP_BY))
+				|| (preposition.equalsIgnoreCase(PREP_BEFORE))
 				|| (preposition.equalsIgnoreCase(PREP_COMMA))
 				|| (preposition.equalsIgnoreCase(PREP_FROM))
 				|| (isStringToday(preposition))
