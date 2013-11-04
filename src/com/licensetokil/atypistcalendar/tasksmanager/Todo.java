@@ -81,9 +81,9 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 
 	public String toString() {
 		if(place.equals("")){
-			return "Todo@s" + uniqueId + "@s" + description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime();
+			return "Todo@s" + uniqueId + "@s" + description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 		}
-		return "Todo@s" + uniqueId + "@s" + description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime();
+		return "Todo@s" + uniqueId + "@s" + description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 	}
 
 	public String outputStringForDisplay(){
