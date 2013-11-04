@@ -911,14 +911,14 @@ public class ParserJUnitTest {
 		dayDifference = 0;
 		dayDifference = 2 - startTime.get(Calendar.DAY_OF_WEEK);
 		if(dayDifference==0){
-			if(8==startTime.get(Calendar.HOUR)){
+			if(13==startTime.get(Calendar.HOUR)){
 				if(0<=startTime.get(Calendar.MINUTE)){
 				}
 				else{
 					dayDifference = dayDifference+7;
 				}
 			}
-			else if(8<startTime.get(Calendar.HOUR)){
+			else if(13<startTime.get(Calendar.HOUR)){
 				dayDifference = dayDifference+7;
 			}
 		}
@@ -957,14 +957,14 @@ public class ParserJUnitTest {
 		dayDifference = 0;
 		dayDifference = 4 - startTime.get(Calendar.DAY_OF_WEEK);
 		if(dayDifference==0){
-			if(8==startTime.get(Calendar.HOUR)){
+			if(13==startTime.get(Calendar.HOUR)){
 				if(0<=startTime.get(Calendar.MINUTE)){
 				}
 				else{
 					dayDifference = dayDifference+7;
 				}
 			}
-			else if(8<startTime.get(Calendar.HOUR)){
+			else if(13<startTime.get(Calendar.HOUR)){
 				dayDifference = dayDifference+7;
 			}
 		}

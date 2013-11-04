@@ -706,6 +706,10 @@ public class Parser {
 		
 		if(isStringFrom(preposition)){
 			doDateEndSet(st, tempSt, intStartDate, intEndDate, calendarArray, startTimeCal, endTimeCal, date, actionType);
+			if(!isValidStartAndEndCal(calendarArray)){
+				logger.log(Level.WARNING, "Get date processing error"); 
+				throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+			}
 			logger.log(Level.INFO, "Get date 3 end process"); 
 			return;
 		}
@@ -740,6 +744,11 @@ public class Parser {
 		else{
 			logger.log(Level.WARNING, "Get date processing error"); 
 			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
+		}
+		
+		if(!isValidStartAndEndCal(calendarArray)){
+			logger.log(Level.WARNING, "Get date processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
 		}
 		logger.log(Level.INFO, "Get date 5 complete end process"); 
 		return;
@@ -1384,6 +1393,8 @@ public class Parser {
 		endTimeCal = getCalendarUpperBoundary(intEndDate);
 		setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 	}
+	
+	
 
 	private static void setCalendarArray(Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal) {
 		calendarArray[INDEX_START_TIME] = startTimeCal;
@@ -1604,6 +1615,13 @@ public class Parser {
 	private static boolean isPm(String suffix){
 		if((suffix.equalsIgnoreCase(PM_SHORT))
 				||(suffix.equalsIgnoreCase(PM_LONG))){
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isValidStartAndEndCal(Calendar[] calendarArray){
+		if(calendarArray[INDEX_START_TIME].compareTo(calendarArray[INDEX_END_TIME]) < 0){
 			return true;
 		}
 		return false;
