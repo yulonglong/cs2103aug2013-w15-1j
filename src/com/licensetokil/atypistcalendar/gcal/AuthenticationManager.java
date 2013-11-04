@@ -38,14 +38,6 @@ class AuthenticationManager {
 		accessTokenExpiry = null;
 	}
 
-	//TODO delete this on production
-	protected static void debug() {
-		System.out.println(AuthenticationManager.getInstance().authenticationToken);
-		System.out.println(AuthenticationManager.getInstance().accessToken);
-		System.out.println(AuthenticationManager.getInstance().refreshToken);
-		System.out.println(AuthenticationManager.getInstance().accessTokenExpiry);
-	}
-
 	protected static AuthenticationManager getInstance() {
 		if(instance == null) {
 			instance = new AuthenticationManager();

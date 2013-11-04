@@ -3,7 +3,7 @@ package com.licensetokil.atypistcalendar.tasksmanager;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class Deadline extends Task implements Comparable<Deadline> {
+public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 	private String remoteId;
 	private String taskType;
 	private int uniqueId;
@@ -22,7 +22,7 @@ public class Deadline extends Task implements Comparable<Deadline> {
 		this.status = status;
 		this.lastModifiedDate = lastModifiedDate;
 	}
-	
+
 	public Deadline(Deadline d){
 		this.taskType = "deadline";
 		this.endTime = d.getEndTime();
@@ -31,7 +31,10 @@ public class Deadline extends Task implements Comparable<Deadline> {
 		this.uniqueId = d.getUniqueId();
 		this.status = d.getStatus();
 	}
-	
+
+	public Deadline() {
+	}
+
 	public String getRemoteId(){
 		return remoteId;
 	}
@@ -39,11 +42,11 @@ public class Deadline extends Task implements Comparable<Deadline> {
 	public int getUniqueId() {
 		return uniqueId;
 	}
-	
+
 	public String getTaskType(){
 		return taskType;
 	}
-	
+
 	public Calendar getLastModifiedDate(){
 		return lastModifiedDate;
 	}
@@ -59,31 +62,31 @@ public class Deadline extends Task implements Comparable<Deadline> {
 	public String getPlace() {
 		return place;
 	}
-	
+
 	public String getStatus(){
 		return status;
 	}
-	
+
 	public void setEndTime(Calendar st){
 		this.endTime = st;
 	}
-	
+
 	public void setDescription(String d){
 		this.description = d;
 	}
-	
+
 	public void setPlace(String p){
 		this.place = p;
 	}
-	
+
 	public void setStatus(String s){
 		this.status = s;
 	}
-	
+
 	public void setRemoteId(String remoteId){
 		this.remoteId = remoteId;
 	}
-	
+
 	public void setLastModifiedDate(Calendar lastModifiedDate){
 		this.lastModifiedDate = lastModifiedDate;
 	}
@@ -96,22 +99,36 @@ public class Deadline extends Task implements Comparable<Deadline> {
 		return "Deadline@s" + uniqueId + "@s" + endTime.getTime() + "@s"
 				+ description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime();
 	}
-	
+
 	public String outputStringForDisplay(){
 		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
 		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
-		
+
 		String output = "[" + formatDay.format(endTime.getTime()) + "] [by " + formatTime.format(endTime.getTime()) + "] " + description;
 		if(!place.equals("")){
 			output = output+" at " + this.getPlace();
 		}
-		
+
 		output = output + " [Status: " + status + "]";
-		
+
 		return output;
 	}
-	
+
 	public int compareTo(Deadline d){
 		return endTime.compareTo(d.getEndTime());
+	}
+
+	@Override
+	public Object clone() {
+		Deadline clonedObject = new Deadline();
+		clonedObject.remoteId = this.remoteId;
+		clonedObject.taskType = this.taskType;
+		clonedObject.uniqueId = this.uniqueId;
+		clonedObject.description = this.description;
+		clonedObject.place = this.place;
+		clonedObject.endTime = (Calendar)this.endTime.clone();
+		clonedObject.lastModifiedDate = (Calendar)this.lastModifiedDate.clone();
+
+		return clonedObject;
 	}
 }

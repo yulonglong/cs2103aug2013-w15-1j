@@ -75,7 +75,6 @@ class SyncManager {
 
 	private void runSyncer() {
 		if(syncer == null || !syncer.isAlive()) {
-			System.out.println("creating new lalalla");
 			syncer = new Syncer();
 			syncer.start();
 		}

@@ -1,8 +1,25 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
-import com.licensetokil.atypistcalendar.parser.*;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+
+import com.licensetokil.atypistcalendar.parser.AddAction;
+import com.licensetokil.atypistcalendar.parser.DeleteAction;
+import com.licensetokil.atypistcalendar.parser.DisplayAction;
+import com.licensetokil.atypistcalendar.parser.LocalAction;
+import com.licensetokil.atypistcalendar.parser.LocalActionType;
+import com.licensetokil.atypistcalendar.parser.MarkAction;
+import com.licensetokil.atypistcalendar.parser.SearchAction;
+import com.licensetokil.atypistcalendar.parser.UpdateAction;
 
 public class TasksManager {
 
@@ -80,11 +97,21 @@ public class TasksManager {
 		return todo;
 	}
 
-	public static ArrayList<Task> getAllTasks() {
+	public ArrayList<Task> getAllTasks() {
 		ArrayList<Task> allTasks = new ArrayList<Task>();
-		allTasks.addAll(schedule);
-		allTasks.addAll(deadline);
-		allTasks.addAll(todo);
+
+		for(Schedule s : schedule) {
+			allTasks.add((Schedule)s.clone());
+		}
+
+		for(Deadline d : deadline) {
+			allTasks.add((Deadline)d.clone());
+		}
+
+		for(Todo t : todo) {
+			allTasks.add((Todo)t.clone());
+		}
+
 		return allTasks;
 	}
 
@@ -106,7 +133,7 @@ public class TasksManager {
 	 * if((t.getDescription()).contains("?a!b$")){ String newDescription =
 	 * (t.getDescription()).replaceAll("\\b?a!b$\\b", "@s");
 	 * t.setDescription(newDescription); }
-	 * 
+	 *
 	 * if((t.getPlace()).contains("?a!b$")){ String newPlace =
 	 * (t.getPlace()).replaceAll("\\b?a!b$\\b", "@s"); t.setPlace(newPlace); } }
 	 * }
@@ -286,7 +313,7 @@ public class TasksManager {
 	 * if((t.getDescription()).contains("@s")){ String newDescription =
 	 * (t.getDescription()).replaceAll("\\b@s\\b", "?a!b$");
 	 * t.setDescription(newDescription); }
-	 * 
+	 *
 	 * if((t.getPlace()).contains("@s")){ String newPlace =
 	 * (t.getPlace()).replaceAll("\\b@s\\b", "b?a!b$"); t.setPlace(newPlace); }
 	 * }
@@ -758,12 +785,28 @@ public class TasksManager {
 		return "ERROR";
 
 	}
-	
-	public int addGoogleTask(Task t){
-		add(t);
-		return t.getUniqueId();
+
+	public Todo addTodoFromGoogle(String description, String location, Calendar lastModifiedDate, String remoteId) {
+		Todo todo = new Todo(++uniqueId, description, location, UNDONE, lastModifiedDate);
+		todo.setRemoteId(remoteId);
+		add(todo);
+		return todo;
 	}
-	
+
+	public Deadline addDeadlineFromGoogle(Calendar endTime, String description, String location, Calendar lastModifiedDate, String remoteId) {
+		Deadline deadline = new Deadline(++uniqueId, endTime, description, location, UNDONE, lastModifiedDate);
+		deadline.setRemoteId(remoteId);
+		add(deadline);
+		return deadline;
+	}
+
+	public Schedule addScheduleFromGoogle(Calendar startTime, Calendar endTime, String description, String location, Calendar lastModifiedDate, String remoteId) {
+		Schedule schedule = new Schedule(++uniqueId, startTime, endTime, description, location, lastModifiedDate);
+		schedule.setRemoteId(remoteId);
+		add(schedule);
+		return schedule;
+	}
+
 	public void deleteGoogleTask(int uniqueId) throws TaskNotFoundException{
 		Task t = findTaskFromUniqueId(uniqueId);
 		if(t.getTaskType().equals("schedule")){
@@ -780,7 +823,7 @@ public class TasksManager {
 		}
 		fileSync();
 	}
-	
+
 	public void updateGoogleTask(Task t) throws TaskNotFoundException{
 		Task updateTask = findTaskFromUniqueId(t.getUniqueId());
 		if(t.getTaskType().equals("schedule")){

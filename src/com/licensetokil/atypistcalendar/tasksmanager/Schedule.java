@@ -1,9 +1,9 @@
 package com.licensetokil.atypistcalendar.tasksmanager;
 
-import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
-public class Schedule extends Task implements Comparable<Schedule>{
+public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 	private String remoteId;
 	private String taskType;
 	private int uniqueId;
@@ -23,7 +23,7 @@ public class Schedule extends Task implements Comparable<Schedule>{
 		this.place = place;
 		this.lastModifiedDate = lastModifiedDate;
 	}
-	
+
 	public Schedule(Schedule s){
 		this.taskType = "schedule";
 		this.endTime = s.getEndTime();
@@ -32,19 +32,22 @@ public class Schedule extends Task implements Comparable<Schedule>{
 		this.uniqueId = s.getUniqueId();
 		this.startTime = s.getStartTime();
 	}
-	
+
+	public Schedule() {
+	}
+
 	public String getRemoteId(){
 		return remoteId;
 	}
-	
+
 	public String getTaskType() {
 		return taskType;
 	}
-	
+
 	public int getUniqueId() {
 		return uniqueId;
 	}
-	
+
 	public Calendar getLastModifiedDate(){
 		return lastModifiedDate;
 	}
@@ -64,27 +67,27 @@ public class Schedule extends Task implements Comparable<Schedule>{
 	public String getPlace() {
 		return place;
 	}
-	
+
 	public void setRemoteId(String remoteId){
 		this.remoteId = remoteId;
 	}
-	
+
 	public void setStartTime(Calendar st){
 		this.startTime = st;
 	}
-	
+
 	public void setEndTime(Calendar st){
 		this.endTime = st;
 	}
-	
+
 	public void setDescription(String d){
 		this.description = d;
 	}
-	
+
 	public void setPlace(String p){
 		this.place = p;
 	}
-	
+
 	public void setLastModifiedDate(Calendar lastModifiedDate){
 		this.lastModifiedDate = lastModifiedDate;
 	}
@@ -97,21 +100,36 @@ public class Schedule extends Task implements Comparable<Schedule>{
 		return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
 				+ endTime.getTime() + "@s" + description + "@s" + place + "@s" + lastModifiedDate.getTime();
 	}
-	
+
 	public String outputStringForDisplay(){
 		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
 		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
-		
-		String output = "[" + formatDay.format(startTime.getTime()) + "] [" + formatTime.format(startTime.getTime()) + " - " + formatTime.format(endTime.getTime()) + "] " + 
+
+		String output = "[" + formatDay.format(startTime.getTime()) + "] [" + formatTime.format(startTime.getTime()) + " - " + formatTime.format(endTime.getTime()) + "] " +
 							description;
 		if(!place.equals("")){
 			output = output+" at " + this.getPlace();
 		}
-				
+
 		return output;
 	}
-	
+
 	public int compareTo(Schedule s){
 		return startTime.compareTo(s.getStartTime());
+	}
+
+	@Override
+	public Object clone() {
+		Schedule clonedObject = new Schedule();
+		clonedObject.remoteId = this.remoteId;
+		clonedObject.taskType = this.taskType;
+		clonedObject.uniqueId = this.uniqueId;
+		clonedObject.description = this.description;
+		clonedObject.place = this.place;
+		clonedObject.startTime = (Calendar)this.startTime.clone();
+		clonedObject.endTime = (Calendar)this.endTime.clone();
+		clonedObject.lastModifiedDate = (Calendar)this.lastModifiedDate.clone();
+
+		return clonedObject;
 	}
 }

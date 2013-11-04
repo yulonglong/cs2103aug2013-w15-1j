@@ -2,6 +2,7 @@ package com.licensetokil.atypistcalendar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Logger;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.Action;
@@ -15,6 +16,9 @@ import com.licensetokil.atypistcalendar.ui.ATCGUI;
 
 public class ATypistCalendar {
 	private static ATypistCalendar instance = null;
+
+	private static Logger logger = Logger.getLogger(ATypistCalendar.class.getName());
+
 	public static ATCGUI gui;
 
 	private ATypistCalendar() {
@@ -35,8 +39,8 @@ public class ATypistCalendar {
 		gui.setVisible(true);
 
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
-		
-		//GoogleCalendarManager.getInstance().initialise();
+
+		GoogleCalendarManager.getInstance().initialise();
 
 		/*
 		 userInput("add swimming on 30/12 from 1300 to 1400");
@@ -100,13 +104,13 @@ public class ATypistCalendar {
 		if(action instanceof LocalAction) {
 			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
 			//TODO we shouldnt be doing a complete sync each time we do a command, but this is a temporary measure
-			//GoogleCalendarManager.getInstance().doCompleteSync();
+//			GoogleCalendarManager.getInstance().doCompleteSync();
 		}
-//		else if(action instanceof GoogleAction) {
-//			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
-//		}
+		else if(action instanceof GoogleAction) {
+			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
+		}
 		else {
-			//logger.servere("Unknown sub-class of Action returned from Parser!");
+			logger.severe("Unknown sub-class of Action returned from Parser!");
 			assert false;
 		}
 

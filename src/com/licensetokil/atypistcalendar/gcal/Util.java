@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -18,6 +19,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 public class Util {
+	private static Logger logger = Logger.getLogger(Util.class.getName());
+
 	public static final String REQUEST_METHOD_POST = "POST";
 	public static final String REQUEST_METHOD_GET = "GET";
 	public static final String REQUEST_METHOD_DELETE = "DELETE";
@@ -28,42 +31,48 @@ public class Util {
 
 	private static final SimpleDateFormat RFC3339_FORMAT_WITH_MILLISECONDS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 	private static final SimpleDateFormat RFC3339_FORMAT_WITHOUT_MILLISECONDS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private static final SimpleDateFormat GOOGLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	private static final JsonParser jsonParser = new JsonParser();
 
 	public static SimpleDateFormat getRfc3339FormatWithMilliseconds() {
+		logger.fine("getRfc3339FormatWithMilliseconds method called.");
 		return (SimpleDateFormat) RFC3339_FORMAT_WITH_MILLISECONDS.clone();
 	}
 
 	public static SimpleDateFormat getRfc3339FormatWithoutMilliseconds() {
+		logger.fine("getRfc3339FormatWithoutMilliseconds method called.");
 		return (SimpleDateFormat) RFC3339_FORMAT_WITHOUT_MILLISECONDS.clone();
 	}
 
 	public static SimpleDateFormat getDateFormat() {
-		return (SimpleDateFormat) DATE_FORMAT.clone();
+		logger.fine("getDateFormat method called.");
+		return (SimpleDateFormat) GOOGLE_DATE_FORMAT.clone();
 	}
 
-	public static JsonObject createExtendedPropertiesObject(int localTaskID) {
-		JsonObject privateExtendedProperties = new JsonObject();
-		privateExtendedProperties.addProperty("atc_localTaskID", Integer.toString(localTaskID));
-
-		JsonObject extendedProperties = new JsonObject();
-		extendedProperties.add("private", privateExtendedProperties);
-
-		return extendedProperties;
-	}
-
-	public static Calendar getCalendarObjectFromDateTimeObject(JsonObject dateTimeObject)
+	public static Calendar parseGoogleDateTimeObject(JsonObject dateTimeObject)
 			throws ParseException {
-		return getCalendarObjectFromDateTimeObject(dateTimeObject, getRfc3339FormatWithoutMilliseconds());
+		logger.fine("parseGoogleDateTimeObject method called.");
+		return parseGenericGoogleDateObject(dateTimeObject, RFC3339_FORMAT_WITHOUT_MILLISECONDS, "dateTime");
 	}
 
-	//refactoring of names needed
-	public static Calendar getCalendarObjectFromDateTimeObject(JsonObject dateTimeObject, SimpleDateFormat format)
+	public static Calendar parseGoogleDateObject(JsonObject dateObject)
 			throws ParseException {
-		//Throw some kind exception for of ill-formatted JsonObject
-		String dateTimeString = dateTimeObject.get("dateTime").getAsString();
+		logger.fine("parseGoogleDateObject method called.");
+		return parseGenericGoogleDateObject(dateObject, GOOGLE_DATE_FORMAT, "date");
+	}
+
+	public static Calendar parseGenericGoogleDateObject(JsonObject dateTimeObject, SimpleDateFormat format, String propertyName)
+			throws ParseException {
+		logger.fine("parseGenericGoogleDateObject method called.");
+		//TODO Throw some kind exception for of ill-formatted JsonObject
+		String gooleDateString = dateTimeObject.get(propertyName).getAsString();
+		return parseGenericGoogleDateString(gooleDateString, format);
+	}
+
+	public static Calendar parseGenericGoogleDateString(String dateTimeString, SimpleDateFormat format)
+			throws ParseException {
+		logger.fine("parseGenericGoogleDateString method called.");
 		Date date = format.parse(dateTimeString);
 
 		Calendar calendar = Calendar.getInstance();
@@ -72,32 +81,39 @@ public class Util {
 		return calendar;
 	}
 
-	public static JsonObject createDateTimeObject(Calendar date) {
-		return createGoogleTimeObject(date, RFC3339_FORMAT_WITHOUT_MILLISECONDS, "dateTime");
+	public static JsonObject createGoogleDateTimeObject(Calendar date) {
+		logger.fine("createGoogleDateTimeObject method called.");
+		return createGenericGoogleDateObject(date, RFC3339_FORMAT_WITHOUT_MILLISECONDS, "dateTime");
 	}
 
-	public static JsonObject createDateTimeObject(Calendar date, SimpleDateFormat format) {
-		return createGoogleTimeObject(date, format, "dateTime");
+	public static JsonObject createGoogleDateObject(Calendar date) {
+		logger.fine("createGoogleDateObject method called.");
+		return createGenericGoogleDateObject(date, GOOGLE_DATE_FORMAT, "date");
 	}
 
-	public static JsonObject createDateObject(Calendar date) {
-		return createGoogleTimeObject(date, DATE_FORMAT, "date");
-	}
-
-	public static JsonObject createGoogleTimeObject(Calendar date, SimpleDateFormat format, String propertyName) {
+	public static JsonObject createGenericGoogleDateObject(Calendar date, SimpleDateFormat format, String propertyName) {
+		logger.fine("createGenericGoogleDateObject method called.");
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty(propertyName, format.format(date.getTime()));
+		jsonObject.addProperty(propertyName, createGenericGoogleDateString(date, format));
 
 		return jsonObject;
 	}
 
+	public static String createGenericGoogleDateString(Calendar date, SimpleDateFormat format) {
+		logger.fine("createGenericGoogleDateString method called.");
+		return format.format(date.getTime());
+	}
+
 	public static JsonObject parseToJsonObject(String stringToParse)
 			throws JsonParseException, IllegalStateException {
+		logger.fine("parseToJsonObject method called.");
 		return (JsonObject)jsonParser.parse(stringToParse);
 	}
 
 	public static String sendJsonHttpsRequest(String url, String requestMethod, Map<String, String> additionalHeaders, JsonObject requestBody)
 			throws IOException {
+		logger.fine("sendJsonHttpsRequest method called.");
+
 		//TODO handle get
 		//TODO assert get means requestBody == null
 		URL urlObject = new URL(url);
@@ -120,6 +136,8 @@ public class Util {
 
 	public static String sendUrlencodedFormHttpsRequest(String url, String requestMethod, Map<String, String> additionalHeaders, Map<String, String> formParameters)
 			throws IOException {
+		logger.fine("sendUrlencodedFormHttpsRequest method called.");
+
 		assert requestMethod == REQUEST_METHOD_GET;
 		assert requestMethod == REQUEST_METHOD_POST;
 
@@ -159,6 +177,8 @@ public class Util {
 	}
 
 	private static void addHeaders(HttpsURLConnection httpsConnection, Map<String, String> headers) {
+		logger.fine("addHeaders method called.");
+
 		Iterator<String> headersIterator = headers.keySet().iterator();
 		while (headersIterator.hasNext()) {
 			String currentKey = headersIterator.next();
@@ -168,6 +188,8 @@ public class Util {
 
 	private static String sendAndReceiveRequest(HttpsURLConnection httpsConnection, String content)
 			throws IOException {
+		logger.fine("sendAndReceiveRequest method called.");
+
 		if(content != null) {
 			httpsConnection.setDoOutput(true);
 			DataOutputStream dataOutputStream = new DataOutputStream(httpsConnection.getOutputStream());
@@ -189,6 +211,8 @@ public class Util {
 	}
 
 	public static String getJsonObjectValueOrEmptyString(JsonObject jsonObject, String key) {
+		logger.fine("getJsonObjectValueOrEmptyString method called.");
+
 		if(jsonObject.get(key) != null) {
 			return jsonObject.get(key).getAsString();
 		}
