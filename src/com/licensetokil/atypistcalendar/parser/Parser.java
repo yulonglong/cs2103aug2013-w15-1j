@@ -1,19 +1,29 @@
+//@author A0080415N
+//Name       : Steven Kester Yuwono
+//Matric No. : A0080415N
+//com.licensetokil.atypistcalendar.parser
+
 package com.licensetokil.atypistcalendar.parser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Parser {
 	
 	private static final String MESSAGE_INVALID = "Invalid input!";
 	private static final String MESSAGE_INVALID_ACTION = "Invalid command/action entered!";
 	private static final String MESSAGE_INVALID_STATUS = "Invalid status entered! please enter done or undone!";
+	private static final String MESSAGE_INVALID_PLACE = "Invalid place entered!";
+	private static final String MESSAGE_INVALID_DESCRIPTION = "Invalid descripition entered!";
 	private static final String MESSAGE_INVALID_DATE = "Invalid date/day entered!";
 	private static final String MESSAGE_INVALID_MONTH = "Invalid month entered!";
 	private static final String MESSAGE_INVALID_SEARCH_QUERY = "No search query detected!";
 	private static final String MESSAGE_INVALID_REF_NUMBER = "Invalid Reference Number entered!";
 	private static final String MESSAGE_INVALID_TIME = "Invalid time entered!";
+	private static final String MESSAGE_INVALID_TIME_DURATION = "Invalid time duration entered!";
 	private static final String MESSAGE_INVALID_PREP = "Invalid preposition entered!";
 	private static final String MESSAGE_INVALID_UPDATE_DELIM = "Invalid update delimiter is entered! Please enter '>>' as delimiter";
 	private static final String MESSAGE_INVALID_GOOGLE = "Invalid Google Calendar Command!";
@@ -38,6 +48,7 @@ public class Parser {
 	private static final String PREP_IN = "in";
 	private static final String PREP_AT = "at";
 	private static final String PREP_BY = "by";
+	private static final String PREP_BEFORE = "before";
 	private static final String PREP_FROM = "from";
 	private static final String PREP_TO = "to";
 	private static final String PREP_COMMA = ",";
@@ -151,32 +162,36 @@ public class Parser {
 	private static final String MINUTES_SHORT = "mins";
 	private static final String MINUTE_SHORT = "min";
 
-
+	private static Logger logger = Logger.getLogger("Parser.class.getName()");
 	
 	public static Action parse(String userInput) throws MalformedUserInputException {
-
+		logger.log(Level.INFO, "Main Parser start process"); 
+		
 		// tokenize user input
 		StringTokenizer st = new StringTokenizer(userInput);
-		// get the actionType by getting the first token (first word) from the
-		// user input
+		// get the actionType by getting the first token (first word) from the user input
 		String stringUserAction = new String(st.nextToken());
 		GoogleActionType googleActionType = determineGoogleActionType(stringUserAction);
 		// if Google type
 		if (googleActionType == GoogleActionType.GOOGLE) {
+			logger.log(Level.INFO, "Main Parser end process"); 
 			return googleParser(st);
 		}
 		// if not Google type (means Local type)
 		else {
 			SystemActionType systemActionType = determineSystemActionType(stringUserAction);
 			if (systemActionType == SystemActionType.EXIT) {
+				logger.log(Level.INFO, "Main Parser end process"); 
 				return new ExitAction();
 			}
 			else {
 				LocalActionType localActionType = determineLocalActionType(stringUserAction);
 				if (localActionType == LocalActionType.INVALID) {
+					logger.log(Level.WARNING, "Main Parser processing error"); 
 					throw new MalformedUserInputException(MESSAGE_INVALID_ACTION);
 				}
 				else {
+					logger.log(Level.INFO, "Main Parser end process"); 
 					return localParser(st, localActionType);
 				}
 			}
@@ -265,6 +280,8 @@ public class Parser {
 		}
 		
 		//get the timeframe of the task
+		assert calendarArray[INDEX_START_TIME] == null;
+		assert calendarArray[INDEX_START_TIME] == null;
 		getCompleteDate(calendarArray,st,LocalActionType.ADD);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
@@ -351,7 +368,8 @@ public class Parser {
 		}
 		//get place end
 		
-		
+		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_END_TIME] != null;
 		getCompleteDate(calendarArray,st,LocalActionType.DISPLAY);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
@@ -385,6 +403,7 @@ public class Parser {
 			return userAction;
 		}
 
+		assert referenceNumber == null;
 		//get the numbers
 		referenceNumber = getMultipleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);
@@ -443,6 +462,9 @@ public class Parser {
 			return userAction;
 		}
 
+		
+		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_END_TIME] == null;
 		getCompleteDate(calendarArray,st,LocalActionType.UPDATE);
 		userAction.setUpdatedStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setUpdatedEndTime(calendarArray[INDEX_END_TIME]);
@@ -496,6 +518,8 @@ public class Parser {
 			return userAction;
 		}
 		
+		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_END_TIME] != null;
 		getCompleteDate(calendarArray,st,LocalActionType.SEARCH);
 		userAction.setStartTime(calendarArray[INDEX_START_TIME]);
 		userAction.setEndTime(calendarArray[INDEX_END_TIME]);
@@ -513,6 +537,7 @@ public class Parser {
 		ArrayList<Integer> referenceNumber = null;
 		String status = new String();
 		
+		assert referenceNumber == null;
 		//get reference number array list
 		referenceNumber = getMultipleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);
@@ -559,65 +584,82 @@ public class Parser {
 		return strResult;
 	}
 
-	private static String getDescription(StringTokenizer st, StringTokenizer[] tempSt) {
-
-		String tempDescription = new String();
-		String description = new String();
-		
-		while(st.hasMoreTokens()){
-			tempDescription = new String(st.nextToken());
-			if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))) {
-				description = description + WHITE_SPACE + tempDescription;
-			}
-			else{
-				st = addStringToTokenizer(st,tempDescription);
-				break;
-			}
-		}
-		if(!description.equals(EMPTY_STRING)){
-			description = description.substring(SECOND_INDEX); // remove the white space
-		}
-		tempSt[INDEX_ST]=st;
-		return description;
-	}
-	
-
-	private static String getPlace(StringTokenizer st, StringTokenizer[] tempSt) {
-		String prep = new String(st.nextToken());
-		String place = new String();
-
-		// check if place is included in user input
-		if (isValidPlacePreposition(prep)) {
-			place = new String(st.nextToken());
-		} else {
-			st = addStringToTokenizer(st,prep);
-			place = new String();
-			tempSt[INDEX_ST]=st;
-			return place;
-		}
-
-		// check for place name, separated by space, and incorporate the proper
-		// place name
-		if(st.hasMoreTokens()){
-			prep = new String(st.nextToken());
-			while (!isValidDayPreposition(prep)) {
-				place = place + WHITE_SPACE + prep;
-				if (st.hasMoreTokens()) {
-					prep = new String(st.nextToken());
-				} else {
+	private static String getDescription(StringTokenizer st, StringTokenizer[] tempSt) throws MalformedUserInputException {
+		logger.log(Level.INFO, "Get description/query start process"); 
+		try{
+			String tempDescription = new String();
+			String description = new String();
+			
+			while(st.hasMoreTokens()){
+				tempDescription = new String(st.nextToken());
+				if((!isValidPlacePreposition(tempDescription))&&(!isValidDayPreposition(tempDescription))) {
+					description = description + WHITE_SPACE + tempDescription;
+				}
+				else{
+					st = addStringToTokenizer(st,tempDescription);
 					break;
 				}
 			}
+			if(!description.equals(EMPTY_STRING)){
+				description = description.substring(SECOND_INDEX); // remove the white space
+			}
+			tempSt[INDEX_ST]=st;
+			logger.log(Level.INFO, "Get description/query end process"); 
+			return description;
 		}
-		
-		if(isValidDayPreposition(prep)){
-			st=addStringToTokenizer(st,prep);
+		catch(Exception ex) {
+			logger.log(Level.WARNING, "Get description/query processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_DESCRIPTION);
 		}
-		tempSt[INDEX_ST]=st;
-		return place;
+	}
+	
+
+	private static String getPlace(StringTokenizer st, StringTokenizer[] tempSt) throws MalformedUserInputException {
+		logger.log(Level.INFO, "Get place start process"); 
+		try{	
+			String prep = new String(st.nextToken());
+			String place = new String();
+	
+			// check if place is included in user input
+			if (isValidPlacePreposition(prep)) {
+				place = new String(st.nextToken());
+			} else {
+				st = addStringToTokenizer(st,prep);
+				place = new String();
+				tempSt[INDEX_ST]=st;
+				return place;
+			}
+	
+			// check for place name, separated by space, and incorporate the proper
+			// place name
+			if(st.hasMoreTokens()){
+				prep = new String(st.nextToken());
+				while (!isValidDayPreposition(prep)) {
+					place = place + WHITE_SPACE + prep;
+					if (st.hasMoreTokens()) {
+						prep = new String(st.nextToken());
+					} else {
+						break;
+					}
+				}
+			}
+			
+			if(isValidDayPreposition(prep)){
+				st=addStringToTokenizer(st,prep);
+			}
+			tempSt[INDEX_ST]=st;
+			logger.log(Level.INFO, "Get place end process"); 
+			return place;
+		}
+		catch(Exception ex) {
+			logger.log(Level.WARNING, "Get place processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_PLACE);
+		}
 	}
 	
 	private static void getCompleteDate(Calendar[] calendarArray, StringTokenizer st, LocalActionType actionType) throws MalformedUserInputException {
+		logger.log(Level.INFO, "Get date start process"); 	
+		
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar startTimeCal = calendarArray[INDEX_START_TIME];
 		Calendar endTimeCal = calendarArray[INDEX_END_TIME];
@@ -639,6 +681,7 @@ public class Parser {
 			st = addStringToTokenizer(st,preposition);
 		}
 		else if(!isValidDayPreposition(preposition)){
+			logger.log(Level.WARNING, "Get date processing error"); 
 			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
 		}
 
@@ -646,6 +689,7 @@ public class Parser {
 		if(!st.hasMoreTokens()){
 			endTimeCal = getCalendarUpperBoundary(intEndDate);
 			setCalendarArray(calendarArray,startTimeCal,endTimeCal);
+			logger.log(Level.INFO, "Get date 1 end process"); 
 			return;
 		}
 		
@@ -657,11 +701,17 @@ public class Parser {
 		//if there is only one date field
 		if(!st.hasMoreTokens()){
 			doFirstCompleteDateCheck(intStartDate, calendarArray, startTimeCal, endTimeCal, date, preposition, actionType);
+			logger.log(Level.INFO, "Get date 2 end process"); 
 			return;
 		}
 		
 		if(isStringFrom(preposition)){
 			doDateEndSet(st, tempSt, intStartDate, intEndDate, calendarArray, startTimeCal, endTimeCal, date, actionType);
+			if(!isValidStartAndEndCal(calendarArray)){
+				logger.log(Level.WARNING, "Get date processing error"); 
+				throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+			}
+			logger.log(Level.INFO, "Get date 3 end process"); 
 			return;
 		}
 		
@@ -673,12 +723,14 @@ public class Parser {
 		//if there is no end time field return the corresponding values
 		if(!st.hasMoreTokens()){
 			doSecondCompleteDateCheck(intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR],intStartTime[INDEX_MINUTE], preposition, actionType);
+			logger.log(Level.INFO, "Get date 4 end process"); 
 			return;
 		}
 		
 		//if there is end time
 		prep = new String(st.nextToken());
 		if((!isValidTimeDurationPreposition(prep))&&(!isValidTimeSecondPreposition(prep))){
+			logger.log(Level.WARNING, "Get date processing error"); 
 			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
 		}
 		
@@ -691,10 +743,15 @@ public class Parser {
 			doTimeEndSet(st, tempSt, intStartDate, calendarArray, startTimeCal, endTimeCal, intStartTime[INDEX_HOUR], intStartTime[INDEX_MINUTE]);
 		}
 		else{
+			logger.log(Level.WARNING, "Get date processing error"); 
 			throw new MalformedUserInputException(MESSAGE_INVALID_PREP);
 		}
-	
 		
+		if(!isValidStartAndEndCal(calendarArray)){
+			logger.log(Level.WARNING, "Get date processing error"); 
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
+		logger.log(Level.INFO, "Get date 5 complete end process"); 
 		return;
 	}
 
@@ -772,6 +829,8 @@ public class Parser {
 	}
 	
 	private static ArrayList<Integer> getMultipleReferenceNumber(StringTokenizer st) throws MalformedUserInputException{
+		logger.log(Level.INFO, "Get ref number start process"); 
+		
 		ArrayList<Integer> referenceNumber = new ArrayList<Integer>();
 		String temp = new String();
 		String expectHex = new String();
@@ -784,7 +843,6 @@ public class Parser {
 				if (isValidMarkPreposition(temp)){
 					return referenceNumber;
 				}
-				
 				expectHex = temp.substring(FIRST_INDEX,SECOND_INDEX);
 				//if the first character is not hex, throw error
 				if(!isStringHex(expectHex)){
@@ -795,11 +853,12 @@ public class Parser {
 				tempInt = Integer.parseInt(temp);
 				referenceNumber.add(tempInt);
 			}
-			catch (Exception e){
+			catch (Exception ex){
+				logger.log(Level.WARNING, "Get ref number processing error"); 
 				throw new MalformedUserInputException(MESSAGE_INVALID_REF_NUMBER);
 			}
 		}
-		
+		logger.log(Level.INFO, "Get ref number end process"); 
 		return referenceNumber;
 	}
 
@@ -1005,6 +1064,10 @@ public class Parser {
 		else if(suffix.equals(EMPTY_STRING)){
 			intTimeHour = getAdjustedHour(intTimeHour);
 		}
+		else if((!isAm(suffix))&&(!isPm(suffix))){
+			throw new MalformedUserInputException(MESSAGE_INVALID_TIME);
+		}
+		
 
 		return intTimeHour;
 	}
@@ -1093,7 +1156,7 @@ public class Parser {
 	}
 	
 
-	private static void getDate(int[] intStartDate, String date, LocalActionType type) {
+	private static void getDate(int[] intStartDate, String date, LocalActionType type) throws MalformedUserInputException {
 		//get the date start
 		int indexOfDelimiter = INIT_INT_VALUE;
 		int indexOfDelimiter2 = INIT_INT_VALUE;
@@ -1247,7 +1310,7 @@ public class Parser {
 		setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 	}
 	
-	private static void doTimeDurationSet(StringTokenizer st, int[] intStartDate, Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal, int intStartHour, int intStartMinute){
+	private static void doTimeDurationSet(StringTokenizer st, int[] intStartDate, Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal, int intStartHour, int intStartMinute) throws MalformedUserInputException {
 		String stringTime = new String();
 		int intHourDuration = INIT_INT_VALUE;
 		int intMinuteDuration = INIT_INT_VALUE;
@@ -1257,8 +1320,11 @@ public class Parser {
 			if(isStringHour(timeUnit)){
 				intHourDuration = Integer.parseInt(stringTime);
 			}
-			if(isStringMinute(timeUnit)){
+			else if(isStringMinute(timeUnit)){
 				intMinuteDuration = Integer.parseInt(stringTime);
+			}
+			else{
+				throw new MalformedUserInputException(MESSAGE_INVALID_TIME_DURATION);
 			}
 		}
 		startTimeCal =  getCalendarSpecifiedTime(intStartDate,intStartHour,intStartMinute,MIN_SECOND);
@@ -1328,6 +1394,8 @@ public class Parser {
 		endTimeCal = getCalendarUpperBoundary(intEndDate);
 		setCalendarArray(calendarArray,startTimeCal,endTimeCal);
 	}
+	
+	
 
 	private static void setCalendarArray(Calendar[] calendarArray, Calendar startTimeCal, Calendar endTimeCal) {
 		calendarArray[INDEX_START_TIME] = startTimeCal;
@@ -1389,18 +1457,23 @@ public class Parser {
 		return;
 	}
 	
-	private static void setMonthDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2){
-		String strMonth = new String();
-		if(indexOfDelimiter2 != INIT_INT_VALUE){
-			strMonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
+	private static void setMonthDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2) throws MalformedUserInputException{
+		try{
+			String strMonth = new String();
+			if(indexOfDelimiter2 != INIT_INT_VALUE){
+				strMonth = date.substring(indexOfDelimiter + 1, indexOfDelimiter2);
+			}
+			else{
+				strMonth = date.substring(indexOfDelimiter + 1);
+			}
+			// Calendar in java, stores month starting from 0 (january) to 11 (december)
+			intStartDate[INDEX_MONTH] = Integer.parseInt(strMonth);
+			intStartDate[INDEX_MONTH]--; 
+			return;
 		}
-		else{
-			strMonth = date.substring(indexOfDelimiter + 1);
+		catch (Exception ex){
+			throw new MalformedUserInputException(MESSAGE_INVALID_MONTH);
 		}
-		// Calendar in java, stores month starting from 0 (january) to 11 (december)
-		intStartDate[INDEX_MONTH] = Integer.parseInt(strMonth);
-		intStartDate[INDEX_MONTH]--; 
-		return;
 	}
 	
 	private static void setYearDate(int[] intStartDate, String date, int indexOfDelimiter, int indexOfDelimiter2, LocalActionType type) {
@@ -1548,6 +1621,13 @@ public class Parser {
 		return false;
 	}
 	
+	private static boolean isValidStartAndEndCal(Calendar[] calendarArray){
+		if(calendarArray[INDEX_START_TIME].compareTo(calendarArray[INDEX_END_TIME]) < 0){
+			return true;
+		}
+		return false;
+	}
+	
 	private static boolean isValidTime(int intHour, int intMinute){
 		if((intHour<0)||(intHour>24)){
 			return false;
@@ -1627,7 +1707,8 @@ public class Parser {
 	}
 	
 	private static boolean isValidDeadlinePreposition(String preposition){
-		if (preposition.equalsIgnoreCase(PREP_BY)){
+		if ((preposition.equalsIgnoreCase(PREP_BY))
+			||(preposition.equalsIgnoreCase(PREP_BEFORE))){
 			return true;
 		}
 		return false;
@@ -1636,6 +1717,7 @@ public class Parser {
 	private static boolean isValidDayPreposition(String preposition) {
 		if ((preposition.equalsIgnoreCase(PREP_ON))
 				|| (preposition.equalsIgnoreCase(PREP_BY))
+				|| (preposition.equalsIgnoreCase(PREP_BEFORE))
 				|| (preposition.equalsIgnoreCase(PREP_COMMA))
 				|| (preposition.equalsIgnoreCase(PREP_FROM))
 				|| (isStringToday(preposition))
