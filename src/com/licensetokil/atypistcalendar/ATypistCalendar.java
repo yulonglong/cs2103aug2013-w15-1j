@@ -36,14 +36,14 @@ public class ATypistCalendar {
 	}
 
 	private void initialize() {
-		TasksManager.getInstance().initialize();
-		GoogleCalendarManager.getInstance().initialize();
-
 		gui = new ATCGUI();
 		gui.setVisible(true);
 
 		Calendar calendar = Calendar.getInstance();
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
+		
+		TasksManager.getInstance().initialize();
+		GoogleCalendarManager.getInstance().initialize();
 	}
 
 	public static void userInput(String input) {

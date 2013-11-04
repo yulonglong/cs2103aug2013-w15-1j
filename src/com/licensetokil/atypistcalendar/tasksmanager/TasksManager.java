@@ -305,14 +305,13 @@ public class TasksManager {
 			output = "Added: \n" + t.outputStringForDisplay() + "\n";
 			
 			if (t.getTaskType().equals("schedule")) {
-				schedule.add((Schedule) t);
 				if(!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()){
 					output +="\n" + "Warning: schedule clashes with the following event(s):\n";
 					for(Schedule s: sc){
 						output += s.outputStringForDisplay() + "\n";  
 					}
 				}
-
+				schedule.add((Schedule) t);
 			} else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
 
