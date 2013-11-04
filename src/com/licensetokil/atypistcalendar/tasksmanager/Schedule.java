@@ -95,10 +95,10 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 	public String toString() {
 		if(place.equals("")){
 			return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
-					+ endTime.getTime() + "@s" + description + "@s" + " " + "@s" + lastModifiedDate.getTime();
+					+ endTime.getTime() + "@s" + description + "@s" + " " + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 		}
 		return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
-				+ endTime.getTime() + "@s" + description + "@s" + place + "@s" + lastModifiedDate.getTime();
+				+ endTime.getTime() + "@s" + description + "@s" + place + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 	}
 
 	public String outputStringForDisplay(){

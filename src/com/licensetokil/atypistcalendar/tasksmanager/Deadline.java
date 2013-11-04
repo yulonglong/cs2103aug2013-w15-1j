@@ -94,10 +94,10 @@ public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 	public String toString() {
 		if(place.equals("")){
 			return "Deadline@s" + uniqueId + "@s" + endTime.getTime() + "@s"
-					+ description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime();
+					+ description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 		}
 		return "Deadline@s" + uniqueId + "@s" + endTime.getTime() + "@s"
-				+ description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime();
+				+ description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 	}
 
 	public String outputStringForDisplay(){

@@ -159,6 +159,12 @@ public class TasksManager {
 					if (data[5].equals(" ")) {
 						s.setPlace("");
 					}
+					if(data[7].equals("null")){
+						s.setRemoteId(null);
+					}
+					else{
+						s.setRemoteId(data[7]);
+					}
 				} else if (data[0].equals("Deadline")) {
 					Deadline d = new Deadline(Integer.parseInt(data[1]),
 							convertTimeFromStringToCalendar(data[2]), data[3],
@@ -168,6 +174,12 @@ public class TasksManager {
 					if (data[4].equals(" ")) {
 						d.setPlace("");
 					}
+					if(data[7].equals("null")){
+						d.setRemoteId(null);
+					}
+					else{
+						d.setRemoteId(data[7]);
+					}
 				} else if (data[0].equals("Todo")) {
 					Todo td = new Todo(Integer.parseInt(data[1]), data[2],
 							data[3], data[4],
@@ -175,6 +187,12 @@ public class TasksManager {
 					todo.add(td);
 					if (data[3].equals(" ")) {
 						td.setPlace("");
+					}
+					if(data[6].equals("null")){
+						td.setRemoteId(null);
+					}
+					else{
+						td.setRemoteId(data[6]);
 					}
 				} else if (data[0].equals("uniqueId")) {
 					uniqueId = Integer.parseInt(data[1]); // the last
