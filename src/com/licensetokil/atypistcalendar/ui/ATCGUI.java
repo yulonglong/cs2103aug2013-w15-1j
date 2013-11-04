@@ -74,7 +74,12 @@ public class ATCGUI extends JFrame implements WindowListener {
 				jTextField1KeyReleased(evt);
 			}
 		});
-
+		
+		JScrollBar vertical = jScrollPane1.getVerticalScrollBar();
+		InputMap im = vertical.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		im.put(KeyStroke.getKeyStroke("DOWN"), "positiveUnitIncrement");
+		im.put(KeyStroke.getKeyStroke("UP"), "negativeUnitIncrement");
+				
 		jLabel1.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
 		jLabel1.setText("Type your command here:");
 
@@ -192,7 +197,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 			jTextField1.setText("");
 		}
 	}
-
+	
 	public void outputWithNewline(String text) {
 		StringReader reader;
 
