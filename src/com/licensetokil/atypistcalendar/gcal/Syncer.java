@@ -30,59 +30,71 @@ class Syncer extends Thread {
 
 	public void run() {
 		logger.fine("run() called.");
-		SyncAction currentSyncAction = SyncManager.getInstance().getQueue().peek();
+		while(true) {
+			SyncAction currentSyncAction = SyncManager.getInstance().getQueue().peek();
 
-		while(currentSyncAction != null) {
-			logger.info("Working on next SyncAction. Figuring out the sub-type.");
-			try {
-				if(currentSyncAction instanceof InitialiseRemoteCalendarSyncAction) {
-					logger.info("InitialiseRemoteCalendarSyncAction sub-type detected.");
-					executeSyncAction((InitialiseRemoteCalendarSyncAction)currentSyncAction);
-				}
-				else if(currentSyncAction instanceof AddSyncAction) {
-					logger.info("AddSyncAction sub-type detected.");
-					executeSyncAction((AddSyncAction)currentSyncAction);
-				}
-				else if(currentSyncAction instanceof UpdateSyncAction) {
-					logger.info("UpdateSyncAction sub-type detected.");
-					executeSyncAction((UpdateSyncAction)currentSyncAction);
-				}
-				else if(currentSyncAction instanceof DeleteSyncAction) {
-					logger.info("DeleteSyncAction sub-type detected.");
-					executeSyncAction((DeleteSyncAction)currentSyncAction);
-				}
-				else if(currentSyncAction instanceof DoCompleteSyncAction) {
-					logger.info("DoCompleteSyncAction sub-type detected.");
-					executeSyncAction((DoCompleteSyncAction)currentSyncAction);
-				}
-				else {
-					logger.severe("Unexcepted (subclass of) SyncAction enqueued.");
-					assert false;
-				}
-
-				logger.info("Dequeuing SyncAction item that has been completed (removing head of queue).");
-				SyncManager.getInstance().getQueue().poll();
-				currentSyncAction = SyncManager.getInstance().getQueue().peek();
-			}
-			catch(IllegalStateException | JsonParseException | IOException e) {
-				logger.warning("Exception thrown: " + e.getMessage());
-				e.printStackTrace();
-				logger.warning("DEBUG measure: waiting 1 minute before retrying...");
-
-
+			while(currentSyncAction != null) {
+				logger.info("Working on next SyncAction. Figuring out the sub-type.");
 				try {
-					SyncManager.getInstance().getGoToSleepLock().lock();
-					SyncManager.getInstance().getGoToSleepCondition().await(1, TimeUnit.MINUTES);
-					SyncManager.getInstance().getGoToSleepLock().unlock();
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+					if(currentSyncAction instanceof InitialiseRemoteCalendarSyncAction) {
+						logger.info("InitialiseRemoteCalendarSyncAction sub-type detected.");
+						executeSyncAction((InitialiseRemoteCalendarSyncAction)currentSyncAction);
+					}
+					else if(currentSyncAction instanceof AddSyncAction) {
+						logger.info("AddSyncAction sub-type detected.");
+						executeSyncAction((AddSyncAction)currentSyncAction);
+					}
+					else if(currentSyncAction instanceof UpdateSyncAction) {
+						logger.info("UpdateSyncAction sub-type detected.");
+						executeSyncAction((UpdateSyncAction)currentSyncAction);
+					}
+					else if(currentSyncAction instanceof DeleteSyncAction) {
+						logger.info("DeleteSyncAction sub-type detected.");
+						executeSyncAction((DeleteSyncAction)currentSyncAction);
+					}
+					else if(currentSyncAction instanceof DoCompleteSyncAction) {
+						logger.info("DoCompleteSyncAction sub-type detected.");
+						executeSyncAction((DoCompleteSyncAction)currentSyncAction);
+					}
+					else {
+						logger.severe("Unexcepted (subclass of) SyncAction enqueued.");
+						assert false;
+					}
 
-				break;
+					logger.info("Dequeuing SyncAction item that has been completed (removing head of queue).");
+					SyncManager.getInstance().getQueue().poll();
+					currentSyncAction = SyncManager.getInstance().getQueue().peek();
+				}
+				catch(IllegalStateException | JsonParseException | IOException e) {
+					logger.warning("Exception thrown: " + e.getMessage());
+					logger.warning("Waiting 1 minute before retrying...");
+
+					sleepForOneMinute();
+				}
+			}
+
+			logger.info("Queue is empty, sleeping for 1 minute before next sync...");
+			sleepForOneMinute();
+			logger.info("Thread woke up. Checking if queue is empty.");
+			if(SyncManager.getInstance().getQueue().isEmpty()) {
+				logger.info("Queue is empty. Doing a complete sync.");
+				SyncManager.getInstance().doCompleteSync();
+			}
+			else {
+				logger.info("Queue is not empty. Continuing with enqueued SyncAction.");
 			}
 		}
-		logger.info("Queue is empty, terminating...");
+	}
+
+	private void sleepForOneMinute() {
+		try {
+			SyncManager.getInstance().getGoToSleepLock().lock();
+			SyncManager.getInstance().getGoToSleepCondition().await(1, TimeUnit.MINUTES);
+			SyncManager.getInstance().getGoToSleepLock().unlock();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void executeSyncAction(InitialiseRemoteCalendarSyncAction currentSyncAction)
@@ -150,7 +162,7 @@ class Syncer extends Thread {
 			throws JsonParseException, IllegalStateException, IOException {
 		logger.fine("executeSyncAction(DeleteSyncAction currentSyncAction) called.");
 
-		logger.info("Adding: " + deleteSyncAction.getRemoteTaskID());
+		logger.info("Deleting: " + deleteSyncAction.getRemoteTaskID());
 
 		Util.sendJsonHttpsRequest(
 				"https://www.googleapis.com/calendar/v3/calendars/" +
@@ -392,6 +404,8 @@ class Syncer extends Thread {
 	}
 
 	private void updateLocalTaskfromRemoteTask(JsonObject remoteTask, Task currentLocalTask) {
+		logger.fine("updateLocalTaskfromRemoteTask called.");
+
 		String remoteTaskId = Util.getJsonObjectValueOrEmptyString(remoteTask, "id");
 		String description = Util.getJsonObjectValueOrEmptyString(remoteTask, "summary");
 		String location = Util.getJsonObjectValueOrEmptyString(remoteTask, "location");
@@ -404,12 +418,19 @@ class Syncer extends Thread {
 		}
 
 		if(currentLocalTask instanceof Todo) {
-			//Task type is a todo
+			logger.fine("currentLocalTask is of type Todo.");
 			Todo currentLocalTodo = (Todo)currentLocalTask;
 			currentLocalTodo.setDescription(removePrefix(description, "Todo: "));
 			currentLocalTodo.setPlace(location);
 			currentLocalTodo.setLastModifiedDate(lastModifiedDate);
 			currentLocalTodo.setRemoteId(remoteTaskId);
+
+			try {
+				TasksManager.getInstance().updateGoogleTask(currentLocalTask);
+			} catch (TaskNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else {
 			Calendar startTime = null;
@@ -425,16 +446,23 @@ class Syncer extends Thread {
 			}
 
 			if(currentLocalTask instanceof Deadline) {
-				//Task type is a deadline
+				logger.fine("currentLocalTask is of type Deadline.");
 				Deadline currentLocalDeadline = (Deadline)currentLocalTask;
 				currentLocalDeadline.setDescription(removePrefix(description, "DL: "));
 				currentLocalDeadline.setPlace(location);
 				currentLocalDeadline.setLastModifiedDate(lastModifiedDate);
 				currentLocalDeadline.setEndTime(endTime);
 				currentLocalDeadline.setRemoteId(remoteTaskId);
+
+				try {
+					TasksManager.getInstance().updateGoogleTask(currentLocalDeadline);
+				} catch (TaskNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else {
-				//Task type is a schedule
+				logger.fine("currentLocalTask is of type Schedule.");
 				Schedule currentLocalSchedule = (Schedule)currentLocalTask;
 				currentLocalSchedule.setDescription(description);
 				currentLocalSchedule.setPlace(location);
@@ -442,14 +470,14 @@ class Syncer extends Thread {
 				currentLocalSchedule.setStartTime(startTime);
 				currentLocalSchedule.setEndTime(endTime);
 				currentLocalSchedule.setRemoteId(remoteTaskId);
-			}
-		}
 
-		try {
-			TasksManager.getInstance().updateGoogleTask(currentLocalTask);
-		} catch (TaskNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				try {
+					TasksManager.getInstance().updateGoogleTask(currentLocalSchedule);
+				} catch (TaskNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

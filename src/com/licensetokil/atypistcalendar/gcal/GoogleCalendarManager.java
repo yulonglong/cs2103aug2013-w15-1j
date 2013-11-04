@@ -30,7 +30,7 @@ public class GoogleCalendarManager {
 		return instance;
 	}
 
-	public void initialise() {
+	public void initialize() {
 		logger.fine("initialised() called.");
 
 		logger.info("Reading from ATC_AUTH.txt file, if possible.");
