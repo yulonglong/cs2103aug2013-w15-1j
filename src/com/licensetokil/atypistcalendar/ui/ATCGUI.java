@@ -61,7 +61,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 		jTextField1 = new javax.swing.JTextField();
 		jLabel1 = new javax.swing.JLabel();
 		jScrollPane1 = new javax.swing.JScrollPane();
-		jTextPane1 = new javax.swing.JEditorPane("text/html", null);
+		jEditorPane1 = new javax.swing.JEditorPane("text/html", null);
 		jScrollPane2 = new javax.swing.JScrollPane();
 		jTextArea2 = new javax.swing.JTextArea();
 		htmlEditorKit = new HTMLEditorKit();
@@ -85,14 +85,15 @@ public class ATCGUI extends JFrame implements WindowListener {
 				new java.awt.Font("Consolas", 0, 18))); // NOI18N
 		jScrollPane1.setMaximumSize(jPanel1.getMaximumSize());
 		jScrollPane1.setMinimumSize(jPanel1.getMinimumSize());
-		jScrollPane1.setViewportView(jTextPane1);
+		jScrollPane1.setViewportView(jEditorPane1);
 	
 		jScrollPane2.setBorder(null);
 		jScrollPane2
 				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		jScrollPane2.setAutoscrolls(true);
-		jTextPane1.setFont(new Font("Consolas", Font.PLAIN, 14));
-		jTextPane1.setEditorKit(htmlEditorKit);
+		jEditorPane1.setFont(new Font("Consolas", Font.PLAIN, 14));
+		jEditorPane1.setEditorKit(htmlEditorKit);
+		jEditorPane1.setEditable(false);
 
 		jTextArea2.setEditable(false);
 		jTextArea2.setBackground(new java.awt.Color(222, 222, 222));
@@ -197,7 +198,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 
 		if (text.contains(WELCOME_MESSAGE)) {
 			text = text.replaceAll("\\r|\\n", "<br>");
-			jTextPane1.setText("<b>" + text + "</b><br><hr>");
+			jEditorPane1.setText("<b>" + text + "</b><br><hr>");
 		}
 
 		else {
@@ -211,15 +212,15 @@ public class ATCGUI extends JFrame implements WindowListener {
 				reader = new StringReader(text + "<hr><br>");
 			}
 			try {
-				htmlEditorKit.read(reader, jTextPane1.getDocument(), jTextPane1
+				htmlEditorKit.read(reader, jEditorPane1.getDocument(), jEditorPane1
 						.getDocument().getLength());
 			} catch (Exception e) {
 
 			}
 		}
 
-		// jTextPane1.setText(jTextPane1.getText() + "\n" + text);
-		jTextPane1.setCaretPosition(jTextPane1.getDocument().getLength());
+		// jEditorPane1.setText(jEditorPane1.getText() + "\n" + text);
+		jEditorPane1.setCaretPosition(jEditorPane1.getDocument().getLength());
 		jTextField1.requestFocus();
 
 	}
@@ -264,7 +265,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 	private javax.swing.JScrollPane jScrollPane2;
 	private javax.swing.JTextArea jTextArea2;
 	private javax.swing.JTextField jTextField1;
-	private javax.swing.JEditorPane jTextPane1;
+	private javax.swing.JEditorPane jEditorPane1;
 	private HTMLEditorKit htmlEditorKit;
 	private Document doc;
 	// End of variables declaration//GEN-END:variables

@@ -125,7 +125,6 @@ public class TasksManager {
 
 	// private constructor
 	private TasksManager() {
-		initialize();
 	}
 
 	/*
@@ -139,7 +138,7 @@ public class TasksManager {
 	 * }
 	 */
 
-	private void initialize() {
+	public void initialize() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String currLine;
@@ -301,9 +300,18 @@ public class TasksManager {
 
 		try {
 			String output = new String("");
-
+			ArrayList<Schedule> sc;
+			
+			output = "Added: \n" + t.outputStringForDisplay() + "\n";
+			
 			if (t.getTaskType().equals("schedule")) {
 				schedule.add((Schedule) t);
+				if(!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()){
+					output +="\n" + "Warning: schedule clashes with the following event(s):\n";
+					for(Schedule s: sc){
+						output += s.outputStringForDisplay() + "\n";  
+					}
+				}
 
 			} else if (t.getTaskType().equals("deadline")) {
 				deadline.add((Deadline) t);
@@ -312,10 +320,8 @@ public class TasksManager {
 				todo.add((Todo) t);
 			}
 
-			output = "Added: \n" + t.outputStringForDisplay() + "\n";
-
 			lastTaskCreated = t;
-			fileSync();
+			fileSync();	
 
 			return output;
 
@@ -856,6 +862,17 @@ public class TasksManager {
 		else {
 			throw new TaskNotFoundException();
 		}
+	}
+	
+	public ArrayList<Schedule> checkForScheduleClashes(Schedule s){
+		ArrayList<Schedule> clashedSchedules = new ArrayList<Schedule>();
+		for(Schedule sc: schedule){
+			if(s.getStartTime().getTime().toString().equals(sc.getStartTime().getTime().toString())){
+				clashedSchedules.add(sc);
+			}
+		}
+		
+		return clashedSchedules;
 	}
 
 	public static void exit() {
