@@ -107,13 +107,27 @@ class Syncer extends Thread {
 
 		JsonObject requestBody = createRemoteTaskRequestBody(addSyncAction.getLocalTask());
 
-		Util.sendJsonHttpsRequest(
-				"https://www.googleapis.com/calendar/v3/calendars/" +
-						SyncManager.getInstance().getRemoteCalendarId() +
-						"/events",
-				Util.REQUEST_METHOD_POST,
-				AuthenticationManager.getInstance().getAuthorizationHeader(),
-				requestBody);
+		JsonObject serverReply = Util.parseToJsonObject(
+				Util.sendJsonHttpsRequest(
+						"https://www.googleapis.com/calendar/v3/calendars/" +
+								SyncManager.getInstance().getRemoteCalendarId() +
+								"/events",
+						Util.REQUEST_METHOD_POST,
+						AuthenticationManager.getInstance().getAuthorizationHeader(),
+						requestBody
+				)
+		);
+
+		try {
+			TasksManager.getInstance().updateCorrespondingTaskRemoteId(
+					addSyncAction.getLocalTask().getUniqueId(),
+					Util.getJsonObjectValueOrEmptyString(serverReply, "id")
+			);
+		} catch (TaskNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private void executeSyncAction(UpdateSyncAction updateSyncAction)
