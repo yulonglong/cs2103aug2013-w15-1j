@@ -87,13 +87,11 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 	}
 
 	public String outputStringForDisplay(){
-		String output = description;
+		String output = "[Status: " + status + "] " + description;
 		if(!place.equals("")){
 			output = output+" at " + this.getPlace();
 		}
-
-		output = output + " [Status: " + status + "]";
-
+	
 		return output;
 	}
 

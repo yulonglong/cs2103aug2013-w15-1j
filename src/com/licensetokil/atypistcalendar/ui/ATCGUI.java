@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -75,10 +76,10 @@ public class ATCGUI extends JFrame implements WindowListener {
 			}
 		});
 		
-		JScrollBar vertical = jScrollPane1.getVerticalScrollBar();
-		InputMap im = vertical.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		im.put(KeyStroke.getKeyStroke("DOWN"), "positiveUnitIncrement");
-		im.put(KeyStroke.getKeyStroke("UP"), "negativeUnitIncrement");
+		JScrollBar scrollBar = jScrollPane1.getVerticalScrollBar();
+		InputMap inputMap = scrollBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		inputMap.put(KeyStroke.getKeyStroke("DOWN"), "positiveUnitIncrement");
+		inputMap.put(KeyStroke.getKeyStroke("UP"), "negativeUnitIncrement");
 				
 		jLabel1.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
 		jLabel1.setText("Type your command here:");
@@ -229,7 +230,34 @@ public class ATCGUI extends JFrame implements WindowListener {
 		jTextField1.requestFocus();
 
 	}
-
+	
+	/*public String formatDisplaySchedule(String text){
+		String[] splitString = text.split("<br>");
+		ArrayList<String> listOfSchedules = new ArrayList<String>();
+		String output = "Schedules: <br>";
+		
+		for(int i=1; i<splitString.length; i++){
+			if (splitString[i]!="Deadlines: "){
+				listOfSchedules.add(splitString[i]);
+			}
+			else{
+				break;
+			}				
+		}
+		for(String s: listOfSchedules){
+			output = "<"
+		}
+		
+	}
+	
+	public String formatDisplayDeadline(String text){
+		
+	}
+	
+	public String formatDisplayTodo(String text){
+		
+	}*/
+	
 	public void outputUserInput(String input) {
 		jTextArea2.setText(input);
 	}
