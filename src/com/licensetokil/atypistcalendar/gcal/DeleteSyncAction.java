@@ -2,8 +2,9 @@ package com.licensetokil.atypistcalendar.gcal;
 
 public class DeleteSyncAction extends SyncAction {
 	private String remoteTaskID;
-	
+
 	public DeleteSyncAction(String remoteTaskID) {
+		super();
 		setRemoteTaskID(remoteTaskID);
 	}
 
