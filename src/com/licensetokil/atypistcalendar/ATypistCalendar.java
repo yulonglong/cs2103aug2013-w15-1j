@@ -6,10 +6,12 @@ import java.util.logging.Logger;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.DisplayAction;
 import com.licensetokil.atypistcalendar.parser.GoogleAction;
 import com.licensetokil.atypistcalendar.parser.LocalAction;
 import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
 import com.licensetokil.atypistcalendar.parser.Parser;
+import com.licensetokil.atypistcalendar.parser.SearchAction;
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
@@ -41,7 +43,7 @@ public class ATypistCalendar {
 
 		Calendar calendar = Calendar.getInstance();
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
-		
+
 		TasksManager.getInstance().initialize();
 		GoogleCalendarManager.getInstance().initialize();
 	}
@@ -52,6 +54,7 @@ public class ATypistCalendar {
 		try {
 			action = Parser.parse(input);
 		} catch (MalformedUserInputException muie) {
+			gui.outputUserInput("Your errornous command: " + input);
 			gui.outputWithNewline(muie.getMessage());
 			return;
 		}
@@ -59,7 +62,9 @@ public class ATypistCalendar {
 		if(action instanceof LocalAction) {
 			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
 			//TODO we shouldn't be doing a complete sync each time we do a command, but this is a temporary measure
-			GoogleCalendarManager.getInstance().doCompleteSync();
+			if(!(action instanceof DisplayAction) && !(action instanceof SearchAction)) {
+				GoogleCalendarManager.getInstance().doCompleteSync();
+			}
 		}
 		else if(action instanceof GoogleAction) {
 			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
