@@ -123,6 +123,7 @@ public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 		clonedObject.taskType = this.taskType;
 		clonedObject.uniqueId = this.uniqueId;
 		clonedObject.description = this.description;
+		clonedObject.status = this.status;
 		clonedObject.place = this.place;
 		clonedObject.endTime = (Calendar)this.endTime.clone();
 		clonedObject.lastModifiedDate = (Calendar)this.lastModifiedDate.clone();
