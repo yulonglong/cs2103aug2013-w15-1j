@@ -33,6 +33,8 @@ class SyncManager {
 	}
 
 	private SyncManager() {
+		logger.fine("SyncManager constructor done.");
+
 		queue = new PriorityBlockingQueue<SyncAction>();
 		syncer = null;
 		remoteCalendarId = null;

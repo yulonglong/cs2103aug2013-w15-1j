@@ -32,6 +32,7 @@ class AuthenticationManager {
 	private Date accessTokenExpiry;
 
 	private AuthenticationManager() {
+		logger.fine("AuthenticationManager constructor called.");
 		authenticationToken = "";
 		accessToken = "";
 		refreshToken = "";
