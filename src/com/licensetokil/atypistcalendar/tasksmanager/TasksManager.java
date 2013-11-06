@@ -903,7 +903,7 @@ public class TasksManager {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file,
 					true));
 
-			writer.write("uniqueId@" + uniqueId);
+			writer.write("uniqueId@s" + uniqueId);
 			writer.newLine();
 			writer.close();
 		} catch (Exception e) {
