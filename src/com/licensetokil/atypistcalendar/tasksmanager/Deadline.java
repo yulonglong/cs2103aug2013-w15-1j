@@ -101,7 +101,7 @@ public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 	}
 
 	public String outputStringForDisplay(){
-		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
+		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
 		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM dd, ''yy");
 		
 		String stringStatus = status;
