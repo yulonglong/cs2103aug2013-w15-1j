@@ -23,31 +23,31 @@ import com.licensetokil.atypistcalendar.parser.UpdateAction;
 
 public class TasksManager {
 
-	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n\n";
+	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n";
 
-	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n\n";
-	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n\n";
-	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!\n";
+	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n";
+	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n";
+	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!";
 
-	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n\n";
-	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n\n";
+	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n";
+	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n";
 
-	private static final String MARK_UNSUCCESSFUL = "Mark was unsuccessful. Please try again!\n\n";
-	private static final String MARK_SUCCESSFUL = "Marked %s as %s\n\n";
+	private static final String MARK_UNSUCCESSFUL = "Mark was unsuccessful. Please try again!\n";
+	private static final String MARK_SUCCESSFUL = "Marked %s as %s\n";
 
-	private static final String SEARCH_UNFOUND = "No search matches found!\n\n";
+	private static final String SEARCH_UNFOUND = "No search matches found!";
 
-	private static final String UNDO_DELETE_SUCCESSFUL = "Delete command successfully undone\n\n";
-	private static final String UNDO_MARK_SUCCESSFUL = "Mark command successfully undone\n\n";
-	private static final String UNDO_UPDATE_SUCCESSFUL = "Update command successfully undone\n\n";
-	private static final String UNDO_ADD_SUCCESSFUL = "Add command successfully undone\n\n";
+	private static final String UNDO_DELETE_SUCCESSFUL = "Delete command successfully undone\n";
+	private static final String UNDO_MARK_SUCCESSFUL = "Mark command successfully undone\n";
+	private static final String UNDO_UPDATE_SUCCESSFUL = "Update command successfully undone\n";
+	private static final String UNDO_ADD_SUCCESSFUL = "Add command successfully undone\n";
 
-	private static final String UNDO_DELETE_UNSUCCESSFUL = "Undo Delete command unsuccessful. Please try again!\n\n";
-	private static final String UNDO_MARK_UNSUCCESSFUL = "Undo Mark command unsuccessful. Please try again!\n\n";
-	private static final String UNDO_UPDATE_UNSUCCESSFUL = "Undo Update command unsuccessful. Please try again!\n\n";
-	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n\n";
+	private static final String UNDO_DELETE_UNSUCCESSFUL = "Undo Delete command unsuccessful. Please try again!\n";
+	private static final String UNDO_MARK_UNSUCCESSFUL = "Undo Mark command unsuccessful. Please try again!\n";
+	private static final String UNDO_UPDATE_UNSUCCESSFUL = "Undo Update command unsuccessful. Please try again!\n";
+	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n";
 
-	private static final String UNDO_DISALLOWED = "Undo command is not allowed\n\n";
+	private static final String UNDO_DISALLOWED = "Undo command is not allowed";
 
 	private static final String UNDONE = "undone";
 	private static final String DONE = "done";
@@ -322,7 +322,7 @@ public class TasksManager {
 			lastTaskCreated = t;
 			fileSync();
 
-			return output+"\n";
+			return output;
 
 		} catch (Exception e) {
 			System.out.println("exception error: " + e.getMessage());
@@ -443,7 +443,6 @@ public class TasksManager {
 
 	private String displayOutput(String output) {
 		int count = 1;
-		String strCount;
 
 		Collections.sort(sch);
 		Collections.sort(dl);
@@ -452,13 +451,7 @@ public class TasksManager {
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
-				if(count<10){
-					strCount = count + ". ";
-				}
-				else{
-					strCount = count + ".";
-				}
-				output = output + strCount + s.outputStringForDisplay()
+				output = output + count + ". " + s.outputStringForDisplay()
 						+ "\n";
 				table.put(count, s);
 				count++;
@@ -469,13 +462,7 @@ public class TasksManager {
 		if (!dl.isEmpty()) {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
-				if(count<10){
-					strCount = count + ". ";
-				}
-				else{
-					strCount = count + ".";
-				}
-				output = output + strCount + d.outputStringForDisplay()
+				output = output + count + ". " + d.outputStringForDisplay()
 						+ "\n";
 				table.put(count, d);
 				count++;
@@ -487,13 +474,7 @@ public class TasksManager {
 		if (!toDo.isEmpty()) {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
-				if(count<10){
-					strCount = count + ". ";
-				}
-				else{
-					strCount = count + ".";
-				}
-				output = output + strCount + td.outputStringForDisplay()
+				output = output + count + ". " + td.outputStringForDisplay()
 						+ "\n";
 				table.put(count, td);
 				count++;
