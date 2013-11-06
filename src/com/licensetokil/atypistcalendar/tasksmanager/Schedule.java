@@ -102,8 +102,8 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 	}
 
 	public String outputStringForDisplay(){
-		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
-		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
+		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM dd, ''yy");
 
 		String output = "[" + formatDay.format(startTime.getTime()) + "] [" + formatTime.format(startTime.getTime()) + " - " + formatTime.format(endTime.getTime()) + "] " +
 							description;
