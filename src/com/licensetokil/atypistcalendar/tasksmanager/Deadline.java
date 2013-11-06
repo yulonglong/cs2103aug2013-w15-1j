@@ -101,15 +101,20 @@ public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 	}
 
 	public String outputStringForDisplay(){
-		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
-		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM d, ''yy");
+		SimpleDateFormat formatTime = new SimpleDateFormat("h:mm a");
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM dd, ''yy");
+		
+		String stringStatus = status;
+		if(stringStatus.equals("done")){
+			stringStatus = "done&nbsp&nbsp";
+		}
 
-		String output = "[" + formatDay.format(endTime.getTime()) + "] [by " + formatTime.format(endTime.getTime()) + "] "  + "[Status: " + status + "] " + description;
+		String output = "[" + formatDay.format(endTime.getTime()) + "] [by " + formatTime.format(endTime.getTime()) + "] "  + "[Status: " + stringStatus + "] " + description;
 		if(!place.equals("")){
 			output = output+" at " + this.getPlace();
 		}
 
-		return output; 
+		return output;
 	}
 
 	public int compareTo(Deadline d){
@@ -123,6 +128,7 @@ public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 		clonedObject.taskType = this.taskType;
 		clonedObject.uniqueId = this.uniqueId;
 		clonedObject.description = this.description;
+		clonedObject.status = this.status;
 		clonedObject.place = this.place;
 		clonedObject.endTime = (Calendar)this.endTime.clone();
 		clonedObject.lastModifiedDate = (Calendar)this.lastModifiedDate.clone();
