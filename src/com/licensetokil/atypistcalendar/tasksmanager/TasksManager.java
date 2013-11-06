@@ -301,14 +301,14 @@ public class TasksManager {
 		try {
 			String output = new String("");
 			ArrayList<Schedule> sc;
-			
+
 			output = "Added: \n" + t.outputStringForDisplay() + "\n";
-			
+
 			if (t.getTaskType().equals("schedule")) {
 				if(!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()){
 					output +="\n" + "Warning: schedule clashes with the following event(s):\n";
 					for(Schedule s: sc){
-						output += s.outputStringForDisplay() + "\n";  
+						output += s.outputStringForDisplay() + "\n";
 					}
 				}
 				schedule.add((Schedule) t);
@@ -320,7 +320,7 @@ public class TasksManager {
 			}
 
 			lastTaskCreated = t;
-			fileSync();	
+			fileSync();
 
 			return output;
 
@@ -701,7 +701,7 @@ public class TasksManager {
 		return UNDO_MARK_SUCCESSFUL;
 	}
 
-	public static void fileSync() {
+	public void fileSync() {
 		try {
 			BufferedWriter clearWriter = new BufferedWriter(
 					new FileWriter(file));
@@ -862,7 +862,7 @@ public class TasksManager {
 			throw new TaskNotFoundException();
 		}
 	}
-	
+
 	public ArrayList<Schedule> checkForScheduleClashes(Schedule s){
 		ArrayList<Schedule> clashedSchedules = new ArrayList<Schedule>();
 		for(Schedule sc: schedule){
@@ -870,11 +870,11 @@ public class TasksManager {
 				clashedSchedules.add(sc);
 			}
 		}
-		
+
 		return clashedSchedules;
 	}
 
-	public static void exit() {
+	public void exit() {
 		try {
 			/*
 			 * for(Task t: getAllTasks()){ checkForDelimiters(t); }

@@ -30,8 +30,10 @@ class Syncer extends Thread {
 
 	public void run() {
 		logger.fine("run() called.");
+
+
 		while(true) {
-			SyncAction currentSyncAction = SyncManager.getInstance().getQueue().peek();
+			SyncAction currentSyncAction = SyncManager.getInstance().getQueue().poll();
 
 			while(currentSyncAction != null) {
 				logger.info("Working on next SyncAction. Figuring out the sub-type.");
@@ -54,6 +56,16 @@ class Syncer extends Thread {
 					}
 					else if(currentSyncAction instanceof DoCompleteSyncAction) {
 						logger.info("DoCompleteSyncAction sub-type detected.");
+
+						logger.info("Checking if following SyncActions in queue are DoCompleteSyncAction. Dropping them if they are, for efficency.");
+						SyncAction nextSyncAction = SyncManager.getInstance().getQueue().peek();
+						while(nextSyncAction instanceof DoCompleteSyncAction) {
+							logger.info("Dropping next DoCompleteSyncAction");
+							SyncManager.getInstance().getQueue().poll();
+							nextSyncAction = SyncManager.getInstance().getQueue().peek();
+						}
+						logger.info("Check done.");
+
 						executeSyncAction((DoCompleteSyncAction)currentSyncAction);
 					}
 					else {
@@ -62,8 +74,7 @@ class Syncer extends Thread {
 					}
 
 					logger.info("Dequeuing SyncAction item that has been completed (removing head of queue).");
-					SyncManager.getInstance().getQueue().poll();
-					currentSyncAction = SyncManager.getInstance().getQueue().peek();
+					currentSyncAction = SyncManager.getInstance().getQueue().poll();
 				}
 				catch(IllegalStateException | JsonParseException | IOException e) {
 					logger.warning("Exception thrown: " + e.getMessage());

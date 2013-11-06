@@ -6,10 +6,14 @@ import java.util.logging.Logger;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.Action;
+import com.licensetokil.atypistcalendar.parser.DisplayAction;
+import com.licensetokil.atypistcalendar.parser.ExitAction;
 import com.licensetokil.atypistcalendar.parser.GoogleAction;
 import com.licensetokil.atypistcalendar.parser.LocalAction;
 import com.licensetokil.atypistcalendar.parser.MalformedUserInputException;
 import com.licensetokil.atypistcalendar.parser.Parser;
+import com.licensetokil.atypistcalendar.parser.SearchAction;
+import com.licensetokil.atypistcalendar.parser.SystemAction;
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
@@ -41,28 +45,33 @@ public class ATypistCalendar {
 
 		Calendar calendar = Calendar.getInstance();
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
-		
+
 		TasksManager.getInstance().initialize();
 		GoogleCalendarManager.getInstance().initialize();
 	}
 
-	public static void userInput(String input) {
+	public void userInput(String input) {
 		String reply = "";
 		Action action;
 		try {
 			action = Parser.parse(input);
 		} catch (MalformedUserInputException muie) {
+			gui.outputUserInput("Your erroneous command: " + input);
 			gui.outputWithNewline(muie.getMessage());
 			return;
 		}
 
 		if(action instanceof LocalAction) {
 			reply = TasksManager.getInstance().executeCommand((LocalAction)action);
-			//TODO we shouldn't be doing a complete sync each time we do a command, but this is a temporary measure
-			GoogleCalendarManager.getInstance().doCompleteSync();
+			if(!(action instanceof DisplayAction || action instanceof SearchAction)) {
+				GoogleCalendarManager.getInstance().doCompleteSync();
+			}
 		}
 		else if(action instanceof GoogleAction) {
 			reply = GoogleCalendarManager.getInstance().executeCommand((GoogleAction)action);
+		}
+		else if(action instanceof SystemAction) {
+			reply = executeCommand((SystemAction)action);
 		}
 		else {
 			logger.severe("Unknown sub-class of Action returned from Parser!");
@@ -73,8 +82,24 @@ public class ATypistCalendar {
 		gui.outputWithNewline(reply);
 	}
 
+	public void cleanUp() {
+		TasksManager.getInstance().exit();
+	}
+
 	public ArrayList<Task> getCopyOfAllLocalTasks() {
 		return TasksManager.getInstance().getAllTasks();
+	}
+
+	private String executeCommand(SystemAction action) {
+		if(action instanceof ExitAction) {
+			gui.dispatchWindowClosingEvent();
+			return "";
+		}
+		else {
+			logger.severe("Unknown sub-class of SystemAction!");
+			assert false;
+			return "";
+		}
 	}
 }
 

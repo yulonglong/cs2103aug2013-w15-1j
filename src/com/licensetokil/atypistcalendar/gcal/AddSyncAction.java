@@ -4,8 +4,9 @@ import com.licensetokil.atypistcalendar.tasksmanager.Task;
 
 public class AddSyncAction extends SyncAction {
 	private Task localTask;
-	
+
 	public AddSyncAction(Task localTask) {
+		super();
 		setLocalTask(localTask);
 	}
 

@@ -5,8 +5,9 @@ import com.licensetokil.atypistcalendar.tasksmanager.Task;
 public class UpdateSyncAction extends SyncAction {
 	private Task localTask;
 	private String remoteTaskID;
-	
+
 	public UpdateSyncAction(Task localTask, String remoteTaskID) {
+		super();
 		setLocalTask(localTask);
 		setRemoteTaskID(remoteTaskID);
 	}

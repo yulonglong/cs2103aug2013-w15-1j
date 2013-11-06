@@ -1,7 +1,7 @@
 package com.licensetokil.atypistcalendar.gcal;
 
 import java.util.Calendar;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +19,7 @@ class SyncManager {
 	private Lock goToSleepLock = new ReentrantLock();
 	private Condition goToSleepCondition = goToSleepLock.newCondition();
 
-	private ConcurrentLinkedQueue<SyncAction> queue;
+	private PriorityBlockingQueue<SyncAction> queue;
 	private Syncer syncer;
 	private String remoteCalendarId;
 
@@ -33,7 +33,9 @@ class SyncManager {
 	}
 
 	private SyncManager() {
-		queue = new ConcurrentLinkedQueue<SyncAction>();
+		logger.fine("SyncManager constructor done.");
+
+		queue = new PriorityBlockingQueue<SyncAction>();
 		syncer = null;
 		remoteCalendarId = null;
 	}
@@ -86,7 +88,7 @@ class SyncManager {
 		}
 	}
 
-	protected ConcurrentLinkedQueue<SyncAction> getQueue() {
+	protected PriorityBlockingQueue<SyncAction> getQueue() {
 		return queue;
 	}
 
