@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.StringReader;
 
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -67,6 +68,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setTitle("A Typist's Calendar");
+		setIconImage(new ImageIcon(getClass().getResource("/icon128.png")).getImage());
 
 		jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
 			public void keyReleased(java.awt.event.KeyEvent evt) {
