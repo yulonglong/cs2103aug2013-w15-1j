@@ -100,7 +100,7 @@ class Syncer extends Thread {
 	private void sleepForOneMinute() {
 		try {
 			SyncManager.getInstance().getGoToSleepLock().lock();
-			SyncManager.getInstance().getGoToSleepCondition().await(1, TimeUnit.MINUTES);
+			SyncManager.getInstance().getGoToSleepCondition().await(15, TimeUnit.SECONDS);
 			SyncManager.getInstance().getGoToSleepLock().unlock();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
