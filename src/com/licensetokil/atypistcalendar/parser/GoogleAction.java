@@ -19,9 +19,4 @@ public class GoogleAction extends Action{
 	public GoogleActionType getType(){
 		return type;
 	}
-
-
-	public void setType(GoogleActionType newActionType){
-		type = newActionType;
-	}
 }
