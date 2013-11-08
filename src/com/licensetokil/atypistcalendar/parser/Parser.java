@@ -199,6 +199,9 @@ public class Parser {
 	}
 
 	private static Action googleParser(StringTokenizer st) throws MalformedUserInputException {
+		if(!st.hasMoreTokens()){
+			throw new MalformedUserInputException(MESSAGE_INVALID_GOOGLE);
+		}
 		String userInput = new String();
 		String stringUserAction = new String(GoogleActionType.GOOGLE.getString());
 		AddGoogleAction userActionAdd = new AddGoogleAction();
