@@ -7,7 +7,6 @@ package com.licensetokil.atypistcalendar.parser;
 
 
 public class SyncGoogleAction extends GoogleAction{
-	private GoogleActionType type;
 
 	public SyncGoogleAction(){
 		type = GoogleActionType.GOOGLE_SYNC;

@@ -6,7 +6,7 @@
 package com.licensetokil.atypistcalendar.parser;
 
 public class GoogleAction extends Action{
-	private GoogleActionType type;
+	protected GoogleActionType type;
 
 	public GoogleAction(){
 		type = null;
