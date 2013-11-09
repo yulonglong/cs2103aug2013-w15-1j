@@ -24,9 +24,12 @@ import com.licensetokil.atypistcalendar.parser.UpdateAction;
 public class TasksManager {
 
 	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n\n";
-
+	
+	private static final String CALENDAR_EMPTY = "Calendar is empty! Nothing to be displayed\n\n";
+	
 	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n\n";
 	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n\n";
+	private static final String DELETE_ALL = "Deleted all successfully\n\n";
 	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!\n";
 
 	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n\n";
@@ -100,16 +103,16 @@ public class TasksManager {
 	public ArrayList<Task> getAllTasks() {
 		ArrayList<Task> allTasks = new ArrayList<Task>();
 
-		for(Schedule s : schedule) {
-			allTasks.add((Schedule)s.clone());
+		for (Schedule s : schedule) {
+			allTasks.add((Schedule) s.clone());
 		}
 
-		for(Deadline d : deadline) {
-			allTasks.add((Deadline)d.clone());
+		for (Deadline d : deadline) {
+			allTasks.add((Deadline) d.clone());
 		}
 
-		for(Todo t : todo) {
-			allTasks.add((Todo)t.clone());
+		for (Todo t : todo) {
+			allTasks.add((Todo) t.clone());
 		}
 
 		return allTasks;
@@ -132,7 +135,7 @@ public class TasksManager {
 	 * if((t.getDescription()).contains("?a!b$")){ String newDescription =
 	 * (t.getDescription()).replaceAll("\\b?a!b$\\b", "@s");
 	 * t.setDescription(newDescription); }
-	 *
+	 * 
 	 * if((t.getPlace()).contains("?a!b$")){ String newPlace =
 	 * (t.getPlace()).replaceAll("\\b?a!b$\\b", "@s"); t.setPlace(newPlace); } }
 	 * }
@@ -158,10 +161,9 @@ public class TasksManager {
 					if (data[5].equals(" ")) {
 						s.setPlace("");
 					}
-					if(data[7].equals("null")){
+					if (data[7].equals("null")) {
 						s.setRemoteId(null);
-					}
-					else{
+					} else {
 						s.setRemoteId(data[7]);
 					}
 				} else if (data[0].equals("Deadline")) {
@@ -173,10 +175,9 @@ public class TasksManager {
 					if (data[4].equals(" ")) {
 						d.setPlace("");
 					}
-					if(data[7].equals("null")){
+					if (data[7].equals("null")) {
 						d.setRemoteId(null);
-					}
-					else{
+					} else {
 						d.setRemoteId(data[7]);
 					}
 				} else if (data[0].equals("Todo")) {
@@ -187,10 +188,9 @@ public class TasksManager {
 					if (data[3].equals(" ")) {
 						td.setPlace("");
 					}
-					if(data[6].equals("null")){
+					if (data[6].equals("null")) {
 						td.setRemoteId(null);
-					}
-					else{
+					} else {
 						td.setRemoteId(data[6]);
 					}
 				} else if (data[0].equals("uniqueId")) {
@@ -305,9 +305,10 @@ public class TasksManager {
 			output = "Added: \n" + t.outputStringForDisplay() + "\n";
 
 			if (t.getTaskType().equals("schedule")) {
-				if(!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()){
-					output +="\n" + "Warning: schedule clashes with the following event(s):\n";
-					for(Schedule s: sc){
+				if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
+					output += "\n"
+							+ "Warning: schedule clashes with the following event(s):\n";
+					for (Schedule s : sc) {
 						output += s.outputStringForDisplay() + "\n";
 					}
 				}
@@ -322,7 +323,7 @@ public class TasksManager {
 			lastTaskCreated = t;
 			fileSync();
 
-			return output+"\n";
+			return output + "\n";
 
 		} catch (Exception e) {
 			System.out.println("exception error: " + e.getMessage());
@@ -336,7 +337,7 @@ public class TasksManager {
 	 * if((t.getDescription()).contains("@s")){ String newDescription =
 	 * (t.getDescription()).replaceAll("\\b@s\\b", "?a!b$");
 	 * t.setDescription(newDescription); }
-	 *
+	 * 
 	 * if((t.getPlace()).contains("@s")){ String newPlace =
 	 * (t.getPlace()).replaceAll("\\b@s\\b", "b?a!b$"); t.setPlace(newPlace); }
 	 * }
@@ -360,7 +361,7 @@ public class TasksManager {
 		dl.clear();
 		toDo.clear();
 		table.clear();
-
+		System.out.println(ac);
 		String output = new String("");
 
 		switch (ac.getDescription()) {
@@ -419,23 +420,6 @@ public class TasksManager {
 				}
 			}
 			break;
-
-		case "":
-			for (Deadline d : deadline) {
-				if (d.getEndTime().after(ac.getStartTime())
-						&& d.getEndTime().before(ac.getEndTime())
-						&& d.getStatus().equals(ac.getStatus())) {
-					dl.add(d);
-				}
-			}
-			if (ac.getEndTime().get(Calendar.YEAR) == 2099) {
-				for (Todo td : todo) {
-					if (td.getStatus().equals(ac.getStatus())) {
-						toDo.add(td);
-					}
-				}
-			}
-			break;
 		}
 
 		return displayOutput(output);
@@ -452,14 +436,12 @@ public class TasksManager {
 		if (!sch.isEmpty()) {
 			output = output + "Schedules: \n";
 			for (Schedule s : sch) {
-				if(count<10){
+				if (count < 10) {
 					strCount = count + ". ";
-				}
-				else{
+				} else {
 					strCount = count + ".";
 				}
-				output = output + strCount + s.outputStringForDisplay()
-						+ "\n";
+				output = output + strCount + s.outputStringForDisplay() + "\n";
 				table.put(count, s);
 				count++;
 			}
@@ -469,14 +451,12 @@ public class TasksManager {
 		if (!dl.isEmpty()) {
 			output = output + "Deadlines: \n";
 			for (Deadline d : dl) {
-				if(count<10){
+				if (count < 10) {
 					strCount = count + ". ";
-				}
-				else{
+				} else {
 					strCount = count + ".";
 				}
-				output = output + strCount + d.outputStringForDisplay()
-						+ "\n";
+				output = output + strCount + d.outputStringForDisplay() + "\n";
 				table.put(count, d);
 				count++;
 			}
@@ -487,19 +467,21 @@ public class TasksManager {
 		if (!toDo.isEmpty()) {
 			output = output + "Todos: \n";
 			for (Todo td : toDo) {
-				if(count<10){
+				if (count < 10) {
 					strCount = count + ". ";
-				}
-				else{
+				} else {
 					strCount = count + ".";
 				}
-				output = output + strCount + td.outputStringForDisplay()
-						+ "\n";
+				output = output + strCount + td.outputStringForDisplay() + "\n";
 				table.put(count, td);
 				count++;
 			}
 
 			output = output + "\n";
+		}
+		
+		if(output.equals("")){
+			output = CALENDAR_EMPTY;
 		}
 
 		return output;
@@ -508,26 +490,41 @@ public class TasksManager {
 	private String delete(DeleteAction ac) {
 
 		try {
-			for (Integer num : ac.getReferenceNumber()) {
-				if (num <= table.size() && num > 0) {
-					Task t = table.get(num);
-					deletedTasks.add(t);
+			if (ac.getReferenceNumber().get(0) != -1) {
+				for (Integer num : ac.getReferenceNumber()) {
+					if (num <= table.size() && num > 0) {
+						Task t = table.get(num);
+						deletedTasks.add(t);
 
-					if (t instanceof Schedule) {
-						schedule.remove(t);
-						sch.remove(t);
-					} else if (t instanceof Deadline) {
-						deadline.remove(t);
-						dl.remove(t);
-					} else if (t instanceof Todo) {
-						todo.remove(t);
-						toDo.remove(t);
+						if (t instanceof Schedule) {
+							schedule.remove(t);
+							sch.remove(t);
+						} else if (t instanceof Deadline) {
+							deadline.remove(t);
+							dl.remove(t);
+						} else if (t instanceof Todo) {
+							todo.remove(t);
+							toDo.remove(t);
+						}
+
+						t.setLastModifiedDate(Calendar.getInstance());
+					} else {
+						return INVALID_NUMBER_INPUT;
 					}
-
-					t.setLastModifiedDate(Calendar.getInstance());
-				} else {
-					return INVALID_NUMBER_INPUT;
 				}
+			} else {
+				for (Integer i : table.keySet()) {
+					Task t = table.get(i);
+					deletedTasks.add(t);
+					schedule.remove(t);
+					deadline.remove(t);
+					todo.remove(t);
+					sch.remove(t);
+					dl.remove(t);
+					toDo.remove(t);
+				}
+				fileSync();
+				return DELETE_ALL;
 			}
 
 			fileSync();
@@ -564,12 +561,22 @@ public class TasksManager {
 
 	private String update(UpdateAction ac) {
 		Task t = table.get(ac.getReferenceNumber());
+		ArrayList<Schedule> sc = new ArrayList<Schedule>();
+		String output = String.format(UPDATE_SUCCESSFUL, ac.getReferenceNumber(),
+				t.getDescription());
 
 		try {
 			if (t instanceof Schedule) {
 				updateOriginalTask = new Schedule((Schedule) t);
 				((Schedule) t).setStartTime(ac.getUpdatedStartTime());
 				((Schedule) t).setEndTime(ac.getUpdatedEndTime());
+				if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
+					output += "\n"
+							+ "Warning: Your updated task clashes with the following event(s):\n";
+					for (Schedule s : sc) {
+						output += s.outputStringForDisplay() + "\n";
+					}
+				}
 			} else if (t instanceof Deadline) {
 				updateOriginalTask = new Deadline((Deadline) t);
 				((Deadline) t).setEndTime(ac.getUpdatedEndTime());
@@ -587,8 +594,7 @@ public class TasksManager {
 			return UPDATE_UNSUCCESSFUL;
 		}
 
-		return String.format(UPDATE_SUCCESSFUL, ac.getReferenceNumber(),
-				t.getDescription());
+		return output;
 	}
 
 	private String updateUndo() {
@@ -754,18 +760,18 @@ public class TasksManager {
 
 	private Task findTaskFromUniqueId(int uniqueId)
 			throws TaskNotFoundException {
-		for(Schedule s: schedule){
-			if(s.getUniqueId() == uniqueId){
+		for (Schedule s : schedule) {
+			if (s.getUniqueId() == uniqueId) {
 				return s;
 			}
 		}
-		for(Deadline d: deadline){
-			if(d.getUniqueId() == uniqueId){
+		for (Deadline d : deadline) {
+			if (d.getUniqueId() == uniqueId) {
 				return d;
 			}
 		}
-		for(Todo td: todo){
-			if(td.getUniqueId() == uniqueId){
+		for (Todo td : todo) {
+			if (td.getUniqueId() == uniqueId) {
 				return td;
 			}
 		}
@@ -828,64 +834,68 @@ public class TasksManager {
 
 	}
 
-	public Todo addTodoFromGoogle(String description, String location, Calendar lastModifiedDate, String remoteId) {
-		Todo todo = new Todo(++uniqueId, description, location, UNDONE, lastModifiedDate);
+	public Todo addTodoFromGoogle(String description, String location,
+			Calendar lastModifiedDate, String remoteId) {
+		Todo todo = new Todo(++uniqueId, description, location, UNDONE,
+				lastModifiedDate);
 		todo.setRemoteId(remoteId);
 		add(todo);
 		return todo;
 	}
 
-	public Deadline addDeadlineFromGoogle(Calendar endTime, String description, String location, Calendar lastModifiedDate, String remoteId) {
-		Deadline deadline = new Deadline(++uniqueId, endTime, description, location, UNDONE, lastModifiedDate);
+	public Deadline addDeadlineFromGoogle(Calendar endTime, String description,
+			String location, Calendar lastModifiedDate, String remoteId) {
+		Deadline deadline = new Deadline(++uniqueId, endTime, description,
+				location, UNDONE, lastModifiedDate);
 		deadline.setRemoteId(remoteId);
 		add(deadline);
 		return deadline;
 	}
 
-	public Schedule addScheduleFromGoogle(Calendar startTime, Calendar endTime, String description, String location, Calendar lastModifiedDate, String remoteId) {
-		Schedule schedule = new Schedule(++uniqueId, startTime, endTime, description, location, lastModifiedDate);
+	public Schedule addScheduleFromGoogle(Calendar startTime, Calendar endTime,
+			String description, String location, Calendar lastModifiedDate,
+			String remoteId) {
+		Schedule schedule = new Schedule(++uniqueId, startTime, endTime,
+				description, location, lastModifiedDate);
 		schedule.setRemoteId(remoteId);
 		add(schedule);
 		return schedule;
 	}
 
-	public void deleteGoogleTask(int uniqueId) throws TaskNotFoundException{
+	public void deleteGoogleTask(int uniqueId) throws TaskNotFoundException {
 		Task t = findTaskFromUniqueId(uniqueId);
-		if(t.getTaskType().equals("schedule")){
+		if (t.getTaskType().equals("schedule")) {
 			schedule.remove(t);
-		}
-		else if(t.getTaskType().equals("deadline")){
+		} else if (t.getTaskType().equals("deadline")) {
 			deadline.remove(t);
-		}
-		else if(t.getTaskType().equals("todo")){
+		} else if (t.getTaskType().equals("todo")) {
 			todo.remove(t);
-		}
-		else{
+		} else {
 			throw new TaskNotFoundException();
 		}
 		fileSync();
 	}
 
-	public void updateGoogleTask(Task t) throws TaskNotFoundException{
+	public void updateGoogleTask(Task t) throws TaskNotFoundException {
 		Task updateTask = findTaskFromUniqueId(t.getUniqueId());
-		if(t.getTaskType().equals("schedule")){
+		if (t.getTaskType().equals("schedule")) {
 			schedule.set(schedule.indexOf(updateTask), (Schedule) t);
-		}
-		else if(t.getTaskType().equals("deadline")){
+		} else if (t.getTaskType().equals("deadline")) {
 			deadline.set(deadline.indexOf(updateTask), (Deadline) t);
-		}
-		else if(t.getTaskType().equals("todo")){
+		} else if (t.getTaskType().equals("todo")) {
 			todo.set(todo.indexOf(updateTask), (Todo) t);
-		}
-		else {
+		} else {
 			throw new TaskNotFoundException();
 		}
 	}
 
-	public ArrayList<Schedule> checkForScheduleClashes(Schedule s){
+	public ArrayList<Schedule> checkForScheduleClashes(Schedule s) {
 		ArrayList<Schedule> clashedSchedules = new ArrayList<Schedule>();
-		for(Schedule sc: schedule){
-			if(s.getStartTime().getTime().toString().equals(sc.getStartTime().getTime().toString())){
+		for (Schedule sc : schedule) {
+			if ((s.getStartTime().after(sc.getStartTime()) && s.getEndTime()
+					.before(sc.getEndTime()))
+					|| (s.getStartTime().compareTo(sc.getStartTime()) == 0 || (s
+							.getEndTime().compareTo(sc.getEndTime()) == 0))) {
 				clashedSchedules.add(sc);
 			}
 		}
