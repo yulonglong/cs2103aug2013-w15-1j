@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 public abstract class Task implements Cloneable {
 	protected String remoteId;
-	protected String taskType;
+	protected TaskType taskType;
 	protected int uniqueId;
 	protected Calendar lastModifiedDate;
 	protected String place;
@@ -14,7 +14,7 @@ public abstract class Task implements Cloneable {
 		return remoteId;
 	}
 
-	public String getTaskType(){
+	public TaskType getTaskType(){
 		return taskType;
 	}
 
@@ -57,7 +57,7 @@ public abstract class Task implements Cloneable {
 	public String outputStringForDisplay(){
 		return "";
 	}
-
+	
 	@Override
 	public abstract Object clone();
 }

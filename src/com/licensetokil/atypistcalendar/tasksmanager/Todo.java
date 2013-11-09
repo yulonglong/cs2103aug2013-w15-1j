@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 public class Todo extends Task implements Comparable<Todo>, Cloneable {
 	private String remoteId;
-	private String taskType;
+	private TaskType taskType;
 	private int uniqueId;
 	private Calendar lastModifiedDate;
 	private String description;
@@ -13,7 +13,7 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 
 	public Todo(int uniqueId, String description, String place, String status, Calendar lastModifiedDate) {
 		this.uniqueId = uniqueId;
-		this.taskType = "todo";
+		this.taskType = TaskType.TODO;
 		this.description = description;
 		this.place = place;
 		this.status = status;
@@ -21,7 +21,7 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 	}
 
 	public Todo(Todo td) {
-		this.taskType = "todo";
+		this.taskType = TaskType.TODO;
 		this.description = td.getDescription();
 		this.place = td.getPlace();
 		this.uniqueId = td.getUniqueId();
@@ -39,7 +39,7 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 		return uniqueId;
 	}
 
-	public String getTaskType(){
+	public TaskType getTaskType(){
 		return taskType;
 	}
 
@@ -81,15 +81,14 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 
 	public String toString() {
 		if(place.equals("")){
-			return "Todo@s" + uniqueId + "@s" + description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
+			return TaskType.TODO + "@s" + uniqueId + "@s" + description + "@s" + " " + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 		}
-		return "Todo@s" + uniqueId + "@s" + description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
+		return TaskType.TODO + "@s" + uniqueId + "@s" + description + "@s" + place + "@s" + status + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 	}
 
 	public String outputStringForDisplay(){
 		String stringStatus = status;
 		if(stringStatus.equals("done")){
-			System.out.println("HIHIHII");
 			stringStatus = "done&nbsp&nbsp;";
 		}
 		
