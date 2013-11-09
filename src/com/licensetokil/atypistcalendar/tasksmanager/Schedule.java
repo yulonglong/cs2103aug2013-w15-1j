@@ -5,7 +5,7 @@ import java.util.Calendar;
 
 public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 	private String remoteId;
-	private String taskType;
+	private TaskType taskType;
 	private int uniqueId;
 	private Calendar lastModifiedDate;
 	private Calendar startTime;
@@ -15,7 +15,7 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 
 	public Schedule(int uniqueId, Calendar startTime, Calendar endTime,
 			String description, String place, Calendar lastModifiedDate) {
-		this.taskType = "schedule";
+		this.taskType = TaskType.SCHEDULE;
 		this.uniqueId = uniqueId;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -25,7 +25,7 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 	}
 
 	public Schedule(Schedule s){
-		this.taskType = "schedule";
+		this.taskType = TaskType.SCHEDULE;
 		this.endTime = s.getEndTime();
 		this.description = s.getDescription();
 		this.place = s.getPlace();
@@ -40,7 +40,7 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		return remoteId;
 	}
 
-	public String getTaskType() {
+	public TaskType getTaskType() {
 		return taskType;
 	}
 
@@ -94,10 +94,10 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 
 	public String toString() {
 		if(place.equals("")){
-			return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
+			return TaskType.SCHEDULE + "@s" + uniqueId + "@s" + startTime.getTime() + "@s"
 					+ endTime.getTime() + "@s" + description + "@s" + " " + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 		}
-		return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
+		return TaskType.SCHEDULE + "@s" + uniqueId + "@s" + startTime.getTime() + "@s"
 				+ endTime.getTime() + "@s" + description + "@s" + place + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
 	}
 

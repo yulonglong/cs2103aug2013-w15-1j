@@ -87,7 +87,7 @@ public class ATypistCalendar {
 	}
 
 	public ArrayList<Task> getCopyOfAllLocalTasks() {
-		return TasksManager.getInstance().getAllTasks();
+		return TasksManager.getInstance().cloneAllTasks();
 	}
 
 	private String executeCommand(SystemAction action) {
