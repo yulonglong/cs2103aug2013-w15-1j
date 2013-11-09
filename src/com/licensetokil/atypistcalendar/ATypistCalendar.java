@@ -1,8 +1,17 @@
 package com.licensetokil.atypistcalendar;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Logger;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import com.licensetokil.atypistcalendar.gcal.GoogleCalendarManager;
 import com.licensetokil.atypistcalendar.parser.Action;
@@ -36,19 +45,100 @@ public class ATypistCalendar {
 	}
 
 	public static void main(String[] args) {
-		ATypistCalendar.getInstance().initialize();
+		//No logging allowed until we set the System.err stream (if needed)
+		//Logging before setting the stream will make the logging system hook on the original System.err stream.
+		if(containsStringIgnoreCase(args, "-logToFile")) {
+			redirectSystemErrorStream();
+		}
+		else {
+			//TODO delete before production
+			redirectSystemErrorStream();
+		}
+		ATypistCalendar.getInstance().initialize(args);
 	}
 
-	private void initialize() {
+	private static boolean containsStringIgnoreCase(String[] args, String string) {
+		if(args.length == 0) {
+			return false;
+		}
+
+		for(String element : args) {
+			if(element.equalsIgnoreCase(string)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static void redirectSystemErrorStream() {
+		try {
+			PrintStream errStream = new PrintStream("atc_errorStream.log");
+			System.setErr(errStream);
+
+			//We can start logging from here onwards.
+			logger.info("Successfully redirected System.err to file.");
+		} catch (FileNotFoundException e) {
+			logger.severe("Unable to redirect System.err to file! Continuing with default System.err. (Quiet failure)");
+			e.printStackTrace();
+		}
+	}
+
+	private void initialize(String[] args) {
+		logger.fine("initialize called.");
+
+		logger.info("Loading SWT library.");
+		loadSwtLibrary();
+
+		logger.info("Creating new GUI instance.");
 		gui = new ATCGUI();
 		gui.setVisible(true);
 
+		logger.info("Greeting the user.");
 		Calendar calendar = Calendar.getInstance();
 		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
 
+		logger.info("Initializing modules.");
 		TasksManager.getInstance().initialize();
 		GoogleCalendarManager.getInstance().initialize();
+
+		logger.info("Initiallizing done.");
 	}
+
+	private void loadSwtLibrary() {
+		logger.fine("loadSwtLibrary called.");
+
+		logger.info("Deciding which version (32- or 64-bit) of the SWT library to include.");
+		URL pathToSWT;
+		if(System.getProperty("java.vm.name").contains("64-Bit")) {
+			logger.info("Finding path to 64-bit SWT library.");
+			pathToSWT = getClass().getResource("/swt_x64.jar");
+			logger.info("Path to 64-bit SWT library found.");
+		}
+		else {
+			logger.info("Finding path to 32-bit SWT library.");
+			pathToSWT = getClass().getResource("/swt_x86.jar");
+			logger.info("Path to 32-bit SWT library found.");
+		}
+
+		try {
+			logger.info("Reflecting the URLClassLoader.addURL method to expose it (protected -> public)");
+			Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+			method.setAccessible(true);
+
+			logger.info("Invoking the URLClassLoader.addURL method of the ATypistCalendar class'es ClassLoader.");
+			method.invoke((URLClassLoader)ATypistCalendar.class.getClassLoader(), pathToSWT);
+		}
+		catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			logger.severe("Unable to load the SWT library! Displaying error message and exiting.");
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(new JDialog(), "A Typist's Calendar is unable to load the SWT library that is required for running. Exiting...", "Fatal Error", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
+		}
+		logger.info("SWT library loaded successful.");
+	}
+
+
 
 	public void userInput(String input) {
 		String reply = "";
