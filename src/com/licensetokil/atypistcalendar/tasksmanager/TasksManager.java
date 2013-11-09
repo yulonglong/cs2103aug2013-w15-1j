@@ -563,7 +563,7 @@ public class TasksManager {
 		Task t = table.get(ac.getReferenceNumber());
 		ArrayList<Schedule> sc = new ArrayList<Schedule>();
 		String output = String.format(UPDATE_SUCCESSFUL, ac.getReferenceNumber(),
-				t.getDescription());
+				ac.getUpdatedQuery());
 
 		try {
 			if (t instanceof Schedule) {
@@ -572,7 +572,7 @@ public class TasksManager {
 				((Schedule) t).setEndTime(ac.getUpdatedEndTime());
 				if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
 					output += "\n"
-							+ "Warning: Your updated task clashes with the following event(s):\n";
+							+ "Warning: The following events clashes after update:\n";
 					for (Schedule s : sc) {
 						output += s.outputStringForDisplay() + "\n";
 					}
