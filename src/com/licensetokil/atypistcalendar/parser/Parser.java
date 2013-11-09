@@ -13,20 +13,20 @@ import java.util.logging.Logger;
 
 public class Parser {
 	
-	private static final String MESSAGE_INVALID = "Invalid input!";
-	private static final String MESSAGE_INVALID_ACTION = "Invalid command/action entered!";
-	private static final String MESSAGE_INVALID_STATUS = "Invalid status entered! please enter done or undone!";
-	private static final String MESSAGE_INVALID_PLACE = "Invalid place entered!";
-	private static final String MESSAGE_INVALID_DESCRIPTION = "Invalid descripition entered!";
-	private static final String MESSAGE_INVALID_DATE = "Invalid date/day entered!";
-	private static final String MESSAGE_INVALID_MONTH = "Invalid month entered!";
-	private static final String MESSAGE_INVALID_SEARCH_QUERY = "No search query detected!";
-	private static final String MESSAGE_INVALID_REF_NUMBER = "Invalid Reference Number entered!";
-	private static final String MESSAGE_INVALID_TIME = "Invalid time entered!";
-	private static final String MESSAGE_INVALID_TIME_DURATION = "Invalid time duration entered!";
-	private static final String MESSAGE_INVALID_PREP = "Invalid preposition entered!";
-	private static final String MESSAGE_INVALID_UPDATE_DELIM = "Invalid update delimiter is entered! Please enter '>>' as delimiter";
-	private static final String MESSAGE_INVALID_GOOGLE = "Invalid Google Calendar Command!";
+	private static final String MESSAGE_INVALID = "Invalid input!\n";
+	private static final String MESSAGE_INVALID_ACTION = "Invalid command/action entered!\n";
+	private static final String MESSAGE_INVALID_STATUS = "Invalid status entered! please enter done or undone!\n";
+	private static final String MESSAGE_INVALID_PLACE = "Invalid place entered!\n";
+	private static final String MESSAGE_INVALID_DESCRIPTION = "Invalid descripition entered!\n";
+	private static final String MESSAGE_INVALID_DATE = "Invalid date/day entered!\n";
+	private static final String MESSAGE_INVALID_MONTH = "Invalid month entered!\n";
+	private static final String MESSAGE_INVALID_SEARCH_QUERY = "No search query detected!\n";
+	private static final String MESSAGE_INVALID_REF_NUMBER = "Invalid Reference Number entered!\n";
+	private static final String MESSAGE_INVALID_TIME = "Invalid time entered!\n";
+	private static final String MESSAGE_INVALID_TIME_DURATION = "Invalid time duration entered!\n";
+	private static final String MESSAGE_INVALID_PREP = "Invalid preposition entered!\n";
+	private static final String MESSAGE_INVALID_UPDATE_DELIM = "Invalid update delimiter is entered! Please enter '>>' as delimiter\n";
+	private static final String MESSAGE_INVALID_GOOGLE = "Invalid Google Calendar Command!\n";
 	
 	private static final int DELETE_ALL_REF_NUMBER = -1;
 
@@ -199,6 +199,9 @@ public class Parser {
 	}
 
 	private static Action googleParser(StringTokenizer st) throws MalformedUserInputException {
+		if(!st.hasMoreTokens()){
+			throw new MalformedUserInputException(MESSAGE_INVALID_GOOGLE);
+		}
 		String userInput = new String();
 		String stringUserAction = new String(GoogleActionType.GOOGLE.getString());
 		AddGoogleAction userActionAdd = new AddGoogleAction();

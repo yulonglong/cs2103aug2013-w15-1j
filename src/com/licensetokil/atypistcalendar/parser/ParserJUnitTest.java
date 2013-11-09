@@ -1263,7 +1263,6 @@ public class ParserJUnitTest {
 		ac = null;
 		
 		newAddGc = new AddGoogleAction();
-		newAddGc.setType(GoogleActionType.GOOGLE_ADD);
 		newAddGc.setUserInput(" swimming monday at home 5 pm");
 		expectedAc = newAddGc;
 		try{
@@ -1284,7 +1283,6 @@ public class ParserJUnitTest {
 		ac = null;
 		
 		newSyncGc = new SyncGoogleAction();
-		newSyncGc.setType(GoogleActionType.GOOGLE_SYNC);
 		expectedAc = newSyncGc;
 		try{
 			ac = Parser.parse("google sync");

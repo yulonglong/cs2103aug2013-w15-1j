@@ -7,7 +7,6 @@ package com.licensetokil.atypistcalendar.parser;
 
 
 public class AddGoogleAction extends GoogleAction{
-	private GoogleActionType type;
 	private String userInput;
 
 	public AddGoogleAction(){
