@@ -25,9 +25,8 @@ import com.licensetokil.atypistcalendar.parser.UpdateAction;
 
 /**
  * 
- * @author Fan Yuxin Lacie
- * A0103494J
- *
+ * @author Fan Yuxin Lacie A0103494J
+ * 
  */
 public class TasksManager {
 
@@ -442,6 +441,7 @@ public class TasksManager {
 	}
 
 	private String display(DisplayAction ac) {
+		System.out.println(ac);
 		logger.log(Level.INFO,
 				"In display function. Clearing all previously requested tasks by the user");
 		requestedSchedules.clear();
@@ -540,7 +540,7 @@ public class TasksManager {
 
 		return displayOutput(output);
 	}
-	
+
 	private String alignNumbersAndText(int count) {
 		String strCount;
 		if (count < 10) {
@@ -616,13 +616,23 @@ public class TasksManager {
 		return output;
 	}
 
+	private boolean checkValidReferenceNumbers(ArrayList<Integer> refNum) {
+		for (Integer num : refNum) {
+			if (num > selectedTasks.size() || num <= 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private String delete(DeleteAction ac) {
 		logger.log(Level.INFO, "In delete function");
 		try {
 			if (ac.getReferenceNumber().get(0) != -1) {
 				logger.log(Level.INFO, "Normal delete function");
-				for (Integer num : ac.getReferenceNumber()) {
-					if (num <= selectedTasks.size() && num > 0) {
+				if (checkValidReferenceNumbers(ac.getReferenceNumber())) {
+					for (Integer num : ac.getReferenceNumber()) {
+
 						Task t = selectedTasks.get(num);
 						deletedTasks.add(t);
 
@@ -641,11 +651,11 @@ public class TasksManager {
 						}
 
 						t.setLastModifiedDate(Calendar.getInstance());
-					} else {
-						logger.log(Level.INFO,
-								"Number input exceeds displayed number of output. Returning error");
-						return INVALID_NUMBER_INPUT;
 					}
+				} else {
+					logger.log(Level.INFO,
+							"Number input exceeds displayed number of output. Returning error");
+					return INVALID_NUMBER_INPUT;
 				}
 			} else {
 				logger.log(Level.INFO, "Delete all command called");
@@ -737,8 +747,8 @@ public class TasksManager {
 				logger.log(Level.INFO, "Updating todo: " + t);
 				updateOriginalTask = new Todo((Todo) t);
 			}
-			
-			//common attributes to all schedules deadlines and todos
+
+			// common attributes to all schedules deadlines and todos
 			t.setPlace(ac.getUpdatedLocationQuery());
 			t.setDescription(ac.getUpdatedQuery());
 			t.setLastModifiedDate(Calendar.getInstance());
@@ -1028,12 +1038,16 @@ public class TasksManager {
 		else if (ac.getType() == LocalActionType.UNDO) {
 			logger.log(Level.INFO, "Command identified as undo");
 			if (lastAction instanceof AddAction) {
+				lastAction = ac;
 				return addUndo();
 			} else if (lastAction instanceof UpdateAction) {
+				lastAction = ac;
 				return updateUndo();
 			} else if (lastAction instanceof DeleteAction) {
+				lastAction = ac;
 				return deleteUndo();
 			} else if (lastAction instanceof MarkAction) {
+				lastAction = ac;
 				return markUndo();
 			} else {
 				return UNDO_DISALLOWED;

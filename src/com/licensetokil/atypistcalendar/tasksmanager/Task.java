@@ -9,55 +9,27 @@ public abstract class Task implements Cloneable {
 	protected Calendar lastModifiedDate;
 	protected String place;
 	protected String description;
+	protected static final String DELIMITER = "@s";
+	protected static final String EMPTY_STRING = "";
+	protected static final String DONE_ALIGN = "done&nbsp&nbsp";
+	protected static final String DONE_NO_ALIGN = "done";
+	protected static final String DISPLAY_PLACE_NOT_EMPTY = "%s at %s";
+	protected static final String BLANK_SPACE = " ";
 
-	public String getRemoteId(){
-		return remoteId;
-	}
-
-	public TaskType getTaskType(){
-		return taskType;
-	}
-
-	public String getDescription(){
-		return description;
-	}
-
-	public int getUniqueId(){
-		return uniqueId;
-	}
-
-	public Calendar getLastModifiedDate(){
-		return lastModifiedDate;
-	}
-
-	public String getPlace(){
-		return place;
-	}
-
-	public void setPlace(String place){
-		this.place = place;
-	}
-
-	public void setDescription(String description){
-		this.description = description;
-	}
-
-	public void setRemoteId(String remoteId){
-		this.remoteId = remoteId;
-	}
-
-	public void setLastModifiedDate(Calendar lastModifiedDate){
-		this.lastModifiedDate = lastModifiedDate;
-	}
-
-	public String toString(){
-		return "";
-	}
-
-	public String outputStringForDisplay(){
-		return "";
-	}
-	
+	public abstract String getRemoteId();
+	public abstract TaskType getTaskType();
+	public abstract String getDescription();
+	public abstract int getUniqueId();
+	public abstract Calendar getLastModifiedDate();
+	public abstract String getPlace();
+	public abstract void setPlace(String place);
+	public abstract void setDescription(String description);
+	public abstract void setRemoteId(String remoteId);
+	public abstract void setLastModifiedDate(Calendar lastModifiedDate);
+	public abstract void setUniqueId(int uniqueId);
+	public abstract void setTaskType(TaskType t);
+	public abstract String toString();
+	public abstract String outputStringForDisplay();
 	@Override
 	public abstract Object clone();
 }
