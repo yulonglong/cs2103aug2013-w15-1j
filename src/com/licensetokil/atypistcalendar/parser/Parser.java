@@ -439,6 +439,10 @@ public class Parser {
 		referenceNumber = getSingleReferenceNumber(st);
 		userAction.setReferenceNumber(referenceNumber);
 		
+		if(!st.hasMoreTokens()){
+			throw new MalformedUserInputException (MESSAGE_INVALID_UPDATE_DELIM);
+		}
+		
 		//check is there ">>" delimiter after the reference number
 		updateDelimiter = st.nextToken();
 		if (!isValidUpdateDelimiter(updateDelimiter)){
