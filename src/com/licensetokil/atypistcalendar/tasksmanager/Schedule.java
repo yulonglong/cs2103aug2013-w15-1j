@@ -24,15 +24,6 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	public Schedule(Schedule s){
-		this.taskType = TaskType.SCHEDULE;
-		this.endTime = s.getEndTime();
-		this.description = s.getDescription();
-		this.place = s.getPlace();
-		this.uniqueId = s.getUniqueId();
-		this.startTime = s.getStartTime();
-	}
-
 	public Schedule() {
 	}
 

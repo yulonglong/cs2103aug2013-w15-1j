@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -22,14 +23,22 @@ import com.licensetokil.atypistcalendar.parser.MarkAction;
 import com.licensetokil.atypistcalendar.parser.SearchAction;
 import com.licensetokil.atypistcalendar.parser.UpdateAction;
 
+/**
+ * 
+ * @author Fan Yuxin Lacie
+ * A0103494J
+ *
+ */
 public class TasksManager {
 
 	private static Logger logger = Logger.getLogger("TasksManager");
 
+	// Strings for add function
 	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n\n";
 	private static final String ADD_WARNING_CLASH = "Warning: schedule clashes with the following event(s):\n";
 	private static final String ADD_PREFIX = "Added: \n";
 
+	// Strings for display function
 	private static final String DISPLAY_NO_MATCHES = "No display matches! Nothing to be displayed\n\n";
 	private static final String DISPLAY_TYPE_SCHEDULE = "schedules";
 	private static final String DISPLAY_TYPE_DEADLINE = "deadlines";
@@ -41,24 +50,28 @@ public class TasksManager {
 	private static final String DISPLAY_ALIGNMENT_DOT = ". ";
 	private static final String DISPLAY_NONALIGNMENT_DOT = ".";
 
+	// Strings for delete function
 	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n\n";
 	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n\n";
 	private static final String DELETE_ALL = "Deleted all successfully\n\n";
-	
 	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!\n";
 
+	// Strings for update function
 	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n\n";
 	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n\n";
 	private static final String UPDATE_WARNING_CLASH = "Warning: The following events clashes after update:\n";
 
+	// Strings for mark function
 	private static final String MARK_UNSUCCESSFUL = "Mark was unsuccessful. Please try again!\n\n";
 	private static final String MARK_SUCCESSFUL = "Marked %s as %s\n\n";
 	private static final String MARK_SCHEDULE_ERROR = "The event that you are trying to mark is a schedule. Please try again!\n\n";
 	private static final String MARK_UNDONE = "undone";
-	
+
+	// Strings for search function
 	private static final String SEARCH_UNFOUND = "No search matches found!\n\n";
 	private static final String SEARCH_PREFIX = "Search Matches: \n\n";
 
+	// Strings for undo function
 	private static final String UNDO_DELETE_SUCCESSFUL = "Delete command successfully undone\n\n";
 	private static final String UNDO_MARK_SUCCESSFUL = "Mark command successfully undone\n\n";
 	private static final String UNDO_UPDATE_SUCCESSFUL = "Update command successfully undone\n\n";
@@ -70,6 +83,7 @@ public class TasksManager {
 	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n\n";
 	private static final String UNDO_DISALLOWED = "Undo command is not allowed\n\n";
 
+	// Miscellaneous Strings
 	private static final String EMPTY_STRING = "";
 	private static final String BLANK_SPACE = " ";
 	private static final String NULL_STRING = "null";
@@ -77,13 +91,11 @@ public class TasksManager {
 	private static final String DELIMITER = "@s";
 	private static final String NEWLINE = "\n";
 	private static final String UNIQUEID = "uniqueId";
-	
+
 	private static final String ERROR_MESSAGE = "Error in executing your command. Please try again! \n\n";
-	
+
 	private static TasksManager TM;
 
-	private LocalAction action;
-	
 	private static ArrayList<Schedule> allSchedules = new ArrayList<Schedule>();
 	private static ArrayList<Deadline> allDeadlines = new ArrayList<Deadline>();
 	private static ArrayList<Todo> allTodos = new ArrayList<Todo>();
@@ -106,38 +118,23 @@ public class TasksManager {
 
 	private static File file = new File("ATC.txt");
 
-	public void setAction(LocalAction action) {
-		this.action = action;
-	}
-
-	public LocalAction getAction() {
-		return action;
-	}
-
-	public ArrayList<Schedule> getSchedule() {
-		return allSchedules;
-	}
-
-	public ArrayList<Deadline> getDeadline() {
-		return allDeadlines;
-	}
-
-	public ArrayList<Todo> getTodo() {
-		return allTodos;
-	}
-
+	// function for google calendar
 	public ArrayList<Task> cloneAllTasks() {
+		logger.log(Level.INFO, "In cloneAllTasks");
 		ArrayList<Task> allTasks = new ArrayList<Task>();
 
 		for (Schedule s : allSchedules) {
+			logger.log(Level.INFO, "cloning schedule " + s);
 			allTasks.add((Schedule) s.clone());
 		}
 
 		for (Deadline d : allDeadlines) {
+			logger.log(Level.INFO, "cloning deadline " + d);
 			allTasks.add((Deadline) d.clone());
 		}
 
 		for (Todo t : allTodos) {
+			logger.log(Level.INFO, "cloning todo " + t);
 			allTasks.add((Todo) t.clone());
 		}
 
@@ -347,9 +344,10 @@ public class TasksManager {
 		case "Dec":
 			logger.log(Level.INFO, "Detected month as DEC");
 			return 11;
+		default:
+			logger.log(Level.WARNING, "No month detected");
+			return -1;
 		}
-		logger.log(Level.WARNING, "No month detected");
-		return -1;
 	}
 
 	// Method that classifies the user add input into three types of task:
@@ -366,8 +364,8 @@ public class TasksManager {
 				logger.log(Level.INFO,
 						"Creating deadline. No start time detected");
 				t = new Deadline(++uniqueId, action.getEndTime(),
-						action.getDescription(), action.getPlace(), MARK_UNDONE,
-						Calendar.getInstance());
+						action.getDescription(), action.getPlace(),
+						MARK_UNDONE, Calendar.getInstance());
 			}
 		} else {
 			logger.log(Level.INFO,
@@ -426,7 +424,8 @@ public class TasksManager {
 
 	private String addUndo() {
 		try {
-			logger.log(Level.INFO,
+			logger.log(
+					Level.INFO,
 					"In add undo function. Removing the last task added into the function from arraylist.");
 			allSchedules.remove(lastTaskCreated);
 			allDeadlines.remove(lastTaskCreated);
@@ -454,6 +453,7 @@ public class TasksManager {
 
 		switch (ac.getDescription()) {
 
+		// If user wants to display schedules only
 		case DISPLAY_TYPE_SCHEDULE:
 			logger.log(Level.INFO, "Display schedules requested");
 			for (Schedule s : allSchedules) {
@@ -465,6 +465,8 @@ public class TasksManager {
 				}
 			}
 			break;
+
+		// If user wants to display deadlines only
 		case DISPLAY_TYPE_DEADLINE:
 			logger.log(Level.INFO, "Display deadlines requested");
 			for (Deadline d : allDeadlines) {
@@ -487,6 +489,8 @@ public class TasksManager {
 				}
 			}
 			break;
+
+		// If user wants to display todos only
 		case DISPLAY_TYPE_TODO:
 			logger.log(Level.INFO, "Display todos requested");
 			for (Todo td : allTodos) {
@@ -503,6 +507,8 @@ public class TasksManager {
 				}
 			}
 			break;
+
+		// If user wants to display all types
 		case DISPLAY_TYPE_ALL:
 			logger.log(Level.INFO, "Display all requested");
 			for (Schedule s : allSchedules) {
@@ -528,11 +534,13 @@ public class TasksManager {
 				}
 			}
 			break;
+		default:
+			break;
 		}
 
 		return displayOutput(output);
 	}
-
+	
 	private String alignNumbersAndText(int count) {
 		String strCount;
 		if (count < 10) {
@@ -556,7 +564,8 @@ public class TasksManager {
 		Collections.sort(requestedTodos);
 
 		if (!requestedSchedules.isEmpty()) {
-			logger.log(Level.INFO, "Adding schedules to be displayed into output String");
+			logger.log(Level.INFO,
+					"Adding schedules to be displayed into output String");
 			output = output + DISPLAY_SCHEDULE_PREFIX;
 			for (Schedule s : requestedSchedules) {
 				strCount = alignNumbersAndText(count);
@@ -569,7 +578,8 @@ public class TasksManager {
 		}
 
 		if (!requestedDeadlines.isEmpty()) {
-			logger.log(Level.INFO, "Adding deadlines to be displayed into output String");
+			logger.log(Level.INFO,
+					"Adding deadlines to be displayed into output String");
 			output = output + DISPLAY_DEADLINE_PREFIX;
 			for (Deadline d : requestedDeadlines) {
 				strCount = alignNumbersAndText(count);
@@ -583,7 +593,8 @@ public class TasksManager {
 		}
 
 		if (!requestedTodos.isEmpty()) {
-			logger.log(Level.INFO, "Adding todos to be displayed into output String");
+			logger.log(Level.INFO,
+					"Adding todos to be displayed into output String");
 			output = output + DISPLAY_TODO_PREFIX;
 			for (Todo td : requestedTodos) {
 				strCount = alignNumbersAndText(count);
@@ -597,7 +608,8 @@ public class TasksManager {
 		}
 
 		if (output.equals(EMPTY_STRING)) {
-			logger.log(Level.INFO, "No display matches detected. Reuturning no match");
+			logger.log(Level.INFO,
+					"No display matches detected. Reuturning no match");
 			output = DISPLAY_NO_MATCHES;
 		}
 
@@ -630,7 +642,8 @@ public class TasksManager {
 
 						t.setLastModifiedDate(Calendar.getInstance());
 					} else {
-						logger.log(Level.INFO, "Number input exceeds displayed number of output. Returning error");
+						logger.log(Level.INFO,
+								"Number input exceeds displayed number of output. Returning error");
 						return INVALID_NUMBER_INPUT;
 					}
 				}
@@ -647,17 +660,18 @@ public class TasksManager {
 					requestedDeadlines.remove(t);
 					requestedTodos.remove(t);
 				}
-				
+
 				logger.log(Level.INFO, "Preparing for file sync");
 				fileSync();
 				return DELETE_ALL;
 			}
-			
+
 			logger.log(Level.INFO, "Preparing for file sync");
 			fileSync();
 
 		} catch (Exception e) {
-			logger.log(Level.WARNING, "Exception caught in delete: " + e.getMessage());
+			logger.log(Level.WARNING,
+					"Exception caught in delete: " + e.getMessage());
 			return DELETE_UNSUCCESSFUL;
 		}
 
@@ -683,11 +697,12 @@ public class TasksManager {
 
 				t.setLastModifiedDate(Calendar.getInstance());
 			}
-			
+
 			logger.log(Level.INFO, "Preparing for file sync");
 			fileSync();
 		} catch (Exception e) {
-			logger.log(Level.WARNING, "Exception caught in deleteUndo: " + e.getMessage());
+			logger.log(Level.WARNING,
+					"Exception caught in deleteUndo: " + e.getMessage());
 			return UNDO_DELETE_UNSUCCESSFUL;
 		}
 
@@ -703,27 +718,27 @@ public class TasksManager {
 
 		try {
 			if (t instanceof Schedule) {
-				logger.log(Level.INFO, "Updating schedule: "+ t);
-				updateOriginalTask = new Schedule((Schedule) t);
+				logger.log(Level.INFO, "Updating schedule: " + t);
+				updateOriginalTask = (Schedule) t.clone();
 				((Schedule) t).setStartTime(ac.getUpdatedStartTime());
 				((Schedule) t).setEndTime(ac.getUpdatedEndTime());
 				if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
 					logger.log(Level.INFO, "Clashed schedules found");
-					output += NEWLINE
-							+ UPDATE_WARNING_CLASH;
+					output += NEWLINE + UPDATE_WARNING_CLASH;
 					for (Schedule s : sc) {
 						output += s.outputStringForDisplay() + NEWLINE;
 					}
 				}
 			} else if (t instanceof Deadline) {
-				logger.log(Level.INFO, "Updating schedule: "+ t);
+				logger.log(Level.INFO, "Updating schedule: " + t);
 				updateOriginalTask = new Deadline((Deadline) t);
 				((Deadline) t).setEndTime(ac.getUpdatedEndTime());
 			} else if (t instanceof Todo) {
-				logger.log(Level.INFO, "Updating todo: "+ t);
+				logger.log(Level.INFO, "Updating todo: " + t);
 				updateOriginalTask = new Todo((Todo) t);
 			}
-
+			
+			//common attributes to all schedules deadlines and todos
 			t.setPlace(ac.getUpdatedLocationQuery());
 			t.setDescription(ac.getUpdatedQuery());
 			t.setLastModifiedDate(Calendar.getInstance());
@@ -741,7 +756,8 @@ public class TasksManager {
 	private String updateUndo() {
 		logger.log(Level.INFO, "In update undo function");
 		try {
-			logger.log(Level.INFO, "undoing update back to schedule:  " + updateOriginalTask);
+			logger.log(Level.INFO, "undoing update back to schedule:  "
+					+ updateOriginalTask);
 			for (Schedule s : allSchedules) {
 				if (s.getUniqueId() == updateOriginalTask.getUniqueId()) {
 					s = (Schedule) updateOriginalTask;
@@ -769,7 +785,8 @@ public class TasksManager {
 	}
 
 	private String search(SearchAction ac) {
-		logger.log(Level.INFO, "In search function. Clearing all previously requested tasks from memory");
+		logger.log(Level.INFO,
+				"In search function. Clearing all previously requested tasks from memory");
 		requestedSchedules.clear();
 		requestedDeadlines.clear();
 		requestedTodos.clear();
@@ -832,28 +849,32 @@ public class TasksManager {
 					numbers = numbers + num + BLANK_SPACE;
 
 					if (t instanceof Deadline) {
-						logger.log(Level.INFO, "Marking deadline as " + ac.getStatus());
+						logger.log(Level.INFO,
+								"Marking deadline as " + ac.getStatus());
 						((Deadline) t).setStatus(ac.getStatus());
 					} else if (t instanceof Todo) {
-						logger.log(Level.INFO, "Marking todo as " + ac.getStatus());
+						logger.log(Level.INFO,
+								"Marking todo as " + ac.getStatus());
 						((Todo) t).setStatus(ac.getStatus());
-					} else{
-						logger.log(Level.INFO, "User trying to mark schedule. Returning error");
+					} else {
+						logger.log(Level.INFO,
+								"User trying to mark schedule. Returning error");
 						return MARK_SCHEDULE_ERROR;
 					}
 
 					t.setLastModifiedDate(Calendar.getInstance());
-				} else{
-					logger.log(Level.INFO, "Number input out of range. Returning error");
+				} else {
+					logger.log(Level.INFO,
+							"Number input out of range. Returning error");
 					return INVALID_NUMBER_INPUT;
 				}
 			}
-			
+
 			logger.log(Level.INFO, "Preparing for file sync");
 			fileSync();
 
 		} catch (Exception e) {
-			logger.log(Level.WARNING, "Exception error: "+ e.getMessage());
+			logger.log(Level.WARNING, "Exception error: " + e.getMessage());
 			return MARK_UNSUCCESSFUL;
 		}
 
@@ -864,21 +885,22 @@ public class TasksManager {
 		logger.log(Level.INFO, "In mark undo function");
 		try {
 			for (Task t : markUndoList) {
-				for(Deadline d: allDeadlines){
-					if(d.getUniqueId() == t.getUniqueId()){
-						logger.log(Level.INFO, "undoing status of deadline: " + d);
+				for (Deadline d : allDeadlines) {
+					if (d.getUniqueId() == t.getUniqueId()) {
+						logger.log(Level.INFO, "undoing status of deadline: "
+								+ d);
 						d.setStatus(((Deadline) t).getStatus());
 					}
 				}
-				for(Todo td: allTodos){
-					if(td.getUniqueId() == td.getUniqueId()){
+				for (Todo td : allTodos) {
+					if (td.getUniqueId() == td.getUniqueId()) {
 						logger.log(Level.INFO, "undoing status of todo: " + td);
 						td.setStatus(((Todo) t).getStatus());
 					}
 				}
 				t.setLastModifiedDate(Calendar.getInstance());
 			}
-			
+
 			logger.log(Level.INFO, "Preparing for file sync");
 			fileSync();
 		} catch (Exception e) {
@@ -890,13 +912,13 @@ public class TasksManager {
 	}
 
 	private void fileSync() {
+		BufferedWriter clearWriter = null;
+		BufferedWriter appendWriter = null;
 		try {
-			BufferedWriter clearWriter = new BufferedWriter(
-					new FileWriter(file));
+			clearWriter = new BufferedWriter(new FileWriter(file));
 			logger.log(Level.INFO, "Clearing file");
 			clearWriter.write(EMPTY_STRING);
-			BufferedWriter appendWriter = new BufferedWriter(new FileWriter(
-					file, true));
+			appendWriter = new BufferedWriter(new FileWriter(file, true));
 
 			for (Schedule s : allSchedules) {
 				logger.log(Level.INFO, "Appending schedule " + s);
@@ -915,12 +937,20 @@ public class TasksManager {
 				appendWriter.write(td.toString());
 				appendWriter.newLine();
 			}
-			
-			logger.log(Level.INFO, "Closing buffered writers");
-			clearWriter.close();
-			appendWriter.close();
-		} catch (Exception e) {
+
+		} catch (IOException e) {
 			logger.log(Level.WARNING, "Error detected" + e.getMessage());
+		} finally {
+			logger.log(Level.INFO, "Closing buffered writers");
+			try {
+				clearWriter.close();
+				appendWriter.close();
+			} catch (IOException e) {
+				logger.log(
+						Level.WARNING,
+						"Unable to close buffered writers due to error: "
+								+ e.getMessage());
+			}
 		}
 	}
 
@@ -945,7 +975,7 @@ public class TasksManager {
 				return td;
 			}
 		}
-		
+
 		logger.log(Level.WARNING, "Task is not found");
 		throw new TaskNotFoundException("Task not found");
 	}
@@ -959,7 +989,7 @@ public class TasksManager {
 
 	public String executeCommand(LocalAction ac) {
 		logger.log(Level.INFO, "In executeCommand function");
-		
+
 		if (ac.getType() == LocalActionType.ADD) {
 			logger.log(Level.INFO, "Command identified as add");
 			Task t = classify((AddAction) ac);
@@ -1060,7 +1090,7 @@ public class TasksManager {
 			logger.log(Level.WARNING, "Task not found");
 			throw new TaskNotFoundException();
 		}
-		
+
 		logger.log(Level.INFO, "Preparing for file sync");
 		fileSync();
 	}
@@ -1101,17 +1131,27 @@ public class TasksManager {
 
 	public void exit() {
 		logger.log(Level.INFO, "In exit function");
+		BufferedWriter writer = null;
 		try {
 			logger.log(Level.INFO, "Preparing for file sync");
 			fileSync();
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file,
-					true));
-			logger.log(Level.INFO, "Writing into file the last uniqueId" + uniqueId);
+			writer = new BufferedWriter(new FileWriter(file, true));
+			logger.log(Level.INFO, "Writing into file the last uniqueId"
+					+ uniqueId);
 			writer.write(UNIQUEID + DELIMITER + uniqueId);
 			writer.newLine();
-			writer.close();
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Error detected " + e.getMessage());
+		} finally {
+			try {
+				logger.log(Level.INFO, "Closing buffered writer");
+				writer.close();
+			} catch (IOException e) {
+				logger.log(
+						Level.WARNING,
+						"Unable to close buffered writer due to error: "
+								+ e.getMessage());
+			}
 		}
 	}
 }
