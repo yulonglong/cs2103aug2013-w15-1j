@@ -169,10 +169,10 @@ class Syncer extends Thread {
 
 		JsonObject requestBody = createRemoteTaskRequestBody(addSyncAction.getLocalTask());
 
-		JsonObject serverReply = Util.parseToJsonObject(
-				Util.sendJsonHttpsRequest(
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendJsonHttpsRequest(
 						String.format(GOOGLE_REQUEST_URL_ADD_EVENT, SyncManager.getInstance().getRemoteCalendarId()),
-						Util.REQUEST_METHOD_POST,
+						Utilities.REQUEST_METHOD_POST,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
 						requestBody
 				)
@@ -180,7 +180,7 @@ class Syncer extends Thread {
 
 		GoogleCalendarManager.getInstance().updateLocalTaskWithCorrespondingTaskRemoteId(
 				addSyncAction.getLocalTask().getUniqueId(),
-				Util.getJsonObjectValueOrEmptyString(serverReply, EVENT_RESOURCE_LABEL_ID)
+				Utilities.getJsonObjectValueOrEmptyString(serverReply, EVENT_RESOURCE_LABEL_ID)
 		);
 	}
 
@@ -190,13 +190,13 @@ class Syncer extends Thread {
 
 		JsonObject requestBody = createRemoteTaskRequestBody(updateSyncAction.getLocalTask());
 
-		Util.sendJsonHttpsRequest(
+		Utilities.sendJsonHttpsRequest(
 				String.format(
 						GOOGLE_REQUEST_URL_UPDATE_EVENT,
 						SyncManager.getInstance().getRemoteCalendarId(),
 						updateSyncAction.getRemoteTaskID()
 				),
-				Util.REQUEST_METHOD_PUT,
+				Utilities.REQUEST_METHOD_PUT,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
 				requestBody
 		);
@@ -206,15 +206,15 @@ class Syncer extends Thread {
 			throws JsonParseException, IllegalStateException, IOException {
 		logger.info("Deleting: " + deleteSyncAction.getRemoteTaskID());
 
-		Util.sendJsonHttpsRequest(
+		Utilities.sendJsonHttpsRequest(
 				String.format(
 						GOOGLE_REQUEST_URL_DELETE_EVENT,
 						SyncManager.getInstance().getRemoteCalendarId(),
 						deleteSyncAction.getRemoteTaskID()
 				),
-				Util.REQUEST_METHOD_DELETE,
+				Utilities.REQUEST_METHOD_DELETE,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
-				Util.EMPTY_REQUEST_BODY
+				Utilities.EMPTY_REQUEST_BODY
 		);
 	}
 
@@ -229,12 +229,12 @@ class Syncer extends Thread {
 	private boolean remoteCalendarExists()
 			throws IOException, JsonParseException, IllegalStateException {
 
-		JsonObject serverReply = Util.parseToJsonObject(
-				Util.sendJsonHttpsRequest(
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendJsonHttpsRequest(
 						GOOGLE_REQUEST_URL_LIST_CALENDARS,
-						Util.REQUEST_METHOD_GET,
+						Utilities.REQUEST_METHOD_GET,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
-						Util.EMPTY_REQUEST_BODY
+						Utilities.EMPTY_REQUEST_BODY
 				)
 		);
 
@@ -242,12 +242,12 @@ class Syncer extends Thread {
 		for(JsonElement i : calendarList) {
 			JsonObject currentCalendar = (JsonObject) i;
 
-			boolean currentCalendarNameEqualsATypistsCalendar = Util
+			boolean currentCalendarNameEqualsATypistsCalendar = Utilities
 					.getJsonObjectValueOrEmptyString(currentCalendar, CALENDAR_RESOURCE_LABEL_SUMMARY)
 					.equals("A Typist's Calendar");
 			if (currentCalendarNameEqualsATypistsCalendar) {
 				SyncManager.getInstance().setRemoteCalendarId(
-						Util.getJsonObjectValueOrEmptyString(currentCalendar, CALENDAR_RESOURCE_LABEL_ID)
+						Utilities.getJsonObjectValueOrEmptyString(currentCalendar, CALENDAR_RESOURCE_LABEL_ID)
 				);
 				return true;
 			}
@@ -268,17 +268,17 @@ class Syncer extends Thread {
 		requestBody.addProperty(CALENDAR_RESOURCE_LABEL_TIMEZONE, Calendar.getInstance().getTimeZone().getID());
 		requestBody.addProperty(CALENDAR_RESOURCE_LABEL_LOCATION, Calendar.getInstance().getTimeZone().getID());
 
-		JsonObject serverReply = Util.parseToJsonObject(
-				Util.sendJsonHttpsRequest(
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendJsonHttpsRequest(
 						GOOGLE_REQUEST_URL_ADD_CALENDAR,
-						Util.REQUEST_METHOD_POST,
+						Utilities.REQUEST_METHOD_POST,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
 						requestBody
 				)
 		);
 
 		SyncManager.getInstance().setRemoteCalendarId(
-				Util.getJsonObjectValueOrEmptyString(serverReply, CALENDAR_RESOURCE_LABEL_ID)
+				Utilities.getJsonObjectValueOrEmptyString(serverReply, CALENDAR_RESOURCE_LABEL_ID)
 		);
 	}
 
@@ -302,8 +302,8 @@ class Syncer extends Thread {
 		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localSchedule.getPlace());
 		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, localSchedule.getDescription());
 		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localSchedule.getUniqueId()));
-		requestBody.add(EVENT_RESOURCE_LABEL_START, Util.createGoogleDateTimeObject(localSchedule.getStartTime()));
-		requestBody.add(EVENT_RESOURCE_LABEL_END, Util.createGoogleDateTimeObject(localSchedule.getEndTime()));
+		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateTimeObject(localSchedule.getStartTime()));
+		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateTimeObject(localSchedule.getEndTime()));
 
 		return requestBody;
 	}
@@ -315,8 +315,8 @@ class Syncer extends Thread {
 		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localDeadline.getPlace());
 		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, TASK_DESCRIPTION_PREFIX_DEADLINE + localDeadline.getDescription());
 		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localDeadline.getUniqueId()));
-		requestBody.add(EVENT_RESOURCE_LABEL_START, Util.createGoogleDateTimeObject(localDeadline.getEndTime()));
-		requestBody.add(EVENT_RESOURCE_LABEL_END, Util.createGoogleDateTimeObject(localDeadline.getEndTime()));
+		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
+		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
 
 		return requestBody;
 	}
@@ -328,8 +328,8 @@ class Syncer extends Thread {
 		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localTodo.getPlace());
 		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, TASK_DESCRIPTION_PREFIX_TODO + localTodo.getDescription());
 		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localTodo.getUniqueId()));
-		requestBody.add(EVENT_RESOURCE_LABEL_START, Util.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-		requestBody.add(EVENT_RESOURCE_LABEL_END, Util.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 		requestBody.add(EVENT_RESOURCE_LABEL_RECURRENCE, SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
 
 		return requestBody;
@@ -348,11 +348,11 @@ class Syncer extends Thread {
 		}
 		logger.info("Completed iterating through remote task list (for current page).");
 
-		boolean nextPageTokenExists = Util.getJsonObjectValueOrEmptyString(serverReply, "nextPageToken") != EMPTY_PAGE_TOKEN;
+		boolean nextPageTokenExists = Utilities.getJsonObjectValueOrEmptyString(serverReply, "nextPageToken") != EMPTY_PAGE_TOKEN;
 		if (nextPageTokenExists) {
 
 			logger.info("Next page for remote task list is avaliable, continuing on to next page.");
-			syncAllTasks(localTasks, Util.getJsonObjectValueOrEmptyString(serverReply, "nextPageToken"));
+			syncAllTasks(localTasks, Utilities.getJsonObjectValueOrEmptyString(serverReply, "nextPageToken"));
 
 		} else {
 
@@ -391,7 +391,7 @@ class Syncer extends Thread {
 
 				logger.info("Corresponding local task not found, enqueuing to delete remote copy.");
 				SyncManager.getInstance().deleteRemoteTask(
-						Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
+						Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
 				);
 
 			} else {
@@ -415,9 +415,9 @@ class Syncer extends Thread {
 	private void synchorniseLocalAndRemoteTask(JsonObject remoteTask, Task currentLocalTask) {
 		Calendar remoteTaskLastModifiedTime = null;
 		try {
-			remoteTaskLastModifiedTime = Util.parseGenericGoogleDateString(
-					Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_UPDATED),
-					Util.RFC3339_FORMAT_WITH_MILLISECONDS
+			remoteTaskLastModifiedTime = Utilities.parseGenericGoogleDateString(
+					Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_UPDATED),
+					Utilities.RFC3339_FORMAT_WITH_MILLISECONDS
 			);
 		} catch (ParseException e) {
 			logger.severe("Unable to parse Google DateTime object. Unexpected as Google returns a standard format. Failing quietly.");
@@ -432,7 +432,7 @@ class Syncer extends Thread {
 
 			SyncManager.getInstance().updateRemoteTask(
 					currentLocalTask,
-					Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
+					Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
 			);
 
 		} else {
@@ -442,9 +442,9 @@ class Syncer extends Thread {
 
 	private void updateLocalTaskFromRemoteTask(JsonObject remoteTask, Task currentLocalTask) {
 		// Extracting the (common) fields from the RemoteTask object.
-		String remoteTaskId = Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID);
-		String description = Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_SUMMARY);
-		String location = Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_LOCATION);
+		String remoteTaskId = Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID);
+		String description = Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_SUMMARY);
+		String location = Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_LOCATION);
 		Calendar lastModifiedDate = SyncManager.getLastModifiedDateOrTimeNow(remoteTask);
 
 		if (currentLocalTask instanceof Todo) {
@@ -458,8 +458,8 @@ class Syncer extends Thread {
 			Calendar startTime = null;
 			Calendar endTime = null;
 			try {
-				startTime = Util.parseGoogleDateTimeObject(remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_START));
-				endTime = Util.parseGoogleDateTimeObject(remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_END));
+				startTime = Utilities.parseGoogleDateTimeObject(remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_START));
+				endTime = Utilities.parseGoogleDateTimeObject(remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_END));
 			} catch (ParseException e) {
 				logger.severe("Unable to parse Google DateTime object (this is unexpected as Google only returns a standardised format). Failing quietly.");
 				e.printStackTrace();
@@ -523,20 +523,20 @@ class Syncer extends Thread {
 	private JsonObject getRemoteTaskList(String pageToken)
 			throws IOException, JsonParseException, IllegalStateException {
 
-		HashMap<String, String> formParameters = Util.EMPTY_FORM_PARAMETERS;
+		HashMap<String, String> formParameters = Utilities.EMPTY_FORM_PARAMETERS;
 
 		if (pageToken != EMPTY_PAGE_TOKEN) {
 			formParameters = new HashMap<String, String>();
 			formParameters.put(EVENTS_LIST_RESOURCE_PAGE_TOKEN, pageToken);
 		}
 
-		JsonObject serverReply = Util.parseToJsonObject(
-				Util.sendUrlencodedFormHttpsRequest(
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendUrlencodedFormHttpsRequest(
 						String.format(
 								GOOGLE_REQUEST_URL_LIST_EVENTS,
 								SyncManager.getInstance().getRemoteCalendarId()
 						),
-						Util.REQUEST_METHOD_GET,
+						Utilities.REQUEST_METHOD_GET,
 						AuthenticationManager.getInstance().getAuthorizationHeader(),
 						formParameters
 				)
@@ -602,18 +602,18 @@ class Syncer extends Thread {
 
 
 	private boolean isIdenticalSchedule(JsonObject remoteTask, Schedule localSchedule) {
-		boolean locationIsIdentical = Util
+		boolean locationIsIdentical = Utilities
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_LOCATION)
 				.equals(localSchedule.getPlace());
-		boolean summaryIsIdentical = Util
+		boolean summaryIsIdentical = Utilities
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
 				.equals(localSchedule.getDescription());
 		boolean startTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_START)
-				.equals(Util.createGoogleDateTimeObject(localSchedule.getStartTime()));
+				.equals(Utilities.createGoogleDateTimeObject(localSchedule.getStartTime()));
 		boolean endTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_END)
-				.equals(Util.createGoogleDateTimeObject(localSchedule.getEndTime()));
+				.equals(Utilities.createGoogleDateTimeObject(localSchedule.getEndTime()));
 
 		return locationIsIdentical &&
 				summaryIsIdentical &&
@@ -624,18 +624,18 @@ class Syncer extends Thread {
 
 	private boolean isIdenticalDeadline(JsonObject remoteTask, Deadline localDeadline) {
 		// TODO handle done/undone
-		boolean locationIsIdentical = Util
+		boolean locationIsIdentical = Utilities
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_LOCATION)
 				.equals(localDeadline.getPlace());
-		boolean summaryIsIdentical = Util
+		boolean summaryIsIdentical = Utilities
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
 				.equals(TASK_DESCRIPTION_PREFIX_DEADLINE + localDeadline.getDescription());
 		boolean startTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_START)
-				.equals(Util.createGoogleDateTimeObject(localDeadline.getEndTime()));
+				.equals(Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
 		boolean endTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_END)
-				.equals(Util.createGoogleDateTimeObject(localDeadline.getEndTime()));
+				.equals(Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
 
 		return locationIsIdentical &&
 				summaryIsIdentical &&
@@ -646,18 +646,18 @@ class Syncer extends Thread {
 
 	private boolean isIdenticalTodo(JsonObject remoteTask, Todo localTodo) {
 		// TODO handle done/undone
-		boolean locationIsIdentical = Util
+		boolean locationIsIdentical = Utilities
 				.getJsonObjectValueOrEmptyString(remoteTask, CALENDAR_RESOURCE_LABEL_LOCATION)
 				.equals(localTodo.getPlace());
-		boolean summaryIsIdentical = Util
+		boolean summaryIsIdentical = Utilities
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
 				.equals(TASK_DESCRIPTION_PREFIX_TODO + localTodo.getDescription());
 		boolean startTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_START)
-				.equals(Util.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+				.equals(Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 		boolean endTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_END)
-				.equals(Util.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+				.equals(Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
 
 		boolean recurrenceIsIdentical = false;
 		if (remoteTask.get(EVENT_RESOURCE_LABEL_RECURRENCE) != null) {

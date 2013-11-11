@@ -1,5 +1,6 @@
 package com.licensetokil.atypistcalendar.gcal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ public class GoogleCalendarManager {
 	protected static final boolean SYNCER_STATUS_SLEEPING = false;
 
 	private static final String MESSAGE_GOOGLE_LOGOUT_NOT_LOGINED = "You are currently not logged in!";
+	private static final String MESSAGE_GOOGLE_LOGOUT_FAILED = "An unexpected error occured. Please try again later.";
 	private static final String MESSAGE_GOOGLE_LOGOUT_SUCCESSFULLY_LOGGED_OUT = "You have been logged out.";
 	private static final String MESSAGE_GOOGLE_LOGIN_LOGGING_IN = "Logging in...";
 	private static final String MESSAGE_GOOGLE_LOGIN_ALREADY_LOGINED = "You are already logged in!";
@@ -131,7 +133,15 @@ public class GoogleCalendarManager {
 		logger.info("Checking if user is logged in.");
 		if (AuthenticationManager.getInstance().isAuthenticated()) {
 			logger.info("User is logged in. Calling deleting authentication details (to logout).");
-			AuthenticationManager.getInstance().deleteAuthenticationDetails();
+
+			try {
+				AuthenticationManager.getInstance().deleteAuthenticationDetails();
+			} catch (IOException e) {
+				logger.warning("Problem writing to authentication details to file (IOException's source is writeAuthenticationDetailsToFile()).");
+				e.printStackTrace();
+				return MESSAGE_GOOGLE_LOGOUT_FAILED;
+			}
+
 			return MESSAGE_GOOGLE_LOGOUT_SUCCESSFULLY_LOGGED_OUT;
 		} else {
 			logger.info("User is not logged in. Returning with error message.");

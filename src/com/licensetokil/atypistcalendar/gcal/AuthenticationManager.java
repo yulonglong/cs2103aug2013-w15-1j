@@ -87,14 +87,20 @@ class AuthenticationManager {
 	// This method is a fail safe. The user will not be registered as
 	// authenticated should any exceptions occur.
 	protected void authenticateUserFailed() {
-		deleteAuthenticationDetails();
+		try {
+			deleteAuthenticationDetails();
+		} catch (IOException e) {
+			// Do nothing. (File could not be written)
+			e.printStackTrace();
+		}
 	}
 
-	protected void deleteAuthenticationDetails() {
+	protected void deleteAuthenticationDetails() throws IOException {
 		authenticationToken = NULL_TOKEN;
 		accessToken = NULL_TOKEN;
 		refreshToken = NULL_TOKEN;
 		accessTokenExpiry = null;
+		writeAuthenticationDetailsToFile();
 	}
 
 	protected HashMap<String, String> getAuthorizationHeader()
@@ -116,17 +122,17 @@ class AuthenticationManager {
 		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_REDIRECT_URI, FETCH_ACCESS_TOKEN_REQUEST_VALUE_REDIRECT_URI);
 		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_GRANT_TYPE, FETCH_ACCESS_TOKEN_REQUEST_VALUE_GRANT_TYPE);
 
-		JsonObject serverReply = Util.parseToJsonObject(
-				Util.sendUrlencodedFormHttpsRequest(
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendUrlencodedFormHttpsRequest(
 						GOOGLE_REQUEST_URL_FETCH_ACCESS_TOKEN,
-						Util.REQUEST_METHOD_POST,
-						Util.EMPTY_ADDITIONAL_HEADERS,
+						Utilities.REQUEST_METHOD_POST,
+						Utilities.EMPTY_ADDITIONAL_HEADERS,
 						parameters
 				)
 		);
 
-		accessToken = Util.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN);
-		refreshToken = Util.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_REFRESH_TOKEN);
+		accessToken = Utilities.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN);
+		refreshToken = Utilities.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_REFRESH_TOKEN);
 
 		long timeNow = new Date().getTime();
 		long accessTokenValidityPeriod = serverReply.get(FETCH_ACCESS_TOKEN_REPLY_LABEL_EXPIRES_IN).getAsLong() *
@@ -155,7 +161,10 @@ class AuthenticationManager {
 
 			reader.close();
 		} catch (IOException e) {
-			deleteAuthenticationDetails();
+			authenticationToken = NULL_TOKEN;
+			accessToken = NULL_TOKEN;
+			refreshToken = NULL_TOKEN;
+			accessTokenExpiry = null;
 		}
 	}
 
@@ -169,16 +178,16 @@ class AuthenticationManager {
 		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_SECRET, GOOGLE_API_CLIENT_SECRET);
 		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_GRANT_TYPE, FETCH_ACCESS_TOKEN_REQUEST_LABEL_REFRESH_TOKEN);
 
-		JsonObject serverReply = Util.parseToJsonObject(
-				Util.sendUrlencodedFormHttpsRequest(
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendUrlencodedFormHttpsRequest(
 						GOOGLE_REQUEST_URL_FETCH_ACCESS_TOKEN,
-						Util.REQUEST_METHOD_POST,
-						Util.EMPTY_ADDITIONAL_HEADERS,
+						Utilities.REQUEST_METHOD_POST,
+						Utilities.EMPTY_ADDITIONAL_HEADERS,
 						parameters
 				)
 		);
 
-		accessToken = Util.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN);
+		accessToken = Utilities.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN);
 
 		long timeNow = new Date().getTime();
 		long accessTokenValidityPeriod = serverReply.get(FETCH_ACCESS_TOKEN_REPLY_LABEL_EXPIRES_IN).getAsLong() *

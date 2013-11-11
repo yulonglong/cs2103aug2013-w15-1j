@@ -136,10 +136,10 @@ class SyncManager {
 
 		JsonObject serverReply;
 		try {
-			serverReply = Util.parseToJsonObject(
-					Util.sendUrlencodedFormHttpsRequest(
+			serverReply = Utilities.parseToJsonObject(
+					Utilities.sendUrlencodedFormHttpsRequest(
 							String.format(GOOGLE_REQUEST_URL_QUICK_ADD, getRemoteCalendarId()),
-							Util.REQUEST_METHOD_POST,
+							Utilities.REQUEST_METHOD_POST,
 							AuthenticationManager.getInstance().getAuthorizationHeader(),
 							formParameters
 					)
@@ -157,9 +157,9 @@ class SyncManager {
 
 	protected Task insertRemoteTaskIntoTasksManager(JsonObject remoteTask) {
 		//Extracting the (common) fields from the RemoteTask object.
-		String remoteTaskId = Util.getJsonObjectValueOrEmptyString(remoteTask, "id");
-		String description = Util.getJsonObjectValueOrEmptyString(remoteTask, "summary");
-		String location = Util.getJsonObjectValueOrEmptyString(remoteTask, "location");
+		String remoteTaskId = Utilities.getJsonObjectValueOrEmptyString(remoteTask, "id");
+		String description = Utilities.getJsonObjectValueOrEmptyString(remoteTask, "summary");
+		String location = Utilities.getJsonObjectValueOrEmptyString(remoteTask, "location");
 		Calendar lastModifiedDate = getLastModifiedDateOrTimeNow(remoteTask);
 
 		Task newLocalTask = null;
@@ -171,8 +171,8 @@ class SyncManager {
 			Calendar startTime = null;
 			Calendar endTime = null;
 			try {
-				startTime = Util.parseGoogleDateTimeObject(remoteTask.getAsJsonObject("start"));
-				endTime = Util.parseGoogleDateTimeObject(remoteTask.getAsJsonObject("end"));
+				startTime = Utilities.parseGoogleDateTimeObject(remoteTask.getAsJsonObject("start"));
+				endTime = Utilities.parseGoogleDateTimeObject(remoteTask.getAsJsonObject("end"));
 			} catch (ParseException e) {
 				logger.severe("Unable to parse Google DateTime object (this is unexpected as Google only returns a standardised format)");
 				e.printStackTrace();
@@ -197,9 +197,9 @@ class SyncManager {
 
 	protected static Calendar getLastModifiedDateOrTimeNow(JsonObject remoteTask) {
 		try {
-			return Util.parseGenericGoogleDateString(
-					Util.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_UPDATED),
-					Util.RFC3339_FORMAT_WITH_MILLISECONDS
+			return Utilities.parseGenericGoogleDateString(
+					Utilities.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_UPDATED),
+					Utilities.RFC3339_FORMAT_WITH_MILLISECONDS
 			);
 		} catch (ParseException e) {
 			return Calendar.getInstance(); // Fail quietly

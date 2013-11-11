@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-public class Util {
+public class Utilities {
 	public static final String REQUEST_METHOD_POST = "POST";
 	public static final String REQUEST_METHOD_GET = "GET";
 	public static final String REQUEST_METHOD_DELETE = "DELETE";
@@ -108,7 +108,7 @@ public class Util {
 			JsonObject requestBody)
 			throws IOException {
 
-		if (requestMethod == REQUEST_METHOD_GET) {
+		if (requestMethod == REQUEST_METHOD_GET || requestMethod == REQUEST_METHOD_DELETE) {
 			assert requestBody == EMPTY_REQUEST_BODY;
 		}
 
