@@ -343,8 +343,8 @@ public class Parser {
 		status=getStatus(st,tempSt);
 		st= tempSt[INDEX_ST];
 		userAction.setStatus(status);
-		if((userAction.getDescription().equals(EMPTY_STRING))&&(status.equals(EMPTY_STRING))){
-			userAction.setDescription(ALL);
+		if((!userAction.getDescription().equals(EMPTY_STRING))&&(!status.equals(EMPTY_STRING))){
+			userAction.setDescription(EMPTY_STRING);
 		}
 		
 		//if no more elements
