@@ -137,6 +137,7 @@ class Syncer extends Thread {
 	private void sleep() {
 		logger.info("Sleeping for " + PERIOD_TO_SLEEP_IN_SECONDS + " seconds.");
 
+		System.out.println("shoudl be defu");
 		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_SLEEPING);
 
 		try {
@@ -148,7 +149,7 @@ class Syncer extends Thread {
 			logger.severe("Thread was interrupted.");
 			e.printStackTrace();
 		}
-
+		System.out.println("shoudl be sync");
 		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_EXECUTING);
 	}
 
