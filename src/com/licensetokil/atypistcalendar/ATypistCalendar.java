@@ -197,7 +197,7 @@ public class ATypistCalendar {
 	}
 
 	public ArrayList<Task> getCopyOfAllLocalTasks() {
-		return TasksManager.getInstance().getAllTasks();
+		return TasksManager.getInstance().cloneAllTasks();
 	}
 
 	public void updateLocalTaskWithCorrespondingTaskRemoteId(int localTaskId, String remoteTaskId) {

@@ -4,8 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
+	private static final String OUTPUT_FORMAT = "[%s] [%s - %s] %s";
+
 	private String remoteId;
-	private String taskType;
+	private TaskType taskType;
 	private int uniqueId;
 	private Calendar lastModifiedDate;
 	private Calendar startTime;
@@ -15,7 +17,7 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 
 	public Schedule(int uniqueId, Calendar startTime, Calendar endTime,
 			String description, String place, Calendar lastModifiedDate) {
-		this.taskType = "schedule";
+		this.taskType = TaskType.SCHEDULE;
 		this.uniqueId = uniqueId;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -24,23 +26,14 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	public Schedule(Schedule s){
-		this.taskType = "schedule";
-		this.endTime = s.getEndTime();
-		this.description = s.getDescription();
-		this.place = s.getPlace();
-		this.uniqueId = s.getUniqueId();
-		this.startTime = s.getStartTime();
-	}
-
 	public Schedule() {
 	}
 
-	public String getRemoteId(){
+	public String getRemoteId() {
 		return remoteId;
 	}
 
-	public String getTaskType() {
+	public TaskType getTaskType() {
 		return taskType;
 	}
 
@@ -48,7 +41,7 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		return uniqueId;
 	}
 
-	public Calendar getLastModifiedDate(){
+	public Calendar getLastModifiedDate() {
 		return lastModifiedDate;
 	}
 
@@ -68,53 +61,69 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		return place;
 	}
 
-	public void setRemoteId(String remoteId){
+	public void setRemoteId(String remoteId) {
 		this.remoteId = remoteId;
 	}
 
-	public void setStartTime(Calendar st){
+	public void setTaskType(TaskType t) {
+		this.taskType = t;
+	}
+
+	public void setUniqueId(int uniqueId) {
+		this.uniqueId = uniqueId;
+	}
+
+	public void setStartTime(Calendar st) {
 		this.startTime = st;
 	}
 
-	public void setEndTime(Calendar st){
+	public void setEndTime(Calendar st) {
 		this.endTime = st;
 	}
 
-	public void setDescription(String d){
+	public void setDescription(String d) {
 		this.description = d;
 	}
 
-	public void setPlace(String p){
+	public void setPlace(String p) {
 		this.place = p;
 	}
 
-	public void setLastModifiedDate(Calendar lastModifiedDate){
+	public void setLastModifiedDate(Calendar lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public String toString() {
-		if(place.equals("")){
-			return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
-					+ endTime.getTime() + "@s" + description + "@s" + " " + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
+		if (place.equals(EMPTY_STRING)) {
+			return TaskType.SCHEDULE + DELIMITER + uniqueId + DELIMITER
+					+ startTime.getTime() + DELIMITER + endTime.getTime()
+					+ DELIMITER + description + DELIMITER + BLANK_SPACE
+					+ DELIMITER + lastModifiedDate.getTime() + DELIMITER
+					+ remoteId;
 		}
-		return "Schedule@s" + uniqueId + "@s" + startTime.getTime() + "@s"
-				+ endTime.getTime() + "@s" + description + "@s" + place + "@s" + lastModifiedDate.getTime() + "@s" + remoteId;
+		return TaskType.SCHEDULE + DELIMITER + uniqueId + DELIMITER
+				+ startTime.getTime() + DELIMITER + endTime.getTime()
+				+ DELIMITER + description + DELIMITER + place + DELIMITER
+				+ lastModifiedDate.getTime() + DELIMITER + remoteId;
 	}
 
-	public String outputStringForDisplay(){
+	public String outputStringForDisplay() {
 		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
 		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM dd, ''yy");
 
-		String output = "[" + formatDay.format(startTime.getTime()) + "] [" + formatTime.format(startTime.getTime()) + " - " + formatTime.format(endTime.getTime()) + "] " +
-							description;
-		if(!place.equals("")){
-			output = output+" at " + this.getPlace();
+		String output = String.format(OUTPUT_FORMAT,
+				formatDay.format(startTime.getTime()),
+				formatTime.format(startTime.getTime()),
+				formatTime.format(endTime.getTime()), description);
+		if (!place.equals(EMPTY_STRING)) {
+			output = String.format(DISPLAY_PLACE_NOT_EMPTY, output,
+					this.getPlace());
 		}
 
 		return output;
 	}
 
-	public int compareTo(Schedule s){
+	public int compareTo(Schedule s) {
 		return startTime.compareTo(s.getStartTime());
 	}
 
@@ -126,9 +135,10 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		clonedObject.uniqueId = this.uniqueId;
 		clonedObject.description = this.description;
 		clonedObject.place = this.place;
-		clonedObject.startTime = (Calendar)this.startTime.clone();
-		clonedObject.endTime = (Calendar)this.endTime.clone();
-		clonedObject.lastModifiedDate = (Calendar)this.lastModifiedDate.clone();
+		clonedObject.startTime = (Calendar) this.startTime.clone();
+		clonedObject.endTime = (Calendar) this.endTime.clone();
+		clonedObject.lastModifiedDate = (Calendar) this.lastModifiedDate
+				.clone();
 
 		return clonedObject;
 	}
