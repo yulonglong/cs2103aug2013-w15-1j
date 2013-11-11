@@ -6,7 +6,6 @@
 package com.licensetokil.atypistcalendar.ui;
 
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.StringReader;
@@ -44,17 +43,29 @@ public class ATCGUI extends JFrame implements WindowListener {
 	private final static String POSITIVE_UNIT_INCREMENT = "positiveUnitIncrement";
 	private final static String NEGATIVE_UNIT_INCREMENT = "negativeUnitIncrement";
 	private final static String EMPTY_STRING = "";
-
+	
 	private final static String NEWLINE_REGEX = "\\r|\\n";
 	private final static String NEWLINE_HTML = "<br>";
-
+	
 	private final static String OUTPUT_FORMAT = "%s<hr><br>";
-
-	private Image defaultIcon;
-	private Image syncingIcon;
+	
+	private final static int FONT_SIZE = 14;
+	private final static int EDITOR_SCROLLPANE_FONT_SIZE = 18;
+	private final static int FONT_STYLE = 0;
+	private final static int BACKGROUND_COLOR_RGB = 222;
+	private final static int TEXTAREA_FONT_SIZE = 12;
+	private final static int TEXTAREA_FONT_STYLE = 1;
+	private final static int TEXTAREA_COLUMNS = 20;
+	private final static int TEXTAREA_ROWS = 5;
+	private final static int SCROLLPANE_WIDTH = 700;
+	private final static int SCROLLPANE_HEIGHT = 402;
+	private final static int GAP1 = 0;
+	private final static int GAP2 = 5;
+	private final static int TEXTFIELD_SIZE = 33;
+	private final static int AREASCROLLPANE_SIZE = 29;
 
 	private static Logger logger = Logger.getLogger("ATCGUI");
-
+	
 	//public constructor
 	public ATCGUI() {
 		try {
@@ -64,187 +75,22 @@ public class ATCGUI extends JFrame implements WindowListener {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Error detected: " + e.getMessage());
 		}
-
-		getResources();
-
 		initComponents();
 		this.setContentPane(jPanel);
 		addWindowListener(this);
 	}
-
-	private void getResources() {
-		logger.log(Level.INFO, "Getting resources");
-
-		defaultIcon = (new ImageIcon(getClass().getResource("/icon128.png"))).getImage();
-		syncingIcon = (new ImageIcon(getClass().getResource("/icon128sync.png"))).getImage();
-	}
-
-	//initialising function
-	private void initComponents() {
-
-		logger.log(Level.INFO, "Initialising various components of GUI");
-		jPanel = new JPanel();
-		jTextField = new JTextField();
-		jLabel = new JLabel();
-		editorScrollPane = new JScrollPane();
-		jEditorPane = new JEditorPane("text/html", null);
-		areaScrollPane = new JScrollPane();
-		jTextArea = new JTextArea();
-		htmlEditorKit = new HTMLEditorKit();
-
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		setTitle(MESSAGE_TITLE);
-		setIconImage(defaultIcon);
-
-		jTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-			public void keyReleased(java.awt.event.KeyEvent evt) {
-				jTextField1KeyReleased(evt);
-			}
-		});
-
-		setKeyScrolling();
-
-		logger.log(Level.INFO, "Configuring jLabel");
-		jLabel.setFont(new java.awt.Font("Consolas", 0, 14));
-		jLabel.setText(MESSAGE_COMMAND);
-
-		logger.log(Level.INFO, "Configuring editorScrollPane");
-		editorScrollPane.setBorder(javax.swing.BorderFactory
-				.createTitledBorder(null, MESSAGE_TITLE,
-						javax.swing.border.TitledBorder.CENTER,
-						javax.swing.border.TitledBorder.DEFAULT_POSITION,
-						new java.awt.Font("Consolas", 0, 18)));
-		editorScrollPane.setMaximumSize(jPanel.getMaximumSize());
-		editorScrollPane.setMinimumSize(jPanel.getMinimumSize());
-		editorScrollPane.setViewportView(jEditorPane);
-
-		logger.log(Level.INFO, "Configuring areaScrollPane");
-		areaScrollPane.setBorder(null);
-		areaScrollPane
-				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		areaScrollPane.setAutoscrolls(true);
-
-		logger.log(Level.INFO, "Configuring editorPane");
-		jEditorPane.setFont(new Font("Consolas", Font.PLAIN, 14));
-		jEditorPane.setEditorKit(htmlEditorKit);
-		jEditorPane.setEditable(false);
-
-		logger.log(Level.INFO, "Configuring textArea");
-		jTextArea.setEditable(false);
-		jTextArea.setBackground(new java.awt.Color(222, 222, 222));
-		jTextArea.setColumns(20);
-		jTextArea.setFont(new java.awt.Font("Consolas", 1, 12)); // NOI18N
-		jTextArea.setRows(5);
-		jTextArea.setBorder(null);
-		areaScrollPane.setViewportView(jTextArea);
-
-		logger.log(Level.INFO, "Configuring various layout and outlook");
-		GroupLayout jPanel1Layout = new GroupLayout(jPanel);
-		jPanel.setLayout(jPanel1Layout);
-		jPanel1Layout
-				.setHorizontalGroup(jPanel1Layout
-						.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel1Layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												jPanel1Layout
-														.createParallelGroup(
-																GroupLayout.Alignment.LEADING)
-														.addComponent(
-																editorScrollPane,
-																GroupLayout.DEFAULT_SIZE,
-																700,
-																Short.MAX_VALUE)
-														.addComponent(
-																jTextField)
-														.addGroup(
-																jPanel1Layout
-																		.createSequentialGroup()
-																		.addComponent(
-																				jLabel)
-																		.addGap(0,
-																				0,
-																				Short.MAX_VALUE))
-														.addComponent(
-																areaScrollPane))
-										.addContainerGap()));
-		jPanel1Layout
-				.setVerticalGroup(jPanel1Layout
-						.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel1Layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addComponent(editorScrollPane,
-												GroupLayout.PREFERRED_SIZE,
-												402, Short.MAX_VALUE)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-										.addComponent(jLabel)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(jTextField,
-												GroupLayout.PREFERRED_SIZE, 33,
-												GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(areaScrollPane,
-												GroupLayout.PREFERRED_SIZE, 29,
-												GroupLayout.PREFERRED_SIZE)
-										.addGap(5, 5, 5)));
-
-		GroupLayout layout = new GroupLayout(getContentPane());
-		getContentPane().setLayout(layout);
-		layout.setHorizontalGroup(layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addComponent(jPanel,
-				GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
-				Short.MAX_VALUE));
-		layout.setVerticalGroup(layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addComponent(jPanel,
-				GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-				GroupLayout.PREFERRED_SIZE));
-
-		pack();
-	}
-
-	// Function for attaching up and down keys to up and down scrolling of
-	// editor pane
-	private void setKeyScrolling() {
-		logger.log(Level.INFO, "Setting key scrolling with editorPane");
-		JScrollBar scrollBar = editorScrollPane.getVerticalScrollBar();
-		InputMap inputMap = scrollBar
-				.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		inputMap.put(KeyStroke.getKeyStroke(KEY_DOWN), POSITIVE_UNIT_INCREMENT);
-		inputMap.put(KeyStroke.getKeyStroke(KEY_UP), NEGATIVE_UNIT_INCREMENT);
-	}
-
-	// function to respond to an enter key in jtextfield
-	private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {
-		if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-			if (jTextField.getText().equals(EMPTY_STRING)) {
-				logger.log(Level.INFO, "No input detected. Returning");
-				return;
-			}
-			logger.log(Level.INFO,
-					"Getting user input. Setting text field to empty");
-			ATypistCalendar.getInstance().userInput(jTextField.getText());
-			jTextField.setText(EMPTY_STRING);
-		}
-	}
-
+	
 	// function that displays responses from user input
 	public void outputWithNewline(String text) {
 		logger.log(Level.INFO, "In outputWithNewline function");
 		StringReader reader;
-
+	
 		if (text.contains(MESSAGE_WELCOME)) {
 			logger.log(Level.INFO, "Displaying Welcome Message");
 			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
 			jEditorPane.setText(String.format(MESSAGE_WELCOME_FORMAT, text));
 		}
-
+	
 		else {
 			logger.log(Level.INFO, "Displaying all other output");
 			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
@@ -256,7 +102,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 				logger.log(Level.WARNING, "Error detected: " + e.getMessage());
 			}
 		}
-
+	
 		jEditorPane.setCaretPosition(jEditorPane.getDocument().getLength());
 		jTextField.requestFocus();
 	}
@@ -304,27 +150,170 @@ public class ATCGUI extends JFrame implements WindowListener {
 	public void windowDeactivated(WindowEvent e) {
 	}
 
-	public void changeWindowIcon(boolean useSyncingIcon) {
-		logger.log(Level.INFO, "Changing window icon");
+	//initialising function
+	private void initComponents() {
 
-		if(useSyncingIcon) {
-			logger.log(Level.INFO, "Using syncing icon");
-			setIconImage(syncingIcon);
-		}
-		else {
-			logger.log(Level.INFO, "Using default icon");
-			setIconImage(defaultIcon);
+		logger.log(Level.INFO, "Initialising various components of GUI");
+		jPanel = new JPanel();
+		jTextField = new JTextField();
+		jLabel = new JLabel();
+		editorScrollPane = new JScrollPane();
+		jEditorPane = new JEditorPane("text/html", null);
+		areaScrollPane = new JScrollPane();
+		jTextArea = new JTextArea();
+		htmlEditorKit = new HTMLEditorKit();
+
+		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setTitle(MESSAGE_TITLE);
+		setIconImage(new ImageIcon(getClass().getResource("/icon128.png"))
+				.getImage());
+
+		jTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				jTextField1KeyReleased(evt);
+			}
+		});
+
+		setKeyScrolling();
+
+		logger.log(Level.INFO, "Configuring jLabel");
+		jLabel.setFont(new java.awt.Font("Consolas", FONT_STYLE, FONT_SIZE));
+		jLabel.setText(MESSAGE_COMMAND);
+
+		logger.log(Level.INFO, "Configuring editorScrollPane");
+		editorScrollPane.setBorder(javax.swing.BorderFactory
+				.createTitledBorder(null, MESSAGE_TITLE,
+						javax.swing.border.TitledBorder.CENTER,
+						javax.swing.border.TitledBorder.DEFAULT_POSITION,
+						new java.awt.Font("Consolas", FONT_STYLE, EDITOR_SCROLLPANE_FONT_SIZE)));
+		editorScrollPane.setMaximumSize(jPanel.getMaximumSize());
+		editorScrollPane.setMinimumSize(jPanel.getMinimumSize());
+		editorScrollPane.setViewportView(jEditorPane);
+
+		logger.log(Level.INFO, "Configuring areaScrollPane");
+		areaScrollPane.setBorder(null);
+		areaScrollPane
+				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		areaScrollPane.setAutoscrolls(true);
+
+		logger.log(Level.INFO, "Configuring editorPane");
+		jEditorPane.setFont(new Font("Consolas", Font.PLAIN, FONT_SIZE));
+		jEditorPane.setEditorKit(htmlEditorKit);
+		jEditorPane.setEditable(false);
+
+		logger.log(Level.INFO, "Configuring textArea");
+		jTextArea.setEditable(false);
+		jTextArea.setBackground(new java.awt.Color(BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB));
+		jTextArea.setColumns(TEXTAREA_COLUMNS);
+		jTextArea.setFont(new java.awt.Font("Consolas", TEXTAREA_FONT_STYLE, TEXTAREA_FONT_SIZE)); 
+		jTextArea.setRows(TEXTAREA_ROWS);
+		jTextArea.setBorder(null);
+		areaScrollPane.setViewportView(jTextArea);
+
+		logger.log(Level.INFO, "Configuring various layout and outlook");
+		GroupLayout jPanel1Layout = new GroupLayout(jPanel);
+		jPanel.setLayout(jPanel1Layout);
+		jPanel1Layout
+				.setHorizontalGroup(jPanel1Layout
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addGroup(
+								jPanel1Layout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addGroup(
+												jPanel1Layout
+														.createParallelGroup(
+																GroupLayout.Alignment.LEADING)
+														.addComponent(
+																editorScrollPane,
+																GroupLayout.DEFAULT_SIZE,
+																SCROLLPANE_WIDTH,
+																Short.MAX_VALUE)
+														.addComponent(
+																jTextField)
+														.addGroup(
+																jPanel1Layout
+																		.createSequentialGroup()
+																		.addComponent(
+																				jLabel)
+																		.addGap(GAP1,
+																				GAP1,
+																				Short.MAX_VALUE))
+														.addComponent(
+																areaScrollPane))
+										.addContainerGap()));
+		jPanel1Layout
+				.setVerticalGroup(jPanel1Layout
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addGroup(
+								jPanel1Layout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addComponent(editorScrollPane,
+												GroupLayout.PREFERRED_SIZE,
+												SCROLLPANE_HEIGHT, Short.MAX_VALUE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+										.addComponent(jLabel)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(jTextField,
+												GroupLayout.PREFERRED_SIZE, TEXTFIELD_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(areaScrollPane,
+												GroupLayout.PREFERRED_SIZE, AREASCROLLPANE_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(GAP2, GAP2, GAP2)));
+
+		GroupLayout layout = new GroupLayout(getContentPane());
+		getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addComponent(jPanel,
+				GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+				Short.MAX_VALUE));
+		layout.setVerticalGroup(layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addComponent(jPanel,
+				GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+				GroupLayout.PREFERRED_SIZE));
+
+		pack();
+	}
+
+	// Function for attaching up and down keys to up and down scrolling of
+	// editor pane
+	private void setKeyScrolling() {
+		logger.log(Level.INFO, "Setting key scrolling with editorPane");
+		JScrollBar scrollBar = editorScrollPane.getVerticalScrollBar();
+		InputMap inputMap = scrollBar
+				.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		inputMap.put(KeyStroke.getKeyStroke(KEY_DOWN), POSITIVE_UNIT_INCREMENT);
+		inputMap.put(KeyStroke.getKeyStroke(KEY_UP), NEGATIVE_UNIT_INCREMENT);
+	}
+
+	// function to respond to an enter key in jtextfield
+	private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {
+		if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+			if (jTextField.getText().equals(EMPTY_STRING)) {
+				logger.log(Level.INFO, "No input detected. Returning");
+				return;
+			}
+			logger.log(Level.INFO,
+					"Getting user input. Setting text field to empty");
+			ATypistCalendar.getInstance().userInput(jTextField.getText());
+			jTextField.setText(EMPTY_STRING);
 		}
 	}
 
 	// Variables declaration
-	private JLabel jLabel;
-	private JPanel jPanel;
-	private JScrollPane editorScrollPane;
-	private JScrollPane areaScrollPane;
-	private JTextArea jTextArea;
-	private JTextField jTextField;
-	private JEditorPane jEditorPane;
-	private HTMLEditorKit htmlEditorKit;
+		private JLabel jLabel;
+		private JPanel jPanel;
+		private JScrollPane editorScrollPane;
+		private JScrollPane areaScrollPane;
+		private JTextArea jTextArea;
+		private JTextField jTextField;
+		private JEditorPane jEditorPane;
+		private HTMLEditorKit htmlEditorKit;
 
 }

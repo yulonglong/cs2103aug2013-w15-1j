@@ -27,6 +27,7 @@ public class ParserJUnitTest {
 		UndoAction newUndc = new UndoAction();
 		AddGoogleAction newAddGc = new AddGoogleAction();
 		SyncGoogleAction newSyncGc = new SyncGoogleAction();
+		@SuppressWarnings("unused")
 		GoogleAction newGc = new GoogleAction();
 		
 		Action ac = null;

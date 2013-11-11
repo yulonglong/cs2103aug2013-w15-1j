@@ -186,5 +186,23 @@ public class JUnitTestAdd {
 		//display
 		displayAction.setDescription("schedules");
 		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Schedules: \n1. [Sun, Dec 01, '13] [02:00 PM - 03:00 PM] Gymming at gym\n\n");
+		displayAction.setDescription("all");
+		
+		//updateTest2
+		TasksManager.getInstance().executeCommand(displayAction);
+		updateAction.setUpdatedStartTime(null);
+		updateAction.setUpdatedEndTime(null);
+		updateAction.setUpdatedQuery("Finish reading Harry Potter");
+		updateAction.setUpdatedLocationQuery("");
+		updateRefNum = 5;
+		updateAction.setReferenceNumber(updateRefNum);
+		assertEquals(TasksManager.getInstance().executeCommand(updateAction), "Updated 5 to Finish reading Harry Potter successfully\n\n");
+		
+		//display
+		displayAction.setDescription("todos");
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Todos: \n1. [Status: undone] Finish reading Harry Potter\n2. [Status: done&nbsp&nbsp] clean my room\n3. [Status: undone] complete CS2106 project\n\n");
+		
+		//UPDATE UNDO TEST
+		assertEquals(TasksManager.getInstance().executeCommand(new UndoAction()),"Update command successfully undone\n\n");
 	}
 }
