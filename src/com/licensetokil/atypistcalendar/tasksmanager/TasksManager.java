@@ -254,7 +254,6 @@ public class TasksManager {
 																// is
 																// reopened.
 					logger.log(Level.INFO, "Tracking the last uniqueID");
-					System.out.println("UNIQUE ID = " +uniqueId);
 				}
 			}
 			fileSync();
@@ -694,6 +693,7 @@ public class TasksManager {
 			}
 
 			t.setLastModifiedDate(Calendar.getInstance());
+			t.setRemoteId(null);
 		}
 
 		logger.log(Level.INFO, "Preparing for file sync");
