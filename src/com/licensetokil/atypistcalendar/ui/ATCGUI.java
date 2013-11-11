@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+//@author A0103494J
 package com.licensetokil.atypistcalendar.ui;
 
 import java.awt.Font;
@@ -346,3 +347,4 @@ public class ATCGUI extends JFrame implements WindowListener {
 		private HTMLEditorKit htmlEditorKit;
 
 }
+//@author A0103494J

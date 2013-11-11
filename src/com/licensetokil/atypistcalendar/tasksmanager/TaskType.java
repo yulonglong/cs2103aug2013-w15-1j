@@ -1,3 +1,4 @@
+//@author A0103494J
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 public enum TaskType {
@@ -15,3 +16,4 @@ public enum TaskType {
 		return strTaskType;
 	}
 }
+//@author A0103494J

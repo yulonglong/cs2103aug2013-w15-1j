@@ -1,3 +1,4 @@
+//@author A0103494J
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import java.util.Calendar;
@@ -127,3 +128,4 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 		return clonedObject;
 	}
 }
+//@author A0103494J
