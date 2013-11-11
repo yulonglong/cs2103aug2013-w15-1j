@@ -19,6 +19,7 @@ public class Parser {
 	private static final String MESSAGE_INVALID_ACTION = "Invalid command/action entered!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_STATUS = "Invalid status entered! please enter done or undone!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_PLACE = "Invalid place entered!\n" + CHAR_ENDLINE;
+	private static final String MESSAGE_MISSING_DESCRIPTION = "Missing Description! Please enter task description" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_DESCRIPTION = "Invalid descripition entered!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_DATE = "Invalid date/day entered!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_MONTH = "Invalid month entered!" + CHAR_ENDLINE;
@@ -266,6 +267,10 @@ public class Parser {
 		String description = new String();
 		String place = new String();
 		
+		if(!st.hasMoreTokens()){
+			throw new MalformedUserInputException(MESSAGE_MISSING_DESCRIPTION);
+		}
+		
 		//get the description of the task
 		description = getDescription(st,tempSt);
 		st = tempSt[INDEX_ST];
@@ -457,7 +462,7 @@ public class Parser {
 				
 		//after finding the delimiter ">>"
 		if(!st.hasMoreTokens()){
-			throw new MalformedUserInputException (MESSAGE_INVALID_UPDATE);
+			throw new MalformedUserInputException(MESSAGE_MISSING_DESCRIPTION);
 		}
 		
 		//get the description
@@ -867,6 +872,9 @@ public class Parser {
 				
 				temp = temp.substring(SECOND_INDEX); //retrieve the integer and remove the hex (#)
 				tempInt = Integer.parseInt(temp);
+				if(tempInt<1){
+					throw new MalformedUserInputException(MESSAGE_INVALID_REF_NUMBER);
+				}
 				referenceNumber.add(tempInt);
 			}
 			catch (Exception ex){
