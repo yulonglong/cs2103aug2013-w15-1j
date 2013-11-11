@@ -86,6 +86,63 @@ public class GoogleCalendarManager {
 		}
 	}
 
+	public void initialiseRemoteCalendar() {
+		logger.info("initialiseRemoteCalendar() called.");
+		SyncManager.getInstance().initialiseRemoteCalendar();
+	}
+
+	public void addRemoteTask(Task localTask) {
+		logger.info("addRemoteTask(Task localTask) called - localTask ID: " + localTask.getUniqueId());
+		SyncManager.getInstance().addRemoteTask(localTask);
+	}
+
+	public void updateRemoteTask(Task localTask, String remoteTask) {
+		logger.info("updateRemoteTask(Task localTask, String remoteTask) called. localTask ID: " + localTask.getUniqueId() + " . remoteTask ID: " + remoteTask);
+		SyncManager.getInstance().updateRemoteTask(localTask, remoteTask);
+	}
+
+	public void deleteRemoteTask(String remoteTask) {
+		logger.info("deleteRemoteTask(String remoteTask) called. remoteTask ID: " + remoteTask);
+		SyncManager.getInstance().deleteRemoteTask(remoteTask);
+	}
+
+	public void doCompleteSync() {
+		logger.info("doCompleteSync() called.");
+		SyncManager.getInstance().doCompleteSync();
+	}
+
+	protected void updateTasksManagerWithUpdatedLocalTask(Task updatedLocalTask) {
+		ATypistCalendar.getInstance().updateTasksManagerWithUpdatedLocalTask(updatedLocalTask);
+	}
+
+	protected void deleteLocalTaskfromTasksManager(int localTaskId) {
+		ATypistCalendar.getInstance().deleteLocalTaskfromTasksManager(localTaskId);
+	}
+
+	protected Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId) {
+		return ATypistCalendar.getInstance().insertLocalTaskIntoTasksManager(description, location, lastModifiedDate, remoteTaskId);
+	}
+
+	protected Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime) {
+		return ATypistCalendar.getInstance().insertLocalTaskIntoTasksManager(description, location, lastModifiedDate, remoteTaskId, endTime);
+	}
+
+	protected Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime, Calendar startTime) {
+		return ATypistCalendar.getInstance().insertLocalTaskIntoTasksManager(description, location, lastModifiedDate, remoteTaskId, endTime, startTime);
+	}
+
+	protected void updateLocalTaskWithCorrespondingTaskRemoteId(int localTaskId, String remoteTaskId) {
+		ATypistCalendar.getInstance().updateLocalTaskWithCorrespondingTaskRemoteId(localTaskId, remoteTaskId);
+	}
+
+	protected ArrayList<Task> getCopyOfAllLocalTasks() {
+		return ATypistCalendar.getInstance().getCopyOfAllLocalTasks();
+	}
+
+	protected void setSyncerStatus(boolean isExecuting) {
+		ATypistCalendar.getInstance().setSyncerStatus(isExecuting);
+	}
+
 	private String executeGoogleAction(AddGoogleAction action) {
 		logger.info("Checking if user is logged in.");
 		if (AuthenticationManager.getInstance().isAuthenticated()) {
@@ -147,62 +204,5 @@ public class GoogleCalendarManager {
 			logger.info("User is not logged in. Returning with error message.");
 			return MESSAGE_GOOGLE_LOGOUT_NOT_LOGINED;
 		}
-	}
-
-	public void initialiseRemoteCalendar() {
-		logger.info("initialiseRemoteCalendar() called.");
-		SyncManager.getInstance().initialiseRemoteCalendar();
-	}
-
-	public void addRemoteTask(Task localTask) {
-		logger.info("addRemoteTask(Task localTask) called - localTask ID: " + localTask.getUniqueId());
-		SyncManager.getInstance().addRemoteTask(localTask);
-	}
-
-	public void updateRemoteTask(Task localTask, String remoteTask) {
-		logger.info("updateRemoteTask(Task localTask, String remoteTask) called. localTask ID: " + localTask.getUniqueId() + " . remoteTask ID: " + remoteTask);
-		SyncManager.getInstance().updateRemoteTask(localTask, remoteTask);
-	}
-
-	public void deleteRemoteTask(String remoteTask) {
-		logger.info("deleteRemoteTask(String remoteTask) called. remoteTask ID: " + remoteTask);
-		SyncManager.getInstance().deleteRemoteTask(remoteTask);
-	}
-
-	public void doCompleteSync() {
-		logger.info("doCompleteSync() called.");
-		SyncManager.getInstance().doCompleteSync();
-	}
-
-	protected void updateTasksManagerWithUpdatedLocalTask(Task updatedLocalTask) {
-		ATypistCalendar.getInstance().updateTasksManagerWithUpdatedLocalTask(updatedLocalTask);
-	}
-
-	protected void deleteLocalTaskfromTasksManager(int localTaskId) {
-		ATypistCalendar.getInstance().deleteLocalTaskfromTasksManager(localTaskId);
-	}
-
-	protected Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId) {
-		return ATypistCalendar.getInstance().insertLocalTaskIntoTasksManager(description, location, lastModifiedDate, remoteTaskId);
-	}
-
-	protected Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime) {
-		return ATypistCalendar.getInstance().insertLocalTaskIntoTasksManager(description, location, lastModifiedDate, remoteTaskId, endTime);
-	}
-
-	protected Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime, Calendar startTime) {
-		return ATypistCalendar.getInstance().insertLocalTaskIntoTasksManager(description, location, lastModifiedDate, remoteTaskId, endTime, startTime);
-	}
-
-	protected void updateLocalTaskWithCorrespondingTaskRemoteId(int localTaskId, String remoteTaskId) {
-		ATypistCalendar.getInstance().updateLocalTaskWithCorrespondingTaskRemoteId(localTaskId, remoteTaskId);
-	}
-
-	protected ArrayList<Task> getCopyOfAllLocalTasks() {
-		return ATypistCalendar.getInstance().getCopyOfAllLocalTasks();
-	}
-
-	protected void setSyncerStatus(boolean isExecuting) {
-		ATypistCalendar.getInstance().setSyncerStatus(isExecuting);
 	}
 }

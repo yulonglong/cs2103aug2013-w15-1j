@@ -90,24 +90,6 @@ class SyncManager {
 		runSyncer();
 	}
 
-	private void runSyncer() {
-		if(!AuthenticationManager.getInstance().isAuthenticated()) {
-			logger.info("User is not logged in. No use running Syncer as it will return will authentication errors. Nothing else to do, returning. (Logging in will tigger this process again.");
-			return;
-		}
-
-		if(syncer == null || !syncer.isAlive()) {
-			syncer = new Syncer();
-			syncer.start();
-		}
-		else {
-			//Signaling... if needed.
-			goToSleepLock.lock();
-			goToSleepCondition.signal();
-			goToSleepLock.unlock();
-		}
-	}
-
 	protected PriorityBlockingQueue<SyncAction> getQueue() {
 		return queue;
 	}
@@ -205,4 +187,23 @@ class SyncManager {
 			return Calendar.getInstance(); // Fail quietly
 		}
 	}
+
+	private void runSyncer() {
+		if(!AuthenticationManager.getInstance().isAuthenticated()) {
+			logger.info("User is not logged in. No use running Syncer as it will return will authentication errors. Nothing else to do, returning. (Logging in will tigger this process again.");
+			return;
+		}
+
+		if(syncer == null || !syncer.isAlive()) {
+			syncer = new Syncer();
+			syncer.start();
+		}
+		else {
+			//Signaling... if needed.
+			goToSleepLock.lock();
+			goToSleepCondition.signal();
+			goToSleepLock.unlock();
+		}
+	}
+
 }

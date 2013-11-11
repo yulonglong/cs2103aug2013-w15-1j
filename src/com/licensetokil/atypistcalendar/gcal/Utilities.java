@@ -169,6 +169,14 @@ public class Utilities {
 		}
 	}
 
+	public static String getJsonObjectValueOrEmptyString(JsonObject jsonObject,String key) {
+		if (jsonObject.get(key) != null) {
+			return jsonObject.get(key).getAsString();
+		} else {
+			return EMPTY_STRING;
+		}
+	}
+
 	private static void addHeaders(HttpsURLConnection httpsConnection, HashMap<String, String> headers) {
 		for(String key : headers.keySet()) {
 			httpsConnection.setRequestProperty(key, headers.get(key));
@@ -196,13 +204,5 @@ public class Utilities {
 		}
 		serverReplyBufferedInputStream.close();
 		return serverReplyStringBuilder.toString();
-	}
-
-	public static String getJsonObjectValueOrEmptyString(JsonObject jsonObject,String key) {
-		if (jsonObject.get(key) != null) {
-			return jsonObject.get(key).getAsString();
-		} else {
-			return EMPTY_STRING;
-		}
 	}
 }

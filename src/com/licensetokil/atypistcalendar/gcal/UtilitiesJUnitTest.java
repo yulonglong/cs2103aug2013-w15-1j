@@ -101,6 +101,69 @@ public class UtilitiesJUnitTest {
 	}
 
 	@Test
+	public void test_json_post_withArguments_noAdditionalHeaders() {
+		try {
+			JsonObject leveltwo = new JsonObject();
+			leveltwo.addProperty("leveltwo", "volume");
+
+			JsonObject body = new JsonObject();
+			body.add("levelone", leveltwo);
+			body.addProperty("fire", "water");
+
+			String reply = Utilities.sendJsonHttpsRequest(
+					"https://httpbin.org/post",
+					Utilities.REQUEST_METHOD_POST,
+					Utilities.EMPTY_ADDITIONAL_HEADERS,
+					body);
+
+			JsonObject jsonReply = (JsonObject)new JsonParser().parse(reply);
+
+			assertEquals("http://httpbin.org/post", jsonReply.get("url").getAsString());
+			if (!jsonReply.getAsJsonObject("json").equals(body)) {
+				fail("Body not matched.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void test_json_post_withArguments_withAdditionalHeaders() {
+		try {
+			HashMap<String, String> headers = new HashMap<>();
+			headers.put("Custom-Header-One", "tree");
+			headers.put("Custom-Header-Two", "rubber");
+
+			JsonObject leveltwo = new JsonObject();
+			leveltwo.addProperty("leveltwo", "volume");
+
+			JsonObject body = new JsonObject();
+			body.add("levelone", leveltwo);
+			body.addProperty("fire", "water");
+
+			String reply = Utilities.sendJsonHttpsRequest(
+					"https://httpbin.org/post",
+					Utilities.REQUEST_METHOD_POST,
+					headers,
+					body);
+
+			JsonObject jsonReply = (JsonObject)new JsonParser().parse(reply);
+
+			assertEquals("http://httpbin.org/post", jsonReply.get("url").getAsString());
+			assertEquals("tree", jsonReply.getAsJsonObject("headers").get("Custom-Header-One").getAsString());
+			assertEquals("rubber", jsonReply.getAsJsonObject("headers").get("Custom-Header-Two").getAsString());
+
+			if (!jsonReply.getAsJsonObject("json").equals(body)) {
+				fail("Body not matched.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void test_json_delete_noArguments_noAdditionalHeaders() {
 		try {
 			String reply = Utilities.sendJsonHttpsRequest(
@@ -181,6 +244,69 @@ public class UtilitiesJUnitTest {
 			assertEquals("tree", jsonReply.getAsJsonObject("headers").get("Custom-Header-One").getAsString());
 			assertEquals("rubber", jsonReply.getAsJsonObject("headers").get("Custom-Header-Two").getAsString());
 			assertEquals("{}", jsonReply.get("args").toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void test_json_put_withArguments_noAdditionalHeaders() {
+		try {
+			JsonObject leveltwo = new JsonObject();
+			leveltwo.addProperty("leveltwo", "volume");
+
+			JsonObject body = new JsonObject();
+			body.add("levelone", leveltwo);
+			body.addProperty("fire", "water");
+
+			String reply = Utilities.sendJsonHttpsRequest(
+					"https://httpbin.org/put",
+					Utilities.REQUEST_METHOD_PUT,
+					Utilities.EMPTY_ADDITIONAL_HEADERS,
+					body);
+
+			JsonObject jsonReply = (JsonObject)new JsonParser().parse(reply);
+
+			assertEquals("http://httpbin.org/put", jsonReply.get("url").getAsString());
+			if (!jsonReply.getAsJsonObject("json").equals(body)) {
+				fail("Body not matched.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void test_json_put_withArguments_withAdditionalHeaders() {
+		try {
+			HashMap<String, String> headers = new HashMap<>();
+			headers.put("Custom-Header-One", "tree");
+			headers.put("Custom-Header-Two", "rubber");
+
+			JsonObject leveltwo = new JsonObject();
+			leveltwo.addProperty("leveltwo", "volume");
+
+			JsonObject body = new JsonObject();
+			body.add("levelone", leveltwo);
+			body.addProperty("fire", "water");
+
+			String reply = Utilities.sendJsonHttpsRequest(
+					"https://httpbin.org/put",
+					Utilities.REQUEST_METHOD_PUT,
+					headers,
+					body);
+
+			JsonObject jsonReply = (JsonObject)new JsonParser().parse(reply);
+
+			assertEquals("http://httpbin.org/put", jsonReply.get("url").getAsString());
+			assertEquals("tree", jsonReply.getAsJsonObject("headers").get("Custom-Header-One").getAsString());
+			assertEquals("rubber", jsonReply.getAsJsonObject("headers").get("Custom-Header-Two").getAsString());
+
+			if (!jsonReply.getAsJsonObject("json").equals(body)) {
+				fail("Body not matched.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -345,9 +471,9 @@ public class UtilitiesJUnitTest {
 
 			JsonObject jsonReply = (JsonObject)new JsonParser().parse(reply);
 
-			assertEquals("http://httpbin.org/get", jsonReply.get("url").getAsString());
-			assertEquals("helloworld", jsonReply.get("form").getAsJsonObject().get("argone").getAsString());
-			assertEquals("cs2103t", jsonReply.get("form").getAsJsonObject().get("argtwo").getAsString());
+			assertEquals("http://httpbin.org/get", jsonReply.get("url").getAsString().substring(0, 22));
+			assertEquals("helloworld", jsonReply.get("args").getAsJsonObject().get("argone").getAsString());
+			assertEquals("cs2103t", jsonReply.get("args").getAsJsonObject().get("argtwo").getAsString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -374,11 +500,11 @@ public class UtilitiesJUnitTest {
 
 			JsonObject jsonReply = (JsonObject)new JsonParser().parse(reply);
 
-			assertEquals("http://httpbin.org/get", jsonReply.get("url").getAsString());
+			assertEquals("http://httpbin.org/get", jsonReply.get("url").getAsString().substring(0, 22));
 			assertEquals("tree", jsonReply.getAsJsonObject("headers").get("Custom-Header-One").getAsString());
 			assertEquals("rubber", jsonReply.getAsJsonObject("headers").get("Custom-Header-Two").getAsString());
-			assertEquals("helloworld", jsonReply.get("form").getAsJsonObject().get("argone").getAsString());
-			assertEquals("cs2103t", jsonReply.get("form").getAsJsonObject().get("argtwo").getAsString());
+			assertEquals("helloworld", jsonReply.get("args").getAsJsonObject().get("argone").getAsString());
+			assertEquals("cs2103t", jsonReply.get("args").getAsJsonObject().get("argtwo").getAsString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
