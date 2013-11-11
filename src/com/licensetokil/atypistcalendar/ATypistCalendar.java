@@ -52,7 +52,7 @@ public class ATypistCalendar {
 		}
 		else {
 			//TODO delete before production
-			redirectSystemErrorStream();
+			//redirectSystemErrorStream();
 		}
 		ATypistCalendar.getInstance().initialize(args);
 	}
