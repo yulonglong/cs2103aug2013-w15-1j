@@ -107,6 +107,18 @@ public class TasksManager {
 
 	private static File file = new File("ATC.txt");
 
+	// private constructor
+	private TasksManager() {
+	}
+
+	// Method to access a single instance
+	public static TasksManager getInstance() {
+		if (TM == null) {
+			TM = new TasksManager();
+		}
+		return TM;
+	}
+
 	// function for google calendar
 	public ArrayList<Task> cloneAllTasks() {
 		logger.log(Level.INFO, "In cloneAllTasks");
@@ -129,46 +141,16 @@ public class TasksManager {
 
 		return allTasks;
 	}
-
-	// Method to access a single instance
-	public static TasksManager getInstance() {
-		if (TM == null) {
-			TM = new TasksManager();
-		}
-		return TM;
-	}
-
-	// private constructor
-	private TasksManager() {
-	}
-
-	/*
-	 * private void convertFromDelimiters() { for (Task t : getAllTasks()) { if
-	 * ((t.getDescription()).contains("?a!b$")) { String newDescription =
-	 * (t.getDescription()).replaceAll("@", "@a");
-	 * t.setDescription(newDescription); }
-	 * 
-	 * if ((t.getPlace()).contains("?a!b$")) { String newPlace = (t.getPlace())
-	 * .replaceAll("\\b?a!b$\\b", "@s"); t.setPlace(newPlace); } } }
-	 * 
-	 * private static void checkForDelimiters(Task t) { if
-	 * ((t.getDescription()).contains("@")) { String newDescription =
-	 * (t.getDescription()).replaceAll("@", "@a");
-	 * t.setDescription(newDescription); }
-	 * 
-	 * if ((t.getPlace()).contains("@")) { String newPlace =
-	 * (t.getPlace()).replaceAll("@", "@a"); t.setPlace(newPlace); } }
-	 */
-
+	
 	public void initialize() {
 		try {
 			logger.log(Level.INFO,
 					"Initialising files and transferring data from files to temporary memory");
-
+	
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String currLine;
 			String[] fileData;
-
+	
 			// To import all tasks from file to ArrayList
 			while ((currLine = reader.readLine()) != null) {
 				fileData = currLine.split(DELIMITER);
@@ -179,20 +161,20 @@ public class TasksManager {
 							fileData[4], fileData[5],
 							convertTimeFromStringToCalendar(fileData[6]));
 					allSchedules.add(s);
-
+	
 					logger.log(Level.INFO,
 							"Added schedule into temporary memory");
 					if (fileData[5].equals(BLANK_SPACE)) {
 						logger.log(Level.INFO,
 								"No place indicated. Setting place to empty string");
 						s.setPlace(EMPTY_STRING);
-
+	
 					}
 					if (fileData[7].equals(NULL_STRING)) {
 						logger.log(Level.INFO,
 								"No remote ID for schedule indicated. Setting remoteId to null");
 						s.setRemoteId(null);
-
+	
 					} else {
 						s.setRemoteId(fileData[7]);
 					}
@@ -208,7 +190,7 @@ public class TasksManager {
 						logger.log(Level.INFO,
 								"No place indicated. Setting place to empty string");
 						d.setPlace(EMPTY_STRING);
-
+	
 					}
 					if (fileData[7].equals(NULL_STRING)) {
 						logger.log(Level.INFO,
@@ -228,7 +210,7 @@ public class TasksManager {
 						logger.log(Level.INFO,
 								"No place indicated. Setting place to empty string");
 						td.setPlace(EMPTY_STRING);
-
+	
 					}
 					if (fileData[6].equals(NULL_STRING)) {
 						logger.log(Level.INFO,
@@ -261,6 +243,195 @@ public class TasksManager {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Exception detected");
 			System.err.println("Error: " + e.getMessage());
+		}
+	}
+
+	public void updateCorrespondingTaskRemoteId(int uniqueId, String remoteId)
+			throws TaskNotFoundException {
+		logger.log(Level.INFO, "In updateCorrespondingTaskRemoteId function");
+		Task t = findTaskFromUniqueId(uniqueId);
+		t.setRemoteId(remoteId);
+	}
+
+	public String executeCommand(LocalAction ac) {
+		logger.log(Level.INFO, "In executeCommand function");
+	
+		if (ac.getType() == LocalActionType.ADD) {
+			logger.log(Level.INFO, "Command identified as add");
+			Task t = classify((AddAction) ac);
+			lastAction = ac;
+			return add(t);
+		}
+	
+		else if (ac.getType() == LocalActionType.DISPLAY) {
+			logger.log(Level.INFO, "Command identified as display");
+			return display((DisplayAction) ac);
+		}
+	
+		else if (ac.getType() == LocalActionType.SEARCH) {
+			logger.log(Level.INFO, "Command identified as search");
+			return search((SearchAction) ac);
+		}
+	
+		else if (ac.getType() == LocalActionType.DELETE) {
+			logger.log(Level.INFO, "Command identified as delete");
+			String output = delete((DeleteAction) ac);
+			if (!output.equals(INVALID_NUMBER_INPUT)) {
+				lastAction = ac;
+			}
+			return output;
+		}
+	
+		else if (ac.getType() == LocalActionType.UPDATE) {
+			logger.log(Level.INFO, "Command identified as update");
+			lastAction = ac;
+			return update((UpdateAction) ac);
+		}
+	
+		else if (ac.getType() == LocalActionType.MARK) {
+			logger.log(Level.INFO, "Command identified as mark");
+			String output = mark((MarkAction) ac);
+			if (!output.equals(INVALID_NUMBER_INPUT)
+					&& !output.equals(MARK_SCHEDULE_ERROR)) {
+				lastAction = ac;
+			}
+			return output;
+		}
+	
+		else if (ac.getType() == LocalActionType.UNDO) {
+			logger.log(Level.INFO, "Command identified as undo");
+			if (lastAction instanceof AddAction) {
+				lastAction = ac;
+				return addUndo();
+			} else if (lastAction instanceof UpdateAction) {
+				lastAction = ac;
+				return updateUndo();
+			} else if (lastAction instanceof DeleteAction) {
+				lastAction = ac;
+				return deleteUndo();
+			} else if (lastAction instanceof MarkAction) {
+				lastAction = ac;
+				return markUndo();
+			} else {
+				return UNDO_DISALLOWED;
+			}
+		}
+		return ERROR_MESSAGE;
+	
+	}
+
+	public Todo addTodoFromGoogle(String description, String location,
+			Calendar lastModifiedDate, String remoteId) {
+		logger.log(Level.INFO, "In addTodoFromGoogle function");
+		Todo todo = new Todo(++uniqueId, description, location, MARK_UNDONE,
+				lastModifiedDate);
+		todo.setRemoteId(remoteId);
+		add(todo);
+		return todo;
+	}
+
+	public Deadline addDeadlineFromGoogle(Calendar endTime, String description,
+			String location, Calendar lastModifiedDate, String remoteId) {
+		logger.log(Level.INFO, "In addDeadlineFromGoogle function");
+		Deadline deadline = new Deadline(++uniqueId, endTime, description,
+				location, MARK_UNDONE, lastModifiedDate);
+		deadline.setRemoteId(remoteId);
+		add(deadline);
+		return deadline;
+	}
+
+	public Schedule addScheduleFromGoogle(Calendar startTime, Calendar endTime,
+			String description, String location, Calendar lastModifiedDate,
+			String remoteId) {
+		logger.log(Level.INFO, "In addScheduleFromGoogle function");
+		Schedule schedule = new Schedule(++uniqueId, startTime, endTime,
+				description, location, lastModifiedDate);
+		schedule.setRemoteId(remoteId);
+		add(schedule);
+		return schedule;
+	}
+
+	public void deleteGoogleTask(int uniqueId) throws TaskNotFoundException {
+		logger.log(Level.INFO, "In deleteGoogleTask function");
+		Task t = findTaskFromUniqueId(uniqueId);
+		if (t.getTaskType() == TaskType.SCHEDULE) {
+			logger.log(Level.INFO, "Removing schedule " + t);
+			allSchedules.remove(t);
+		} else if (t.getTaskType() == TaskType.DEADLINE) {
+			logger.log(Level.INFO, "Removing deadline " + t);
+			allDeadlines.remove(t);
+		} else if (t.getTaskType() == TaskType.TODO) {
+			logger.log(Level.INFO, "Removing todo " + t);
+			allTodos.remove(t);
+		} else {
+			logger.log(Level.WARNING, "Task not found");
+			throw new TaskNotFoundException();
+		}
+	
+		logger.log(Level.INFO, "Preparing for file sync");
+		fileSync();
+	}
+
+	public void updateGoogleTask(Task t) throws TaskNotFoundException {
+		logger.log(Level.INFO, "In updateGoogleTask");
+		Task updateTask = findTaskFromUniqueId(t.getUniqueId());
+		if (t.getTaskType() == TaskType.SCHEDULE) {
+			logger.log(Level.INFO, "Updating schedule " + t);
+			allSchedules.set(allSchedules.indexOf(updateTask), (Schedule) t);
+		} else if (t.getTaskType() == TaskType.DEADLINE) {
+			logger.log(Level.INFO, "Updating deadline " + t);
+			allDeadlines.set(allDeadlines.indexOf(updateTask), (Deadline) t);
+		} else if (t.getTaskType() == TaskType.TODO) {
+			logger.log(Level.INFO, "Updating todo " + t);
+			allTodos.set(allTodos.indexOf(updateTask), (Todo) t);
+		} else {
+			logger.log(Level.WARNING, "Task not found");
+			throw new TaskNotFoundException();
+		}
+	}
+
+	public ArrayList<Schedule> checkForScheduleClashes(Schedule s) {
+		logger.log(Level.INFO, "In check for schedule clashes");
+		ArrayList<Schedule> clashedSchedules = new ArrayList<Schedule>();
+		for (Schedule sc : allSchedules) {
+			if ((s.getStartTime().after(sc.getStartTime()) && s.getEndTime()
+					.before(sc.getEndTime()))
+					|| (s.getStartTime().compareTo(sc.getStartTime()) == 0 || (s
+							.getEndTime().compareTo(sc.getEndTime()) == 0))) {
+				logger.log(Level.INFO, "Clashed schedule found: " + sc);
+				if (updateOriginalTask != null
+						&& updateOriginalTask.getUniqueId() != sc.getUniqueId()) {
+					clashedSchedules.add(sc);
+				}
+			}
+		}
+	
+		return clashedSchedules;
+	}
+
+	public void exit() {
+		logger.log(Level.INFO, "In exit function");
+		BufferedWriter writer = null;
+		try {
+			logger.log(Level.INFO, "Preparing for file sync");
+			fileSync();
+			writer = new BufferedWriter(new FileWriter(file, true));
+			logger.log(Level.INFO, "Writing into file the last uniqueId"
+					+ uniqueId);
+			writer.write(UNIQUEID + DELIMITER + uniqueId);
+			writer.newLine();
+		} catch (Exception e) {
+			logger.log(Level.WARNING, "Error detected " + e.getMessage());
+		} finally {
+			try {
+				logger.log(Level.INFO, "Closing buffered writer");
+				writer.close();
+			} catch (IOException e) {
+				logger.log(
+						Level.WARNING,
+						"Unable to close buffered writer due to error: "
+								+ e.getMessage());
+			}
 		}
 	}
 
@@ -418,7 +589,7 @@ public class TasksManager {
 
 		return UNDO_ADD_SUCCESSFUL;
 	}
-
+	
 	private String display(DisplayAction ac) {
 		logger.log(Level.INFO,
 				"In display function. Clearing all previously requested tasks by the user");
@@ -775,27 +946,53 @@ public class TasksManager {
 
 		logger.log(Level.INFO, "undoing update back to task:  "
 				+ updateOriginalTask);
+		
+		Schedule scheduleToRemove = null;
+		Schedule scheduleToAdd = null;
 		for (Schedule s : allSchedules) {
 			if (s.getUniqueId() == updateOriginalTask.getUniqueId()) {
-				allSchedules.remove(s);
-				allSchedules.add((Schedule) updateOriginalTask.clone());
-				s.setLastModifiedDate(Calendar.getInstance());
+				scheduleToRemove = s;
+				scheduleToAdd = (Schedule) updateOriginalTask.clone();
+				break;
 			}
 		}
+		if(scheduleToRemove != null) {
+			allSchedules.remove(scheduleToRemove);
+
+			scheduleToAdd.setLastModifiedDate(Calendar.getInstance());
+			allSchedules.add(scheduleToAdd);
+		}
+		
+		Deadline deadlineToRemove = null;
+		Deadline deadlineToAdd = null;
 		for (Deadline d : allDeadlines) {
 			if (d.getUniqueId() == updateOriginalTask.getUniqueId()) {
-				allDeadlines.remove(d);
-				allDeadlines.add((Deadline) updateOriginalTask.clone());
-				d.setLastModifiedDate(Calendar.getInstance());
+				deadlineToRemove = d;
+				deadlineToAdd = (Deadline) updateOriginalTask.clone();
+				break;
 			}
 		}
+		if(deadlineToRemove != null) {
+			allDeadlines.remove(deadlineToRemove);
+
+			deadlineToAdd.setLastModifiedDate(Calendar.getInstance());
+			allDeadlines.add(deadlineToAdd);
+		}
+		
+		Todo todoToRemove = null;
+		Todo todoToAdd = null;
 		for (Todo td : allTodos) {
 			if (td.getUniqueId() == updateOriginalTask.getUniqueId()) {
-				allTodos.remove(td);
-				allTodos.add((Todo) updateOriginalTask.clone());
-				System.out.println("Todo: " + td);
-				td.setLastModifiedDate(Calendar.getInstance());
+				todoToRemove = td;
+				todoToAdd = (Todo) updateOriginalTask.clone();
+				break;
 			}
+		}
+		if(todoToRemove != null) {
+			allTodos.remove(todoToRemove);
+
+			todoToAdd.setLastModifiedDate(Calendar.getInstance());
+			allTodos.add(todoToAdd);
 		}
 
 		fileSync();
@@ -991,194 +1188,5 @@ public class TasksManager {
 
 		logger.log(Level.WARNING, "Task is not found");
 		throw new TaskNotFoundException("Task not found");
-	}
-
-	public void updateCorrespondingTaskRemoteId(int uniqueId, String remoteId)
-			throws TaskNotFoundException {
-		logger.log(Level.INFO, "In updateCorrespondingTaskRemoteId function");
-		Task t = findTaskFromUniqueId(uniqueId);
-		t.setRemoteId(remoteId);
-	}
-
-	public String executeCommand(LocalAction ac) {
-		logger.log(Level.INFO, "In executeCommand function");
-
-		if (ac.getType() == LocalActionType.ADD) {
-			logger.log(Level.INFO, "Command identified as add");
-			Task t = classify((AddAction) ac);
-			lastAction = ac;
-			return add(t);
-		}
-
-		else if (ac.getType() == LocalActionType.DISPLAY) {
-			logger.log(Level.INFO, "Command identified as display");
-			return display((DisplayAction) ac);
-		}
-
-		else if (ac.getType() == LocalActionType.SEARCH) {
-			logger.log(Level.INFO, "Command identified as search");
-			return search((SearchAction) ac);
-		}
-
-		else if (ac.getType() == LocalActionType.DELETE) {
-			logger.log(Level.INFO, "Command identified as delete");
-			String output = delete((DeleteAction) ac);
-			if (!output.equals(INVALID_NUMBER_INPUT)) {
-				lastAction = ac;
-			}
-			return output;
-		}
-
-		else if (ac.getType() == LocalActionType.UPDATE) {
-			logger.log(Level.INFO, "Command identified as update");
-			lastAction = ac;
-			return update((UpdateAction) ac);
-		}
-
-		else if (ac.getType() == LocalActionType.MARK) {
-			logger.log(Level.INFO, "Command identified as mark");
-			String output = mark((MarkAction) ac);
-			if (!output.equals(INVALID_NUMBER_INPUT)
-					&& !output.equals(MARK_SCHEDULE_ERROR)) {
-				lastAction = ac;
-			}
-			return output;
-		}
-
-		else if (ac.getType() == LocalActionType.UNDO) {
-			logger.log(Level.INFO, "Command identified as undo");
-			if (lastAction instanceof AddAction) {
-				lastAction = ac;
-				return addUndo();
-			} else if (lastAction instanceof UpdateAction) {
-				lastAction = ac;
-				return updateUndo();
-			} else if (lastAction instanceof DeleteAction) {
-				lastAction = ac;
-				return deleteUndo();
-			} else if (lastAction instanceof MarkAction) {
-				lastAction = ac;
-				return markUndo();
-			} else {
-				return UNDO_DISALLOWED;
-			}
-		}
-		return ERROR_MESSAGE;
-
-	}
-
-	public Todo addTodoFromGoogle(String description, String location,
-			Calendar lastModifiedDate, String remoteId) {
-		logger.log(Level.INFO, "In addTodoFromGoogle function");
-		Todo todo = new Todo(++uniqueId, description, location, MARK_UNDONE,
-				lastModifiedDate);
-		todo.setRemoteId(remoteId);
-		add(todo);
-		return todo;
-	}
-
-	public Deadline addDeadlineFromGoogle(Calendar endTime, String description,
-			String location, Calendar lastModifiedDate, String remoteId) {
-		logger.log(Level.INFO, "In addDeadlineFromGoogle function");
-		Deadline deadline = new Deadline(++uniqueId, endTime, description,
-				location, MARK_UNDONE, lastModifiedDate);
-		deadline.setRemoteId(remoteId);
-		add(deadline);
-		return deadline;
-	}
-
-	public Schedule addScheduleFromGoogle(Calendar startTime, Calendar endTime,
-			String description, String location, Calendar lastModifiedDate,
-			String remoteId) {
-		logger.log(Level.INFO, "In addScheduleFromGoogle function");
-		Schedule schedule = new Schedule(++uniqueId, startTime, endTime,
-				description, location, lastModifiedDate);
-		schedule.setRemoteId(remoteId);
-		add(schedule);
-		return schedule;
-	}
-
-	public void deleteGoogleTask(int uniqueId) throws TaskNotFoundException {
-		logger.log(Level.INFO, "In deleteGoogleTask function");
-		Task t = findTaskFromUniqueId(uniqueId);
-		if (t.getTaskType() == TaskType.SCHEDULE) {
-			logger.log(Level.INFO, "Removing schedule " + t);
-			allSchedules.remove(t);
-		} else if (t.getTaskType() == TaskType.DEADLINE) {
-			logger.log(Level.INFO, "Removing deadline " + t);
-			allDeadlines.remove(t);
-		} else if (t.getTaskType() == TaskType.TODO) {
-			logger.log(Level.INFO, "Removing todo " + t);
-			allTodos.remove(t);
-		} else {
-			logger.log(Level.WARNING, "Task not found");
-			throw new TaskNotFoundException();
-		}
-
-		logger.log(Level.INFO, "Preparing for file sync");
-		fileSync();
-	}
-
-	public void updateGoogleTask(Task t) throws TaskNotFoundException {
-		logger.log(Level.INFO, "In updateGoogleTask");
-		Task updateTask = findTaskFromUniqueId(t.getUniqueId());
-		if (t.getTaskType() == TaskType.SCHEDULE) {
-			logger.log(Level.INFO, "Updating schedule " + t);
-			allSchedules.set(allSchedules.indexOf(updateTask), (Schedule) t);
-		} else if (t.getTaskType() == TaskType.DEADLINE) {
-			logger.log(Level.INFO, "Updating deadline " + t);
-			allDeadlines.set(allDeadlines.indexOf(updateTask), (Deadline) t);
-		} else if (t.getTaskType() == TaskType.TODO) {
-			logger.log(Level.INFO, "Updating todo " + t);
-			allTodos.set(allTodos.indexOf(updateTask), (Todo) t);
-		} else {
-			logger.log(Level.WARNING, "Task not found");
-			throw new TaskNotFoundException();
-		}
-	}
-
-	public ArrayList<Schedule> checkForScheduleClashes(Schedule s) {
-		logger.log(Level.INFO, "In check for schedule clashes");
-		ArrayList<Schedule> clashedSchedules = new ArrayList<Schedule>();
-		for (Schedule sc : allSchedules) {
-			if ((s.getStartTime().after(sc.getStartTime()) && s.getEndTime()
-					.before(sc.getEndTime()))
-					|| (s.getStartTime().compareTo(sc.getStartTime()) == 0 || (s
-							.getEndTime().compareTo(sc.getEndTime()) == 0))) {
-				logger.log(Level.INFO, "Clashed schedule found: " + sc);
-				if (updateOriginalTask != null
-						&& updateOriginalTask.getUniqueId() != sc.getUniqueId()) {
-					clashedSchedules.add(sc);
-				}
-			}
-		}
-
-		return clashedSchedules;
-	}
-
-	public void exit() {
-		logger.log(Level.INFO, "In exit function");
-		BufferedWriter writer = null;
-		try {
-			logger.log(Level.INFO, "Preparing for file sync");
-			fileSync();
-			writer = new BufferedWriter(new FileWriter(file, true));
-			logger.log(Level.INFO, "Writing into file the last uniqueId"
-					+ uniqueId);
-			writer.write(UNIQUEID + DELIMITER + uniqueId);
-			writer.newLine();
-		} catch (Exception e) {
-			logger.log(Level.WARNING, "Error detected " + e.getMessage());
-		} finally {
-			try {
-				logger.log(Level.INFO, "Closing buffered writer");
-				writer.close();
-			} catch (IOException e) {
-				logger.log(
-						Level.WARNING,
-						"Unable to close buffered writer due to error: "
-								+ e.getMessage());
-			}
-		}
 	}
 }

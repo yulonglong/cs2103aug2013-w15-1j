@@ -48,6 +48,21 @@ public class ATCGUI extends JFrame implements WindowListener {
 	private final static String NEWLINE_HTML = "<br>";
 	
 	private final static String OUTPUT_FORMAT = "%s<hr><br>";
+	
+	private final static int FONT_SIZE = 14;
+	private final static int EDITOR_SCROLLPANE_FONT_SIZE = 18;
+	private final static int FONT_STYLE = 0;
+	private final static int BACKGROUND_COLOR_RGB = 222;
+	private final static int TEXTAREA_FONT_SIZE = 12;
+	private final static int TEXTAREA_FONT_STYLE = 1;
+	private final static int TEXTAREA_COLUMNS = 20;
+	private final static int TEXTAREA_ROWS = 5;
+	private final static int SCROLLPANE_WIDTH = 700;
+	private final static int SCROLLPANE_HEIGHT = 402;
+	private final static int GAP1 = 0;
+	private final static int GAP2 = 5;
+	private final static int TEXTFIELD_SIZE = 33;
+	private final static int AREASCROLLPANE_SIZE = 29;
 
 	private static Logger logger = Logger.getLogger("ATCGUI");
 	
@@ -65,6 +80,76 @@ public class ATCGUI extends JFrame implements WindowListener {
 		addWindowListener(this);
 	}
 	
+	// function that displays responses from user input
+	public void outputWithNewline(String text) {
+		logger.log(Level.INFO, "In outputWithNewline function");
+		StringReader reader;
+	
+		if (text.contains(MESSAGE_WELCOME)) {
+			logger.log(Level.INFO, "Displaying Welcome Message");
+			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
+			jEditorPane.setText(String.format(MESSAGE_WELCOME_FORMAT, text));
+		}
+	
+		else {
+			logger.log(Level.INFO, "Displaying all other output");
+			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
+			reader = new StringReader(String.format(OUTPUT_FORMAT, text));
+			try {
+				htmlEditorKit.read(reader, jEditorPane.getDocument(),
+						jEditorPane.getDocument().getLength());
+			} catch (Exception e) {
+				logger.log(Level.WARNING, "Error detected: " + e.getMessage());
+			}
+		}
+	
+		jEditorPane.setCaretPosition(jEditorPane.getDocument().getLength());
+		jTextField.requestFocus();
+	}
+
+	//for window closing
+	public void dispatchWindowClosingEvent() {
+		logger.log(Level.INFO, "In dispatchWindowClosingEventFunction");
+		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	}
+
+	//function to output the previous user input for convenience purposes
+	public void outputUserInput(String input) {
+		logger.log(Level.INFO, "In outputUserInput function");
+		jTextArea.setText(input);
+	}
+
+	@Override
+	//function to save data into files when window is closed
+	public void windowClosing(WindowEvent e) {
+		logger.log(Level.INFO, "In windowClosing function");
+		ATypistCalendar.getInstance().cleanUp();
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+	}
+
 	//initialising function
 	private void initComponents() {
 
@@ -92,7 +177,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 		setKeyScrolling();
 
 		logger.log(Level.INFO, "Configuring jLabel");
-		jLabel.setFont(new java.awt.Font("Consolas", 0, 14));
+		jLabel.setFont(new java.awt.Font("Consolas", FONT_STYLE, FONT_SIZE));
 		jLabel.setText(MESSAGE_COMMAND);
 
 		logger.log(Level.INFO, "Configuring editorScrollPane");
@@ -100,7 +185,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 				.createTitledBorder(null, MESSAGE_TITLE,
 						javax.swing.border.TitledBorder.CENTER,
 						javax.swing.border.TitledBorder.DEFAULT_POSITION,
-						new java.awt.Font("Consolas", 0, 18)));
+						new java.awt.Font("Consolas", FONT_STYLE, EDITOR_SCROLLPANE_FONT_SIZE)));
 		editorScrollPane.setMaximumSize(jPanel.getMaximumSize());
 		editorScrollPane.setMinimumSize(jPanel.getMinimumSize());
 		editorScrollPane.setViewportView(jEditorPane);
@@ -112,16 +197,16 @@ public class ATCGUI extends JFrame implements WindowListener {
 		areaScrollPane.setAutoscrolls(true);
 
 		logger.log(Level.INFO, "Configuring editorPane");
-		jEditorPane.setFont(new Font("Consolas", Font.PLAIN, 14));
+		jEditorPane.setFont(new Font("Consolas", Font.PLAIN, FONT_SIZE));
 		jEditorPane.setEditorKit(htmlEditorKit);
 		jEditorPane.setEditable(false);
 
 		logger.log(Level.INFO, "Configuring textArea");
 		jTextArea.setEditable(false);
-		jTextArea.setBackground(new java.awt.Color(222, 222, 222));
-		jTextArea.setColumns(20);
-		jTextArea.setFont(new java.awt.Font("Consolas", 1, 12)); // NOI18N
-		jTextArea.setRows(5);
+		jTextArea.setBackground(new java.awt.Color(BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB));
+		jTextArea.setColumns(TEXTAREA_COLUMNS);
+		jTextArea.setFont(new java.awt.Font("Consolas", TEXTAREA_FONT_STYLE, TEXTAREA_FONT_SIZE)); 
+		jTextArea.setRows(TEXTAREA_ROWS);
 		jTextArea.setBorder(null);
 		areaScrollPane.setViewportView(jTextArea);
 
@@ -142,7 +227,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 														.addComponent(
 																editorScrollPane,
 																GroupLayout.DEFAULT_SIZE,
-																700,
+																SCROLLPANE_WIDTH,
 																Short.MAX_VALUE)
 														.addComponent(
 																jTextField)
@@ -151,8 +236,8 @@ public class ATCGUI extends JFrame implements WindowListener {
 																		.createSequentialGroup()
 																		.addComponent(
 																				jLabel)
-																		.addGap(0,
-																				0,
+																		.addGap(GAP1,
+																				GAP1,
 																				Short.MAX_VALUE))
 														.addComponent(
 																areaScrollPane))
@@ -166,21 +251,21 @@ public class ATCGUI extends JFrame implements WindowListener {
 										.addContainerGap()
 										.addComponent(editorScrollPane,
 												GroupLayout.PREFERRED_SIZE,
-												402, Short.MAX_VALUE)
+												SCROLLPANE_HEIGHT, Short.MAX_VALUE)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
 										.addComponent(jLabel)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 										.addComponent(jTextField,
-												GroupLayout.PREFERRED_SIZE, 33,
+												GroupLayout.PREFERRED_SIZE, TEXTFIELD_SIZE,
 												GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 										.addComponent(areaScrollPane,
-												GroupLayout.PREFERRED_SIZE, 29,
+												GroupLayout.PREFERRED_SIZE, AREASCROLLPANE_SIZE,
 												GroupLayout.PREFERRED_SIZE)
-										.addGap(5, 5, 5)));
+										.addGap(GAP2, GAP2, GAP2)));
 
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
@@ -221,84 +306,14 @@ public class ATCGUI extends JFrame implements WindowListener {
 		}
 	}
 
-	// function that displays responses from user input
-	public void outputWithNewline(String text) {
-		logger.log(Level.INFO, "In outputWithNewline function");
-		StringReader reader;
-
-		if (text.contains(MESSAGE_WELCOME)) {
-			logger.log(Level.INFO, "Displaying Welcome Message");
-			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
-			jEditorPane.setText(String.format(MESSAGE_WELCOME_FORMAT, text));
-		}
-
-		else {
-			logger.log(Level.INFO, "Displaying all other output");
-			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
-			reader = new StringReader(String.format(OUTPUT_FORMAT, text));
-			try {
-				htmlEditorKit.read(reader, jEditorPane.getDocument(),
-						jEditorPane.getDocument().getLength());
-			} catch (Exception e) {
-				logger.log(Level.WARNING, "Error detected: " + e.getMessage());
-			}
-		}
-
-		jEditorPane.setCaretPosition(jEditorPane.getDocument().getLength());
-		jTextField.requestFocus();
-	}
-	
-	//for window closing
-	public void dispatchWindowClosingEvent() {
-		logger.log(Level.INFO, "In dispatchWindowClosingEventFunction");
-		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-	}
-	
-	//function to output the previous user input for convenience purposes
-	public void outputUserInput(String input) {
-		logger.log(Level.INFO, "In outputUserInput function");
-		jTextArea.setText(input);
-	}
-
-	@Override
-	//function to save data into files when window is closed
-	public void windowClosing(WindowEvent e) {
-		logger.log(Level.INFO, "In windowClosing function");
-		ATypistCalendar.getInstance().cleanUp();
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-	}
-
 	// Variables declaration
-	private JLabel jLabel;
-	private JPanel jPanel;
-	private JScrollPane editorScrollPane;
-	private JScrollPane areaScrollPane;
-	private JTextArea jTextArea;
-	private JTextField jTextField;
-	private JEditorPane jEditorPane;
-	private HTMLEditorKit htmlEditorKit;
+		private JLabel jLabel;
+		private JPanel jPanel;
+		private JScrollPane editorScrollPane;
+		private JScrollPane areaScrollPane;
+		private JTextArea jTextArea;
+		private JTextField jTextField;
+		private JEditorPane jEditorPane;
+		private HTMLEditorKit htmlEditorKit;
 
 }

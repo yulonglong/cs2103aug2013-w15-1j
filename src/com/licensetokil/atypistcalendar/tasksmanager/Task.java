@@ -2,7 +2,7 @@ package com.licensetokil.atypistcalendar.tasksmanager;
 
 import java.util.Calendar;
 
-public abstract class Task implements Cloneable {
+public abstract class Task implements Cloneable{
 	protected String remoteId;
 	protected TaskType taskType;
 	protected int uniqueId;
