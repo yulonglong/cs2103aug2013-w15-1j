@@ -1,4 +1,664 @@
-//@author A0103494J
+//@author: a0103494j
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Deadline.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
+	private static final String OUTPUT_FORMAT = "[%s] [by %s] [Status: %s] %s";
+	private String remoteId;
+	private TaskType taskType;
+	private int uniqueId;
+	private Calendar lastModifiedDate;
+	private Calendar endTime;
+	private String description;
+	private String place;
+	private String status;
+
+	public Deadline(int uniqueId, Calendar endTime, String description,
+			String place, String status, Calendar lastModifiedDate) {
+		this.taskType = TaskType.DEADLINE;
+		this.endTime = endTime;
+		this.description = description;
+		this.place = place;
+		this.uniqueId = uniqueId;
+		this.status = status;
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public Deadline() {
+	}
+
+	public String getRemoteId() {
+		return remoteId;
+	}
+
+	public int getUniqueId() {
+		return uniqueId;
+	}
+
+	public TaskType getTaskType() {
+		return taskType;
+	}
+
+	public Calendar getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public Calendar getEndTime() {
+		return endTime;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getPlace() {
+		return place;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setEndTime(Calendar st) {
+		this.endTime = st;
+	}
+
+	public void setDescription(String d) {
+		this.description = d;
+	}
+
+	public void setPlace(String p) {
+		this.place = p;
+	}
+
+	public void setStatus(String s) {
+		this.status = s;
+	}
+
+	public void setRemoteId(String remoteId) {
+		this.remoteId = remoteId;
+	}
+
+	public void setTaskType(TaskType t) {
+		this.taskType = t;
+	}
+
+	public void setUniqueId(int uniqueId) {
+		this.uniqueId = uniqueId;
+	}
+
+	public void setLastModifiedDate(Calendar lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String toString() {
+		if (place.equals(EMPTY_STRING)) {
+			return TaskType.DEADLINE + DELIMITER + uniqueId + DELIMITER
+					+ endTime.getTime() + DELIMITER + description + DELIMITER
+					+ BLANK_SPACE + DELIMITER + status + DELIMITER
+					+ lastModifiedDate.getTime() + DELIMITER + remoteId;
+		}
+		return TaskType.DEADLINE + DELIMITER + uniqueId + DELIMITER
+				+ endTime.getTime() + DELIMITER + description + DELIMITER
+				+ place + DELIMITER + status + DELIMITER
+				+ lastModifiedDate.getTime() + DELIMITER + remoteId;
+	}
+
+	public String outputStringForDisplay() {
+		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM dd, ''yy");
+
+		String stringStatus = status;
+		if (stringStatus.equals(DONE_NO_ALIGN)) {
+			stringStatus = DONE_ALIGN;
+		}
+
+		String output = String
+				.format(OUTPUT_FORMAT, formatDay.format(endTime.getTime()),
+						formatTime.format(endTime.getTime()), stringStatus,
+						description);
+		if (!place.equals(EMPTY_STRING)) {
+			output = String.format(DISPLAY_PLACE_NOT_EMPTY, output,
+					this.getPlace());
+		}
+
+		return output;
+	}
+
+	public int compareTo(Deadline d) {
+		return endTime.compareTo(d.getEndTime());
+	}
+
+	@Override
+	public Object clone() {
+		Deadline clonedObject = new Deadline();
+		clonedObject.remoteId = this.remoteId;
+		clonedObject.taskType = this.taskType;
+		clonedObject.uniqueId = this.uniqueId;
+		clonedObject.description = this.description;
+		clonedObject.status = this.status;
+		clonedObject.place = this.place;
+		clonedObject.endTime = (Calendar) this.endTime.clone();
+		clonedObject.lastModifiedDate = (Calendar) this.lastModifiedDate
+				.clone();
+
+		return clonedObject;
+	}
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Deadline.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Deadline.java
+	 */
+
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Deadline.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\JUnitTestOutput.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import org.junit.Test;
+
+import com.licensetokil.atypistcalendar.parser.*;
+
+public class JUnitTestOutput {
+
+	@Test
+	public void testOutput() {
+		
+		// ADD TESTS
+		AddAction addAction = new AddAction();
+		Calendar addStartTime = Calendar.getInstance();
+		Calendar addEndTime = Calendar.getInstance();
+		addStartTime.set(2013, 10, 25, 12, 0, 0);
+		addEndTime.set(2013, 10, 25, 13, 0, 0);
+		addAction.setStartTime(addStartTime);
+		addAction.setEndTime(addEndTime);
+		addAction.setDescription("swimming");
+		addAction.setPlace("Community Centre");
+
+		// testAdd1
+		assertEquals(
+				TasksManager.getInstance().executeCommand(addAction),
+				"Added: \n[Mon, Nov 25, '13] [12:00 PM - 01:00 PM] swimming at Community Centre\n\n");
+		
+		// testAdd2
+		addAction.setDescription("reply Edward");
+		addAction.setStartTime(null);
+		addAction.setPlace("");
+
+		assertEquals(TasksManager.getInstance().executeCommand(addAction),
+				"Added: \n[Mon, Nov 25, '13] [by 01:00 PM] [Status: undone] reply Edward\n\n");
+		
+		// testAdd3
+		addAction.setEndTime(null);
+		addAction.setDescription("clean my room");
+
+		assertEquals(TasksManager.getInstance().executeCommand(addAction),
+				"Added: \n[Status: undone] clean my room\n\n");
+
+		System.out.println("All Add Tests pass");
+		
+		//ADD UNDO TEST
+		addAction.setDescription("jogging tonight");
+		TasksManager.getInstance().executeCommand(addAction);
+		assertEquals(TasksManager.getInstance().executeCommand(new UndoAction()), "Add command successfully undone\n\n");
+
+		
+		//DISPLAY TESTS
+		DisplayAction displayAction = new DisplayAction();
+		Calendar dispStartTime = Calendar.getInstance();
+		Calendar dispEndTime = Calendar.getInstance();
+		dispStartTime.set(2000, 0, 1, 0, 0, 0);
+		dispEndTime.set(2099, 11, 31, 23,59, 59);
+		displayAction.setStartTime(dispStartTime);
+		displayAction.setEndTime(dispEndTime);
+		
+		// testDisplay1
+		displayAction.setDescription("schedules");
+		assertEquals(
+				TasksManager.getInstance().executeCommand(displayAction),
+				"Schedules: \n1. [Mon, Nov 25, '13] [12:00 PM - 01:00 PM] swimming at Community Centre\n\n");
+
+		// testDisplay2
+		displayAction.setDescription("deadlines");
+		assertEquals(
+				TasksManager.getInstance().executeCommand(displayAction),
+				"Deadlines: \n1. [Mon, Nov 25, '13] [by 01:00 PM] [Status: undone] reply Edward\n\n");
+
+		// testDisplay3
+		displayAction.setDescription("todos");
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction),
+				"Todos: \n1. [Status: undone] clean my room\n\n");
+		
+		// testDisplay4
+		displayAction.setDescription("all");
+				assertEquals(
+						TasksManager.getInstance().executeCommand(displayAction),
+						"Schedules: \n1. [Mon, Nov 25, '13] [12:00 PM - 01:00 PM] swimming at Community Centre\n\nDeadlines: \n2. [Mon, Nov 25, '13] [by 01:00 PM] [Status: undone] reply Edward\n\nTodos: \n3. [Status: undone] clean my room\n\n");
+
+
+		System.out.println("All Display Tests pass");
+		
+		//MARK TEST
+		MarkAction markAction = new MarkAction();
+		markAction.setStatus("done");
+		ArrayList<Integer> refNum = new ArrayList<Integer>();
+		refNum.add(2);
+		refNum.add(3);
+		markAction.setReferenceNumber(refNum);
+		
+		//markTest1
+		assertEquals(TasksManager.getInstance().executeCommand(markAction), "Marked 2 3  as done\n\n");
+		
+		//markTest2
+		markAction.setStatus("undone");
+		assertEquals(TasksManager.getInstance().executeCommand(markAction), "Marked 2 3  as undone\n\n");
+		
+		//MARK UNDO TEST
+		assertEquals(TasksManager.getInstance().executeCommand(new UndoAction()), "Mark command successfully undone\n\n");
+		
+		//Adding in todos
+		addAction.setDescription("learn swimming");
+		TasksManager.getInstance().executeCommand(addAction);
+		addAction.setDescription("Meet Edward for catch up session");
+		TasksManager.getInstance().executeCommand(addAction);
+		addEndTime.set(2013, 10, 16, 23, 59, 0);
+		//Adding in deadline
+		addAction.setDescription("complete CS2106 project");
+		TasksManager.getInstance().executeCommand(addAction);
+		
+		
+		//SEARCH TEST
+		SearchAction searchAction = new SearchAction();
+		Calendar searchStartTime = Calendar.getInstance();
+		Calendar searchEndTime = Calendar.getInstance();
+	
+		//searchTest1
+		searchAction.setQuery("swimming");
+		searchStartTime.set(2000, 0, 1, 0, 0, 0);
+		searchEndTime.set(2099, 11, 31, 23,59, 59);
+		searchAction.setStartTime(searchStartTime);
+		searchAction.setEndTime(searchEndTime);
+		assertEquals(TasksManager.getInstance().executeCommand(searchAction), "Search Matches: \n\nSchedules: \n1. [Mon, Nov 25, '13] [12:00 PM - 11:59 PM] swimming at Community Centre\n\nTodos: \n2. [Status: undone] learn swimming\n\n");
+		
+		//searchTest2
+		searchStartTime.set(2013, 10, 26, 0, 0, 0);
+		assertEquals(TasksManager.getInstance().executeCommand(searchAction), "Search Matches: \n\nTodos: \n1. [Status: undone] learn swimming\n\n");
+		
+		//searchTest3
+		searchAction.setQuery("Edward");
+		searchStartTime.set(2013, 10, 26, 0, 0, 0);
+		assertEquals(TasksManager.getInstance().executeCommand(searchAction), "Search Matches: \n\nTodos: \n1. [Status: undone] Meet Edward for catch up session\n\n");		
+		
+		//DELETE TESTS
+		DeleteAction deleteAction = new DeleteAction();
+		TasksManager.getInstance().executeCommand(displayAction);
+		ArrayList<Integer> deleteRefNum = new ArrayList<Integer>();
+		
+		//deleteTest1
+		deleteRefNum.add(3);
+		deleteAction.setReferenceNumber(deleteRefNum);
+		assertEquals(TasksManager.getInstance().executeCommand(deleteAction),"Deleted [3] successfully \n\n");
+		
+		//display
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Schedules: \n1. [Mon, Nov 25, '13] [12:00 PM - 11:59 PM] swimming at Community Centre\n\nDeadlines: \n2. [Sat, Nov 16, '13] [by 11:59 PM] [Status: done&nbsp&nbsp] reply Edward\n\nTodos: \n3. [Status: done&nbsp&nbsp] clean my room\n4. [Status: undone] complete CS2106 project\n5. [Status: undone] learn swimming\n\n");
+		
+		//deleteTest2
+		deleteRefNum.remove((Integer)3);
+		deleteRefNum.add(1);
+		deleteRefNum.add(2);
+		assertEquals(TasksManager.getInstance().executeCommand(deleteAction),"Deleted [1, 2] successfully \n\n");
+		
+		//display
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Todos: \n1. [Status: done&nbsp&nbsp] clean my room\n2. [Status: undone] complete CS2106 project\n3. [Status: undone] learn swimming\n\n");
+		
+		//DELETE UNDO TEST
+		assertEquals(TasksManager.getInstance().executeCommand(new UndoAction()), "Delete command successfully undone\n\n");
+		
+		//display
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Schedules: \n1. [Mon, Nov 25, '13] [12:00 PM - 11:59 PM] swimming at Community Centre\n\nDeadlines: \n2. [Sat, Nov 16, '13] [by 11:59 PM] [Status: done&nbsp&nbsp] reply Edward\n\nTodos: \n3. [Status: done&nbsp&nbsp] clean my room\n4. [Status: undone] complete CS2106 project\n5. [Status: undone] learn swimming\n\n");
+		
+		//UPDATE TESTS
+		UpdateAction updateAction = new UpdateAction();
+		int updateRefNum = 1;
+		updateAction.setReferenceNumber(updateRefNum);
+		Calendar updateStartTime = Calendar.getInstance();
+		Calendar updateEndTime = Calendar.getInstance();
+		updateStartTime.set(2013, 10, 31, 14, 0, 0);
+		updateEndTime.set(2013, 10, 31, 15, 0, 0);
+		updateAction.setUpdatedStartTime(updateStartTime);
+		updateAction.setUpdatedEndTime(updateEndTime);
+		updateAction.setUpdatedQuery("Gymming");
+		updateAction.setUpdatedLocationQuery("gym");
+		
+		//updateTest1
+		assertEquals(TasksManager.getInstance().executeCommand(updateAction), "Updated 1 to Gymming successfully\n\n");
+		
+		//display
+		displayAction.setDescription("schedules");
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Schedules: \n1. [Sun, Dec 01, '13] [02:00 PM - 03:00 PM] Gymming at gym\n\n");
+		displayAction.setDescription("all");
+		
+		//updateTest2
+		TasksManager.getInstance().executeCommand(displayAction);
+		updateAction.setUpdatedStartTime(null);
+		updateAction.setUpdatedEndTime(null);
+		updateAction.setUpdatedQuery("Finish reading Harry Potter");
+		updateAction.setUpdatedLocationQuery("");
+		updateRefNum = 5;
+		updateAction.setReferenceNumber(updateRefNum);
+		assertEquals(TasksManager.getInstance().executeCommand(updateAction), "Updated 5 to Finish reading Harry Potter successfully\n\n");
+		
+		//display
+		displayAction.setDescription("todos");
+		assertEquals(TasksManager.getInstance().executeCommand(displayAction), "Todos: \n1. [Status: undone] Finish reading Harry Potter\n2. [Status: done&nbsp&nbsp] clean my room\n3. [Status: undone] complete CS2106 project\n\n");
+		
+		//UPDATE UNDO TEST
+		assertEquals(TasksManager.getInstance().executeCommand(new UndoAction()),"Update command successfully undone\n\n");
+	}
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\JUnitTestOutput.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\JUnitTestOutput.java
+	 */
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\JUnitTestOutput.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Schedule.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
+	private static final String OUTPUT_FORMAT = "[%s] [%s - %s] %s";
+
+	private String remoteId;
+	private TaskType taskType;
+	private int uniqueId;
+	private Calendar lastModifiedDate;
+	private Calendar startTime;
+	private Calendar endTime;
+	private String description;
+	private String place;
+
+	public Schedule(int uniqueId, Calendar startTime, Calendar endTime,
+			String description, String place, Calendar lastModifiedDate) {
+		this.taskType = TaskType.SCHEDULE;
+		this.uniqueId = uniqueId;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.description = description;
+		this.place = place;
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public Schedule() {
+	}
+
+	public String getRemoteId() {
+		return remoteId;
+	}
+
+	public TaskType getTaskType() {
+		return taskType;
+	}
+
+	public int getUniqueId() {
+		return uniqueId;
+	}
+
+	public Calendar getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public Calendar getStartTime() {
+		return startTime;
+	}
+
+	public Calendar getEndTime() {
+		return endTime;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getPlace() {
+		return place;
+	}
+
+	public void setRemoteId(String remoteId) {
+		this.remoteId = remoteId;
+	}
+
+	public void setTaskType(TaskType t) {
+		this.taskType = t;
+	}
+
+	public void setUniqueId(int uniqueId) {
+		this.uniqueId = uniqueId;
+	}
+
+	public void setStartTime(Calendar st) {
+		this.startTime = st;
+	}
+
+	public void setEndTime(Calendar st) {
+		this.endTime = st;
+	}
+
+	public void setDescription(String d) {
+		this.description = d;
+	}
+
+	public void setPlace(String p) {
+		this.place = p;
+	}
+
+	public void setLastModifiedDate(Calendar lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String toString() {
+		if (place.equals(EMPTY_STRING)) {
+			return TaskType.SCHEDULE + DELIMITER + uniqueId + DELIMITER
+					+ startTime.getTime() + DELIMITER + endTime.getTime()
+					+ DELIMITER + description + DELIMITER + BLANK_SPACE
+					+ DELIMITER + lastModifiedDate.getTime() + DELIMITER
+					+ remoteId;
+		}
+		return TaskType.SCHEDULE + DELIMITER + uniqueId + DELIMITER
+				+ startTime.getTime() + DELIMITER + endTime.getTime()
+				+ DELIMITER + description + DELIMITER + place + DELIMITER
+				+ lastModifiedDate.getTime() + DELIMITER + remoteId;
+	}
+
+	public String outputStringForDisplay() {
+		SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
+		SimpleDateFormat formatDay = new SimpleDateFormat("EEE, MMM dd, ''yy");
+
+		String output = String.format(OUTPUT_FORMAT,
+				formatDay.format(startTime.getTime()),
+				formatTime.format(startTime.getTime()),
+				formatTime.format(endTime.getTime()), description);
+		if (!place.equals(EMPTY_STRING)) {
+			output = String.format(DISPLAY_PLACE_NOT_EMPTY, output,
+					this.getPlace());
+		}
+
+		return output;
+	}
+
+	public int compareTo(Schedule s) {
+		return startTime.compareTo(s.getStartTime());
+	}
+
+	@Override
+	public Object clone() {
+		Schedule clonedObject = new Schedule();
+		clonedObject.remoteId = this.remoteId;
+		clonedObject.taskType = this.taskType;
+		clonedObject.uniqueId = this.uniqueId;
+		clonedObject.description = this.description;
+		clonedObject.place = this.place;
+		clonedObject.startTime = (Calendar) this.startTime.clone();
+		clonedObject.endTime = (Calendar) this.endTime.clone();
+		clonedObject.lastModifiedDate = (Calendar) this.lastModifiedDate
+				.clone();
+
+		return clonedObject;
+	}
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Schedule.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Schedule.java
+	 */
+
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Schedule.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Task.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+import java.util.Calendar;
+
+public abstract class Task implements Cloneable{
+	protected String remoteId;
+	protected TaskType taskType;
+	protected int uniqueId;
+	protected Calendar lastModifiedDate;
+	protected String place;
+	protected String description;
+	protected static final String DELIMITER = "@s";
+	protected static final String EMPTY_STRING = "";
+	protected static final String DONE_ALIGN = "done&nbsp&nbsp";
+	protected static final String DONE_NO_ALIGN = "done";
+	protected static final String DISPLAY_PLACE_NOT_EMPTY = "%s at %s";
+	protected static final String BLANK_SPACE = " ";
+
+	public abstract String getRemoteId();
+	public abstract TaskType getTaskType();
+	public abstract String getDescription();
+	public abstract int getUniqueId();
+	public abstract Calendar getLastModifiedDate();
+	public abstract String getPlace();
+	public abstract void setPlace(String place);
+	public abstract void setDescription(String description);
+	public abstract void setRemoteId(String remoteId);
+	public abstract void setLastModifiedDate(Calendar lastModifiedDate);
+	public abstract void setUniqueId(int uniqueId);
+	public abstract void setTaskType(TaskType t);
+	public abstract String toString();
+	public abstract String outputStringForDisplay();
+	@Override
+	public abstract Object clone();
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Task.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Task.java
+	 */
+
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Task.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\TaskNotFoundException.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+public class TaskNotFoundException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
+
+	public TaskNotFoundException(){
+		
+	}
+	
+	public TaskNotFoundException(String message){
+		super(message);
+	}
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\TaskNotFoundException.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\TaskNotFoundException.java
+	 */
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\TaskNotFoundException.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\TasksManager.java
+	 */
+
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import java.io.BufferedReader;
@@ -1191,4 +1851,570 @@ public class TasksManager {
 		throw new TaskNotFoundException("Task not found");
 	}
 }
-//@author A0103494J
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\TasksManager.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\TasksManager.java
+	 */
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\TasksManager.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\TaskType.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+public enum TaskType {
+	SCHEDULE("schedule"),
+	DEADLINE("deadline"),
+	TODO("todo");
+	
+	private final String strTaskType;
+	
+	private TaskType(String newStrTaskType){
+		strTaskType = newStrTaskType;
+	}
+	
+	public String toString(){
+		return strTaskType;
+	}
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\TaskType.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\TaskType.java
+	 */
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\TaskType.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Todo.java
+	 */
+
+package com.licensetokil.atypistcalendar.tasksmanager;
+
+import java.util.Calendar;
+
+public class Todo extends Task implements Comparable<Todo>, Cloneable {
+	private static final String OUTPUT_FORMAT = "[Status: %s] %s";
+	private String remoteId;
+	private TaskType taskType;
+	private int uniqueId;
+	private Calendar lastModifiedDate;
+	private String description;
+	private String place;
+	private String status;
+
+	public Todo(int uniqueId, String description, String place, String status,
+			Calendar lastModifiedDate) {
+		this.uniqueId = uniqueId;
+		this.taskType = TaskType.TODO;
+		this.description = description;
+		this.place = place;
+		this.status = status;
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public Todo() {
+	}
+
+	public String getRemoteId() {
+		return remoteId;
+	}
+
+	public int getUniqueId() {
+		return uniqueId;
+	}
+
+	public TaskType getTaskType() {
+		return taskType;
+	}
+
+	public Calendar getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getPlace() {
+		return place;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setDescription(String d) {
+		this.description = d;
+	}
+
+	public void setPlace(String p) {
+		this.place = p;
+	}
+
+	public void setStatus(String s) {
+		this.status = s;
+	}
+
+	public void setRemoteId(String remoteId) {
+		this.remoteId = remoteId;
+	}
+
+	public void setLastModifiedDate(Calendar lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public void setTaskType(TaskType t) {
+		this.taskType = t;
+	}
+
+	public void setUniqueId(int uniqueId) {
+		this.uniqueId = uniqueId;
+	}
+
+	public String toString() {
+		if (place.equals(EMPTY_STRING)) {
+			return TaskType.TODO + DELIMITER + uniqueId + DELIMITER
+					+ description + DELIMITER + BLANK_SPACE + DELIMITER
+					+ status + DELIMITER + lastModifiedDate.getTime()
+					+ DELIMITER + remoteId;
+		}
+		return TaskType.TODO + DELIMITER + uniqueId + DELIMITER + description
+				+ DELIMITER + place + DELIMITER + status + DELIMITER
+				+ lastModifiedDate.getTime() + DELIMITER + remoteId;
+	}
+
+	public String outputStringForDisplay() {
+		String stringStatus = status;
+		if (stringStatus.equals(DONE_NO_ALIGN)) {
+			stringStatus = DONE_ALIGN;
+		}
+
+		String output = String.format(OUTPUT_FORMAT, stringStatus, description);
+		if (!place.equals(EMPTY_STRING)) {
+			output = String.format(DISPLAY_PLACE_NOT_EMPTY, output,
+					this.getPlace());
+		}
+
+		return output;
+	}
+
+	public int compareTo(Todo td) {
+		return description.compareTo(td.getDescription());
+	}
+
+	@Override
+	public Object clone() {
+		Todo clonedObject = new Todo();
+		clonedObject.remoteId = this.remoteId;
+		clonedObject.taskType = this.taskType;
+		clonedObject.uniqueId = this.uniqueId;
+		clonedObject.description = this.description;
+		clonedObject.place = this.place;
+		clonedObject.status = this.status;
+		clonedObject.lastModifiedDate = (Calendar) this.lastModifiedDate
+				.clone();
+
+		return clonedObject;
+	}
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Todo.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\tasksmanager\Todo.java
+	 */
+
+
+	// End of segment: src\com\licensetokil\atypistcalendar\tasksmanager\Todo.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\ui\ATCGUI.java
+	 */
+
+package com.licensetokil.atypistcalendar.ui;
+
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.text.html.HTMLEditorKit;
+
+import com.licensetokil.atypistcalendar.ATypistCalendar;
+
+public class ATCGUI extends JFrame implements WindowListener {
+
+	private static final long serialVersionUID = 1L;
+	private final static String MESSAGE_WELCOME = "Welcome to a Typist's Calendar!\n";
+	private final static String MESSAGE_WELCOME_FORMAT = "<b>%s</b><br><hr>";
+	private final static String MESSAGE_TITLE = "A Typist's Calendar";
+	private final static String MESSAGE_COMMAND = "Type your command here:";
+
+	private final static String KEY_DOWN = "DOWN";
+	private final static String KEY_UP = "UP";
+	private final static String POSITIVE_UNIT_INCREMENT = "positiveUnitIncrement";
+	private final static String NEGATIVE_UNIT_INCREMENT = "negativeUnitIncrement";
+	private final static String EMPTY_STRING = "";
+
+	private final static String NEWLINE_REGEX = "\\r|\\n";
+	private final static String NEWLINE_HTML = "<br>";
+
+	private final static String OUTPUT_FORMAT = "%s<hr><br>";
+
+	private final static int FONT_SIZE = 14;
+	private final static int EDITOR_SCROLLPANE_FONT_SIZE = 18;
+	private final static int FONT_STYLE = 0;
+	private final static int BACKGROUND_COLOR_RGB = 222;
+	private final static int TEXTAREA_FONT_SIZE = 12;
+	private final static int TEXTAREA_FONT_STYLE = 1;
+	private final static int TEXTAREA_COLUMNS = 20;
+	private final static int TEXTAREA_ROWS = 5;
+	private final static int SCROLLPANE_WIDTH = 700;
+	private final static int SCROLLPANE_HEIGHT = 402;
+	private final static int GAP1 = 0;
+	private final static int GAP2 = 5;
+	private final static int TEXTFIELD_SIZE = 33;
+	private final static int AREASCROLLPANE_SIZE = 29;
+
+	private final static String DEFAULT_ICON_RESOURCE_PATH = "/icon128.png";
+	private final static String SYNCING_ICON_RESOURCE_PATH = "/icon128sync.png";
+
+	private static Logger logger = Logger.getLogger("ATCGUI");
+
+	private Image defaultIcon;
+	private Image syncingIcon;
+
+	//public constructor
+	public ATCGUI() {
+		try {
+			logger.log(Level.INFO, "Set to cross-platform Nimbus Look and Feel");
+			UIManager
+					.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Exception e) {
+			logger.log(Level.WARNING, "Error detected: " + e.getMessage());
+		}
+
+		getResources();
+		initComponents();
+		this.setContentPane(jPanel);
+		addWindowListener(this);
+	}
+
+	// function that displays responses from user input
+	public void outputWithNewline(String text) {
+		logger.log(Level.INFO, "In outputWithNewline function");
+		StringReader reader;
+
+		if (text.contains(MESSAGE_WELCOME)) {
+			logger.log(Level.INFO, "Displaying Welcome Message");
+			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
+			jEditorPane.setText(String.format(MESSAGE_WELCOME_FORMAT, text));
+		}
+
+		else {
+			logger.log(Level.INFO, "Displaying all other output");
+			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
+			reader = new StringReader(String.format(OUTPUT_FORMAT, text));
+			try {
+				htmlEditorKit.read(reader, jEditorPane.getDocument(),
+						jEditorPane.getDocument().getLength());
+			} catch (Exception e) {
+				logger.log(Level.WARNING, "Error detected: " + e.getMessage());
+			}
+		}
+
+		jEditorPane.setCaretPosition(jEditorPane.getDocument().getLength());
+		jTextField.requestFocus();
+	}
+
+	//for window closing
+	public void dispatchWindowClosingEvent() {
+		logger.log(Level.INFO, "In dispatchWindowClosingEventFunction");
+		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	}
+
+	//function to output the previous user input for convenience purposes
+	public void outputUserInput(String input) {
+		logger.log(Level.INFO, "In outputUserInput function");
+		jTextArea.setText(input);
+	}
+
+	public void changeWindowIcon(boolean useSyncingIcon) {
+		logger.log(Level.INFO, "Changing window icon");
+
+		if(useSyncingIcon) {
+			logger.log(Level.INFO, "Using syncing icon");
+			setIconImage(syncingIcon);
+		}
+		else {
+			logger.log(Level.INFO, "Using default icon");
+			setIconImage(defaultIcon);
+		}
+	}
+
+	@Override
+	//function to save data into files when window is closed
+	public void windowClosing(WindowEvent e) {
+		logger.log(Level.INFO, "In windowClosing function");
+		ATypistCalendar.getInstance().cleanUp();
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+	}
+
+	private void getResources() {
+		logger.log(Level.INFO, "Getting resources");
+
+		defaultIcon = (new ImageIcon(getClass().getResource(DEFAULT_ICON_RESOURCE_PATH))).getImage();
+		syncingIcon = (new ImageIcon(getClass().getResource(SYNCING_ICON_RESOURCE_PATH))).getImage();
+	}
+
+	//initialising function
+	private void initComponents() {
+
+		logger.log(Level.INFO, "Initialising various components of GUI");
+		jPanel = new JPanel();
+		jTextField = new JTextField();
+		jLabel = new JLabel();
+		editorScrollPane = new JScrollPane();
+		jEditorPane = new JEditorPane("text/html", null);
+		areaScrollPane = new JScrollPane();
+		jTextArea = new JTextArea();
+		htmlEditorKit = new HTMLEditorKit();
+
+		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setTitle(MESSAGE_TITLE);
+		setIconImage(new ImageIcon(getClass().getResource("/icon128.png"))
+				.getImage());
+
+		jTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				jTextField1KeyReleased(evt);
+			}
+		});
+
+		setKeyScrolling();
+
+		logger.log(Level.INFO, "Configuring jLabel");
+		jLabel.setFont(new java.awt.Font("Consolas", FONT_STYLE, FONT_SIZE));
+		jLabel.setText(MESSAGE_COMMAND);
+
+		logger.log(Level.INFO, "Configuring editorScrollPane");
+		editorScrollPane.setBorder(javax.swing.BorderFactory
+				.createTitledBorder(null, MESSAGE_TITLE,
+						javax.swing.border.TitledBorder.CENTER,
+						javax.swing.border.TitledBorder.DEFAULT_POSITION,
+						new java.awt.Font("Consolas", FONT_STYLE, EDITOR_SCROLLPANE_FONT_SIZE)));
+		editorScrollPane.setMaximumSize(jPanel.getMaximumSize());
+		editorScrollPane.setMinimumSize(jPanel.getMinimumSize());
+		editorScrollPane.setViewportView(jEditorPane);
+
+		logger.log(Level.INFO, "Configuring areaScrollPane");
+		areaScrollPane.setBorder(null);
+		areaScrollPane
+				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		areaScrollPane.setAutoscrolls(true);
+
+		logger.log(Level.INFO, "Configuring editorPane");
+		jEditorPane.setFont(new Font("Consolas", Font.PLAIN, FONT_SIZE));
+		jEditorPane.setEditorKit(htmlEditorKit);
+		jEditorPane.setEditable(false);
+
+		logger.log(Level.INFO, "Configuring textArea");
+		jTextArea.setEditable(false);
+		jTextArea.setBackground(new java.awt.Color(BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB));
+		jTextArea.setColumns(TEXTAREA_COLUMNS);
+		jTextArea.setFont(new java.awt.Font("Consolas", TEXTAREA_FONT_STYLE, TEXTAREA_FONT_SIZE));
+		jTextArea.setRows(TEXTAREA_ROWS);
+		jTextArea.setBorder(null);
+		areaScrollPane.setViewportView(jTextArea);
+
+		logger.log(Level.INFO, "Configuring various layout and outlook");
+		GroupLayout jPanel1Layout = new GroupLayout(jPanel);
+		jPanel.setLayout(jPanel1Layout);
+		jPanel1Layout
+				.setHorizontalGroup(jPanel1Layout
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addGroup(
+								jPanel1Layout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addGroup(
+												jPanel1Layout
+														.createParallelGroup(
+																GroupLayout.Alignment.LEADING)
+														.addComponent(
+																editorScrollPane,
+																GroupLayout.DEFAULT_SIZE,
+																SCROLLPANE_WIDTH,
+																Short.MAX_VALUE)
+														.addComponent(
+																jTextField)
+														.addGroup(
+																jPanel1Layout
+																		.createSequentialGroup()
+																		.addComponent(
+																				jLabel)
+																		.addGap(GAP1,
+																				GAP1,
+																				Short.MAX_VALUE))
+														.addComponent(
+																areaScrollPane))
+										.addContainerGap()));
+		jPanel1Layout
+				.setVerticalGroup(jPanel1Layout
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addGroup(
+								jPanel1Layout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addComponent(editorScrollPane,
+												GroupLayout.PREFERRED_SIZE,
+												SCROLLPANE_HEIGHT, Short.MAX_VALUE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+										.addComponent(jLabel)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(jTextField,
+												GroupLayout.PREFERRED_SIZE, TEXTFIELD_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(areaScrollPane,
+												GroupLayout.PREFERRED_SIZE, AREASCROLLPANE_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(GAP2, GAP2, GAP2)));
+
+		GroupLayout layout = new GroupLayout(getContentPane());
+		getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addComponent(jPanel,
+				GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+				Short.MAX_VALUE));
+		layout.setVerticalGroup(layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addComponent(jPanel,
+				GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+				GroupLayout.PREFERRED_SIZE));
+
+		pack();
+	}
+
+	// Function for attaching up and down keys to up and down scrolling of
+	// editor pane
+	private void setKeyScrolling() {
+		logger.log(Level.INFO, "Setting key scrolling with editorPane");
+		JScrollBar scrollBar = editorScrollPane.getVerticalScrollBar();
+		InputMap inputMap = scrollBar
+				.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		inputMap.put(KeyStroke.getKeyStroke(KEY_DOWN), POSITIVE_UNIT_INCREMENT);
+		inputMap.put(KeyStroke.getKeyStroke(KEY_UP), NEGATIVE_UNIT_INCREMENT);
+	}
+
+	// function to respond to an enter key in jtextfield
+	private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {
+		if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+			if (jTextField.getText().equals(EMPTY_STRING)) {
+				logger.log(Level.INFO, "No input detected. Returning");
+				return;
+			}
+			logger.log(Level.INFO,
+					"Getting user input. Setting text field to empty");
+			ATypistCalendar.getInstance().userInput(jTextField.getText());
+			jTextField.setText(EMPTY_STRING);
+		}
+	}
+
+	// Variables declaration
+		private JLabel jLabel;
+		private JPanel jPanel;
+		private JScrollPane editorScrollPane;
+		private JScrollPane areaScrollPane;
+		private JTextArea jTextArea;
+		private JTextField jTextField;
+		private JEditorPane jEditorPane;
+		private HTMLEditorKit htmlEditorKit;
+
+}
+	// End of segment: src\com\licensetokil\atypistcalendar\ui\ATCGUI.java
+
+
+
+
+
+	/**
+	 * origin: src\com\licensetokil\atypistcalendar\ui\ATCGUI.java
+	 */
+
+
+	// End of segment: src\com\licensetokil\atypistcalendar\ui\ATCGUI.java
+
+
+
+
+
