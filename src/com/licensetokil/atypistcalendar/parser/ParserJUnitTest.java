@@ -1741,7 +1741,17 @@ public class ParserJUnitTest {
 		}
 		assertEquals(true,exceptionCaught);
 		
-		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add hello by 2359");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
 		
 		exceptionCaught=false;
 		ac=null;
@@ -2047,5 +2057,6 @@ public class ParserJUnitTest {
 			exceptionCaught=true;
 		}
 		assertEquals(true,exceptionCaught);
+		
 	}
 }

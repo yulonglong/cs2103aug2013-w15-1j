@@ -1462,10 +1462,15 @@ public class Parser {
 		return;
 	}
 
-	private static void setDayDate(int[] intStartDate, String date, int indexOfDelimiter){
+	private static void setDayDate(int[] intStartDate, String date, int indexOfDelimiter) throws MalformedUserInputException{
 		String strDay = new String();
-		strDay = date.substring(FIRST_INDEX, indexOfDelimiter);
-		intStartDate[INDEX_DAY] = Integer.parseInt(strDay);
+		try{
+			strDay = date.substring(FIRST_INDEX, indexOfDelimiter);
+			intStartDate[INDEX_DAY] = Integer.parseInt(strDay);
+		}
+		catch (Exception e){
+			throw new MalformedUserInputException(MESSAGE_INVALID_DATE);
+		}
 		return;
 	}
 	
