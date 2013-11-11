@@ -25,15 +25,6 @@ public class Deadline extends Task implements Comparable<Deadline>, Cloneable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	public Deadline(Deadline d) {
-		this.taskType = TaskType.DEADLINE;
-		this.endTime = d.getEndTime();
-		this.description = d.getDescription();
-		this.place = d.getPlace();
-		this.uniqueId = d.getUniqueId();
-		this.status = d.getStatus();
-	}
-
 	public Deadline() {
 	}
 

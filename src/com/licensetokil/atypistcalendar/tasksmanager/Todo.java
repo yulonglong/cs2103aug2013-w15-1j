@@ -22,14 +22,6 @@ public class Todo extends Task implements Comparable<Todo>, Cloneable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	public Todo(Todo td) {
-		this.taskType = TaskType.TODO;
-		this.description = td.getDescription();
-		this.place = td.getPlace();
-		this.uniqueId = td.getUniqueId();
-		this.status = td.getStatus();
-	}
-
 	public Todo() {
 	}
 
