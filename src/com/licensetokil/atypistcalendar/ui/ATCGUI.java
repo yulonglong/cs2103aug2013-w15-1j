@@ -6,6 +6,7 @@
 package com.licensetokil.atypistcalendar.ui;
 
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.StringReader;
@@ -43,14 +44,17 @@ public class ATCGUI extends JFrame implements WindowListener {
 	private final static String POSITIVE_UNIT_INCREMENT = "positiveUnitIncrement";
 	private final static String NEGATIVE_UNIT_INCREMENT = "negativeUnitIncrement";
 	private final static String EMPTY_STRING = "";
-	
+
 	private final static String NEWLINE_REGEX = "\\r|\\n";
 	private final static String NEWLINE_HTML = "<br>";
-	
+
 	private final static String OUTPUT_FORMAT = "%s<hr><br>";
 
+	private Image defaultIcon;
+	private Image syncingIcon;
+
 	private static Logger logger = Logger.getLogger("ATCGUI");
-	
+
 	//public constructor
 	public ATCGUI() {
 		try {
@@ -60,11 +64,21 @@ public class ATCGUI extends JFrame implements WindowListener {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Error detected: " + e.getMessage());
 		}
+
+		getResources();
+
 		initComponents();
 		this.setContentPane(jPanel);
 		addWindowListener(this);
 	}
-	
+
+	private void getResources() {
+		logger.log(Level.INFO, "Getting resources");
+
+		defaultIcon = (new ImageIcon(getClass().getResource("/icon128.png"))).getImage();
+		syncingIcon = (new ImageIcon(getClass().getResource("/icon128sync.png"))).getImage();
+	}
+
 	//initialising function
 	private void initComponents() {
 
@@ -80,8 +94,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setTitle(MESSAGE_TITLE);
-		setIconImage(new ImageIcon(getClass().getResource("/icon128.png"))
-				.getImage());
+		setIconImage(defaultIcon);
 
 		jTextField.addKeyListener(new java.awt.event.KeyAdapter() {
 			public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -247,13 +260,13 @@ public class ATCGUI extends JFrame implements WindowListener {
 		jEditorPane.setCaretPosition(jEditorPane.getDocument().getLength());
 		jTextField.requestFocus();
 	}
-	
+
 	//for window closing
 	public void dispatchWindowClosingEvent() {
 		logger.log(Level.INFO, "In dispatchWindowClosingEventFunction");
 		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
-	
+
 	//function to output the previous user input for convenience purposes
 	public void outputUserInput(String input) {
 		logger.log(Level.INFO, "In outputUserInput function");
@@ -289,6 +302,19 @@ public class ATCGUI extends JFrame implements WindowListener {
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
+	}
+
+	public void changeWindowIcon(boolean useSyncingIcon) {
+		logger.log(Level.INFO, "Changing window icon");
+
+		if(useSyncingIcon) {
+			logger.log(Level.INFO, "Using syncing icon");
+			setIconImage(syncingIcon);
+		}
+		else {
+			logger.log(Level.INFO, "Using default icon");
+			setIconImage(defaultIcon);
+		}
 	}
 
 	// Variables declaration

@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -243,23 +242,15 @@ public class ATypistCalendar {
 	}
 
 	public Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime) {
-		//TODO change the order
 		return TasksManager.getInstance().addDeadlineFromGoogle(endTime, description, location, lastModifiedDate, remoteTaskId);
 	}
 
 	public Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime, Calendar startTime) {
-		//TODO change the order
 		return TasksManager.getInstance().addScheduleFromGoogle(startTime, endTime, description, location, lastModifiedDate, remoteTaskId);
 	}
 
 	public void setSyncerStatus(boolean syncerIsExecuting) {
-		//TODO
-		if(syncerIsExecuting) {
-			gui.setIconImage(new ImageIcon(getClass().getResource("/icon128sync.png")).getImage());
-		}
-		else {
-			gui.setIconImage(new ImageIcon(getClass().getResource("/icon128.png")).getImage());
-		}
+		gui.changeWindowIcon(syncerIsExecuting);
 	}
 
 	private String executeCommand(SystemAction action) {

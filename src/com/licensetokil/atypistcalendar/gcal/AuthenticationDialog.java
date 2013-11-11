@@ -31,7 +31,7 @@ class AuthenticationDialog extends JDialog {
 
 	private JWebBrowser webBrowser;
 
-	public AuthenticationDialog() {
+	protected AuthenticationDialog() {
 		webBrowser = new JWebBrowser(new NSOption(null));
 		webBrowser.setBarsVisible(AUTHENTICATION_DIALOG_WEB_BROWSER_BARS_VISIBILITY);
 
