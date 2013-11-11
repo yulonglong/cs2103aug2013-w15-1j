@@ -16,7 +16,7 @@ public abstract class Task implements Cloneable{
 	protected static final String DONE_NO_ALIGN = "done";
 	protected static final String DISPLAY_PLACE_NOT_EMPTY = "%s at %s";
 	protected static final String BLANK_SPACE = " ";
-
+	
 	public abstract String getRemoteId();
 	public abstract TaskType getTaskType();
 	public abstract String getDescription();

@@ -92,7 +92,7 @@ public class TasksManager {
 	private static ArrayList<Task> deletedTasks = new ArrayList<Task>();
 
 	private static ArrayList<Task> markUndoList;
-	private static Task updateOriginalTask;
+	private static Task updateOriginalTask = new Schedule();
 
 	private static LocalAction lastAction;
 	private static Task lastTaskCreated;
@@ -137,16 +137,16 @@ public class TasksManager {
 
 		return allTasks;
 	}
-
+	
 	public void initialize() {
 		try {
 			logger.log(Level.INFO,
 					"Initialising files and transferring data from files to temporary memory");
-
+	
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String currLine;
 			String[] fileData;
-
+			
 			// To import all tasks from file to ArrayList
 			while ((currLine = reader.readLine()) != null) {
 				fileData = currLine.split(DELIMITER);
@@ -158,20 +158,20 @@ public class TasksManager {
 							fileData[4], fileData[5],
 							convertTimeFromStringToCalendar(fileData[6]));
 					allSchedules.add(s);
-
+	
 					logger.log(Level.INFO,
 							"Added schedule into temporary memory");
 					if (fileData[5].equals(BLANK_SPACE)) {
 						logger.log(Level.INFO,
 								"No place indicated. Setting place to empty string");
 						s.setPlace(EMPTY_STRING);
-
+	
 					}
 					if (fileData[7].equals(NULL_STRING)) {
 						logger.log(Level.INFO,
 								"No remote ID for schedule indicated. Setting remoteId to null");
 						s.setRemoteId(null);
-
+	
 					} else {
 						s.setRemoteId(fileData[7]);
 					}
@@ -187,7 +187,7 @@ public class TasksManager {
 						logger.log(Level.INFO,
 								"No place indicated. Setting place to empty string");
 						d.setPlace(EMPTY_STRING);
-
+	
 					}
 					if (fileData[7].equals(NULL_STRING)) {
 						logger.log(Level.INFO,
@@ -207,7 +207,7 @@ public class TasksManager {
 						logger.log(Level.INFO,
 								"No place indicated. Setting place to empty string");
 						td.setPlace(EMPTY_STRING);
-
+	
 					}
 					if (fileData[6].equals(NULL_STRING)) {
 						logger.log(Level.INFO,
@@ -252,24 +252,24 @@ public class TasksManager {
 
 	public String executeCommand(LocalAction ac) {
 		logger.log(Level.INFO, "In executeCommand function");
-
+	
 		if (ac.getType() == LocalActionType.ADD) {
 			logger.log(Level.INFO, "Command identified as add");
 			Task t = classify((AddAction) ac);
 			lastAction = ac;
 			return add(t);
 		}
-
+	
 		else if (ac.getType() == LocalActionType.DISPLAY) {
 			logger.log(Level.INFO, "Command identified as display");
 			return display((DisplayAction) ac);
 		}
-
+	
 		else if (ac.getType() == LocalActionType.SEARCH) {
 			logger.log(Level.INFO, "Command identified as search");
 			return search((SearchAction) ac);
 		}
-
+	
 		else if (ac.getType() == LocalActionType.DELETE) {
 			logger.log(Level.INFO, "Command identified as delete");
 			String output = delete((DeleteAction) ac);
@@ -278,13 +278,13 @@ public class TasksManager {
 			}
 			return output;
 		}
-
+	
 		else if (ac.getType() == LocalActionType.UPDATE) {
 			logger.log(Level.INFO, "Command identified as update");
 			lastAction = ac;
 			return update((UpdateAction) ac);
 		}
-
+	
 		else if (ac.getType() == LocalActionType.MARK) {
 			logger.log(Level.INFO, "Command identified as mark");
 			String output = mark((MarkAction) ac);
@@ -294,7 +294,7 @@ public class TasksManager {
 			}
 			return output;
 		}
-
+	
 		else if (ac.getType() == LocalActionType.UNDO) {
 			logger.log(Level.INFO, "Command identified as undo");
 			if (lastAction instanceof AddAction) {
@@ -314,7 +314,7 @@ public class TasksManager {
 			}
 		}
 		return ERROR_MESSAGE;
-
+	
 	}
 
 	public Todo addTodoFromGoogle(String description, String location,
@@ -364,7 +364,7 @@ public class TasksManager {
 			logger.log(Level.WARNING, "Task not found");
 			throw new TaskNotFoundException();
 		}
-
+	
 		logger.log(Level.INFO, "Preparing for file sync");
 		fileSync();
 	}
@@ -402,7 +402,7 @@ public class TasksManager {
 				}
 			}
 		}
-
+	
 		return clashedSchedules;
 	}
 
@@ -549,6 +549,7 @@ public class TasksManager {
 			if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
 				logger.log(Level.INFO, "Clashed schedules detected");
 				output += NEWLINE + ADD_WARNING_CLASH;
+				System.out.println("debugdebug");
 				for (Schedule s : sc) {
 					logger.log(Level.INFO, "Printing all clashed schedules");
 					output += s.outputStringForDisplay() + NEWLINE;
@@ -562,7 +563,7 @@ public class TasksManager {
 
 		} else if (t.getTaskType().equals(TaskType.TODO)) {
 			logger.log(Level.INFO, "Adding todo");
-			allTodos.add((Todo) t);
+			allTodos.add((Todo) t); 
 		}
 
 		lastTaskCreated = t;
@@ -587,7 +588,7 @@ public class TasksManager {
 
 		return UNDO_ADD_SUCCESSFUL;
 	}
-
+	
 	private String display(DisplayAction ac) {
 		logger.log(Level.INFO,
 				"In display function. Clearing all previously requested tasks by the user");
@@ -782,7 +783,7 @@ public class TasksManager {
 					"No display matches detected. Reuturning no match");
 			output = DISPLAY_NO_MATCHES;
 		}
-
+		
 		assert output!=EMPTY_STRING;
 
 		return output;
@@ -947,7 +948,7 @@ public class TasksManager {
 
 		logger.log(Level.INFO, "undoing update back to task:  "
 				+ updateOriginalTask);
-
+		
 		Schedule scheduleToRemove = null;
 		Schedule scheduleToAdd = null;
 		for (Schedule s : allSchedules) {
@@ -963,7 +964,7 @@ public class TasksManager {
 			scheduleToAdd.setLastModifiedDate(Calendar.getInstance());
 			allSchedules.add(scheduleToAdd);
 		}
-
+		
 		Deadline deadlineToRemove = null;
 		Deadline deadlineToAdd = null;
 		for (Deadline d : allDeadlines) {
@@ -979,7 +980,7 @@ public class TasksManager {
 			deadlineToAdd.setLastModifiedDate(Calendar.getInstance());
 			allDeadlines.add(deadlineToAdd);
 		}
-
+		
 		Todo todoToRemove = null;
 		Todo todoToAdd = null;
 		for (Todo td : allTodos) {
