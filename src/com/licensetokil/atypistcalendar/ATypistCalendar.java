@@ -103,62 +103,6 @@ public class ATypistCalendar {
 		}
 	}
 
-	private void initialize(String[] args) {
-		logger.fine("initialize called.");
-
-		logger.info("Loading SWT library.");
-		loadSwtLibrary();
-
-		logger.info("Creating new GUI instance.");
-		gui = new ATCGUI();
-		gui.setVisible(true);
-
-		logger.info("Greeting the user.");
-		Calendar calendar = Calendar.getInstance();
-		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
-
-		logger.info("Initializing modules.");
-		TasksManager.getInstance().initialize();
-		GoogleCalendarManager.getInstance().initialize();
-
-		logger.info("Initiallizing done.");
-	}
-
-	private void loadSwtLibrary() {
-		logger.fine("loadSwtLibrary called.");
-
-		logger.info("Deciding which version (32- or 64-bit) of the SWT library to include.");
-		URL pathToSWT;
-		if(System.getProperty(JAVA_VM_NAME).contains(JAVA_VM_NAME_KEYWORD_64_BIT)) {
-			logger.info("Finding path to 64-bit SWT library.");
-			pathToSWT = getClass().getResource(RESOURCE_PATH_SWT_X64_JAR);
-			logger.info("Path to 64-bit SWT library found.");
-		}
-		else {
-			logger.info("Finding path to 32-bit SWT library.");
-			pathToSWT = getClass().getResource(RESOURCE_PATH_SWT_X86_JAR);
-			logger.info("Path to 32-bit SWT library found.");
-		}
-
-		try {
-			logger.info("Reflecting the URLClassLoader.addURL method to expose it (protected -> public)");
-			Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-			method.setAccessible(true);
-
-			logger.info("Invoking the URLClassLoader.addURL method of the ATypistCalendar class'es ClassLoader.");
-			method.invoke((URLClassLoader)ATypistCalendar.class.getClassLoader(), pathToSWT);
-		}
-		catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			logger.severe("Unable to load the SWT library! Displaying error message and exiting.");
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(new JDialog(), ERROR_DIALOG_MESSAGE, ERROR_DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
-		}
-		logger.info("SWT library loaded successful.");
-	}
-
-
-
 	public void userInput(String input) {
 		String reply = EMPTY_STRING;
 		Action action;
@@ -249,5 +193,59 @@ public class ATypistCalendar {
 			assert false;
 			return EMPTY_STRING;
 		}
+	}
+
+	private void initialize(String[] args) {
+		logger.fine("initialize called.");
+	
+		logger.info("Loading SWT library.");
+		loadSwtLibrary();
+	
+		logger.info("Creating new GUI instance.");
+		gui = new ATCGUI();
+		gui.setVisible(true);
+	
+		logger.info("Greeting the user.");
+		Calendar calendar = Calendar.getInstance();
+		gui.outputWithNewline("Welcome to a Typist Calendar!\n\nCurrent time:\n" + calendar.getTime().toString());
+	
+		logger.info("Initializing modules.");
+		TasksManager.getInstance().initialize();
+		GoogleCalendarManager.getInstance().initialize();
+	
+		logger.info("Initiallizing done.");
+	}
+
+	private void loadSwtLibrary() {
+		logger.fine("loadSwtLibrary called.");
+	
+		logger.info("Deciding which version (32- or 64-bit) of the SWT library to include.");
+		URL pathToSWT;
+		if(System.getProperty(JAVA_VM_NAME).contains(JAVA_VM_NAME_KEYWORD_64_BIT)) {
+			logger.info("Finding path to 64-bit SWT library.");
+			pathToSWT = getClass().getResource(RESOURCE_PATH_SWT_X64_JAR);
+			logger.info("Path to 64-bit SWT library found.");
+		}
+		else {
+			logger.info("Finding path to 32-bit SWT library.");
+			pathToSWT = getClass().getResource(RESOURCE_PATH_SWT_X86_JAR);
+			logger.info("Path to 32-bit SWT library found.");
+		}
+	
+		try {
+			logger.info("Reflecting the URLClassLoader.addURL method to expose it (protected -> public)");
+			Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+			method.setAccessible(true);
+	
+			logger.info("Invoking the URLClassLoader.addURL method of the ATypistCalendar class'es ClassLoader.");
+			method.invoke((URLClassLoader)ATypistCalendar.class.getClassLoader(), pathToSWT);
+		}
+		catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			logger.severe("Unable to load the SWT library! Displaying error message and exiting.");
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(new JDialog(), ERROR_DIALOG_MESSAGE, ERROR_DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
+		}
+		logger.info("SWT library loaded successful.");
 	}
 }
