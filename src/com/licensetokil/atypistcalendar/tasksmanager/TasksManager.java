@@ -32,8 +32,6 @@ public class TasksManager {
 
 	private static Logger logger = Logger.getLogger("TasksManager");
 
-	// Strings for add function
-	private static final String ADD_UNSUCCESSFUL = "Add was unsuccessful. Please try again!\n\n";
 	private static final String ADD_WARNING_CLASH = "Warning: schedule clashes with the following event(s):\n";
 	private static final String ADD_PREFIX = "Added: \n";
 
@@ -49,19 +47,15 @@ public class TasksManager {
 	private static final String DISPLAY_ALIGNMENT_DOT = ". ";
 	private static final String DISPLAY_NONALIGNMENT_DOT = ".";
 
-	// Strings for delete function
-	private static final String DELETE_UNSUCCESSFUL = "Delete was unsuccessful. Please try again!\n\n";
 	private static final String DELETE_SUCCESSFUL = "Deleted %s successfully \n\n";
 	private static final String DELETE_ALL = "Deleted all successfully\n\n";
 	private static final String INVALID_NUMBER_INPUT = "Your number input is invalid and out of range. Please try again!\n";
 
 	// Strings for update function
-	private static final String UPDATE_UNSUCCESSFUL = "Update was unsuccessful. Please try again!\n\n";
+	private static final String UPDATE_TYPE_CLASH = "Update was unsuccessful due to clash in event type. Please try again!\n\n";
 	private static final String UPDATE_SUCCESSFUL = "Updated %s to %s successfully\n\n";
 	private static final String UPDATE_WARNING_CLASH = "Warning: The following events clashes after update:\n";
 
-	// Strings for mark function
-	private static final String MARK_UNSUCCESSFUL = "Mark was unsuccessful. Please try again!\n\n";
 	private static final String MARK_SUCCESSFUL = "Marked %s as %s\n\n";
 	private static final String MARK_SCHEDULE_ERROR = "The event that you are trying to mark is a schedule. Please try again!\n\n";
 	private static final String MARK_UNDONE = "undone";
@@ -76,10 +70,6 @@ public class TasksManager {
 	private static final String UNDO_UPDATE_SUCCESSFUL = "Update command successfully undone\n\n";
 	private static final String UNDO_ADD_SUCCESSFUL = "Add command successfully undone\n\n";
 
-	private static final String UNDO_DELETE_UNSUCCESSFUL = "Undo Delete command unsuccessful. Please try again!\n\n";
-	private static final String UNDO_MARK_UNSUCCESSFUL = "Undo Mark command unsuccessful. Please try again!\n\n";
-	private static final String UNDO_UPDATE_UNSUCCESSFUL = "Undo Update command unsuccessful. Please try again!\n\n";
-	private static final String UNDO_ADD_UNSUCCESSFUL = "Undo Add command unsuccessful. Please try again!\n\n";
 	private static final String UNDO_DISALLOWED = "Undo command is not allowed\n\n";
 
 	// Miscellaneous Strings
@@ -380,63 +370,52 @@ public class TasksManager {
 	// Method for adding classified tasks into the calendar
 	private String add(Task t) {
 
-		try {
-			logger.log(Level.INFO, "In TM add function, adding task");
+		logger.log(Level.INFO, "In TM add function, adding task");
 
-			String output = EMPTY_STRING;
-			ArrayList<Schedule> sc;
+		String output = EMPTY_STRING;
+		ArrayList<Schedule> sc;
 
-			output = ADD_PREFIX + t.outputStringForDisplay() + NEWLINE;
+		output = ADD_PREFIX + t.outputStringForDisplay() + NEWLINE;
 
-			if (t.getTaskType().equals(TaskType.SCHEDULE)) {
-				if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
-					logger.log(Level.INFO, "Clashed schedules detected");
-					output += NEWLINE + ADD_WARNING_CLASH;
-					for (Schedule s : sc) {
-						logger.log(Level.INFO, "Printing all clashed schedules");
-						output += s.outputStringForDisplay() + NEWLINE;
-					}
+		if (t.getTaskType().equals(TaskType.SCHEDULE)) {
+			if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
+				logger.log(Level.INFO, "Clashed schedules detected");
+				output += NEWLINE + ADD_WARNING_CLASH;
+				for (Schedule s : sc) {
+					logger.log(Level.INFO, "Printing all clashed schedules");
+					output += s.outputStringForDisplay() + NEWLINE;
 				}
-				logger.log(Level.INFO, "Adding schedule");
-				allSchedules.add((Schedule) t);
-			} else if (t.getTaskType().equals(TaskType.DEADLINE)) {
-				logger.log(Level.INFO, "Adding deadline");
-				allDeadlines.add((Deadline) t);
-
-			} else if (t.getTaskType().equals(TaskType.TODO)) {
-				logger.log(Level.INFO, "Adding todo");
-				allTodos.add((Todo) t);
 			}
+			logger.log(Level.INFO, "Adding schedule");
+			allSchedules.add((Schedule) t);
+		} else if (t.getTaskType().equals(TaskType.DEADLINE)) {
+			logger.log(Level.INFO, "Adding deadline");
+			allDeadlines.add((Deadline) t);
 
-			lastTaskCreated = t;
-			fileSync();
-
-			return output + NEWLINE;
-
-		} catch (Exception e) {
-			logger.log(Level.WARNING,
-					"Exception error detected " + e.getMessage());
-			return ADD_UNSUCCESSFUL;
+		} else if (t.getTaskType().equals(TaskType.TODO)) {
+			logger.log(Level.INFO, "Adding todo");
+			allTodos.add((Todo) t);
 		}
+
+		lastTaskCreated = t;
+		fileSync();
+
+		return output + NEWLINE;
 
 	}
 
 	private String addUndo() {
-		try {
-			logger.log(
-					Level.INFO,
-					"In add undo function. Removing the last task added into the function from arraylist.");
-			allSchedules.remove(lastTaskCreated);
-			allDeadlines.remove(lastTaskCreated);
-			allTodos.remove(lastTaskCreated);
 
-			logger.log(Level.INFO, "Preparing for file sync");
-			fileSync();
-		} catch (Exception e) {
-			logger.log(Level.WARNING,
-					"Exception error detected " + e.getMessage());
-			return UNDO_ADD_UNSUCCESSFUL;
-		}
+		logger.log(
+				Level.INFO,
+				"In add undo function. Removing the last task added into the function from arraylist.");
+		allSchedules.remove(lastTaskCreated);
+		allDeadlines.remove(lastTaskCreated);
+		allTodos.remove(lastTaskCreated);
+
+		logger.log(Level.INFO, "Preparing for file sync");
+		fileSync();
+
 		return UNDO_ADD_SUCCESSFUL;
 	}
 
@@ -627,63 +606,58 @@ public class TasksManager {
 
 	private String delete(DeleteAction ac) {
 		logger.log(Level.INFO, "In delete function");
-		try {
-			if (ac.getReferenceNumber().get(0) != -1) {
-				logger.log(Level.INFO, "Normal delete function");
-				if (checkValidReferenceNumbers(ac.getReferenceNumber())) {
-					for (Integer num : ac.getReferenceNumber()) {
+		deletedTasks.clear();
 
-						Task t = selectedTasks.get(num);
-						deletedTasks.add(t);
+		if (ac.getReferenceNumber().get(0) != -1) {
+			logger.log(Level.INFO, "Normal delete function");
+			if (checkValidReferenceNumbers(ac.getReferenceNumber())) {
+				for (Integer num : ac.getReferenceNumber()) {
 
-						if (t instanceof Schedule) {
-							logger.log(Level.INFO, "Removing schedule: " + t);
-							allSchedules.remove(t);
-							requestedSchedules.remove(t);
-						} else if (t instanceof Deadline) {
-							logger.log(Level.INFO, "Removing deadline: " + t);
-							allDeadlines.remove(t);
-							requestedDeadlines.remove(t);
-						} else if (t instanceof Todo) {
-							logger.log(Level.INFO, "Removing todo: " + t);
-							allTodos.remove(t);
-							requestedTodos.remove(t);
-						}
+					Task t = selectedTasks.get(num);
+					deletedTasks.add(t);
 
-						t.setLastModifiedDate(Calendar.getInstance());
+					if (t instanceof Schedule) {
+						logger.log(Level.INFO, "Removing schedule: " + t);
+						allSchedules.remove(t);
+						requestedSchedules.remove(t);
+					} else if (t instanceof Deadline) {
+						logger.log(Level.INFO, "Removing deadline: " + t);
+						allDeadlines.remove(t);
+						requestedDeadlines.remove(t);
+					} else if (t instanceof Todo) {
+						logger.log(Level.INFO, "Removing todo: " + t);
+						allTodos.remove(t);
+						requestedTodos.remove(t);
 					}
-				} else {
-					logger.log(Level.INFO,
-							"Number input exceeds displayed number of output. Returning error");
-					return INVALID_NUMBER_INPUT;
+
+					t.setLastModifiedDate(Calendar.getInstance());
 				}
 			} else {
-				logger.log(Level.INFO, "Delete all command called");
-				for (Integer i : selectedTasks.keySet()) {
-					Task t = selectedTasks.get(i);
-					logger.log(Level.INFO, "Removing every trace of " + t);
-					deletedTasks.add(t);
-					allSchedules.remove(t);
-					allDeadlines.remove(t);
-					allTodos.remove(t);
-					requestedSchedules.remove(t);
-					requestedDeadlines.remove(t);
-					requestedTodos.remove(t);
-				}
-
-				logger.log(Level.INFO, "Preparing for file sync");
-				fileSync();
-				return DELETE_ALL;
+				logger.log(Level.INFO,
+						"Number input exceeds displayed number of output. Returning error");
+				return INVALID_NUMBER_INPUT;
+			}
+		} else {
+			logger.log(Level.INFO, "Delete all command called");
+			for (Integer i : selectedTasks.keySet()) {
+				Task t = selectedTasks.get(i);
+				logger.log(Level.INFO, "Removing every trace of " + t);
+				deletedTasks.add(t);
+				allSchedules.remove(t);
+				allDeadlines.remove(t);
+				allTodos.remove(t);
+				requestedSchedules.remove(t);
+				requestedDeadlines.remove(t);
+				requestedTodos.remove(t);
 			}
 
 			logger.log(Level.INFO, "Preparing for file sync");
 			fileSync();
-
-		} catch (Exception e) {
-			logger.log(Level.WARNING,
-					"Exception caught in delete: " + e.getMessage());
-			return DELETE_UNSUCCESSFUL;
+			return DELETE_ALL;
 		}
+
+		logger.log(Level.INFO, "Preparing for file sync");
+		fileSync();
 
 		return String.format(DELETE_SUCCESSFUL, ac.getReferenceNumber());
 
@@ -691,42 +665,55 @@ public class TasksManager {
 
 	private String deleteUndo() {
 		logger.log(Level.INFO, "In delete undo function");
-		try {
-			for (Task t : deletedTasks) {
-				uniqueId--;
-				if (t instanceof Schedule) {
-					logger.log(Level.INFO, "Recovering deleted schedule: " + t);
-					allSchedules.add((Schedule) t);
-				} else if (t instanceof Deadline) {
-					logger.log(Level.INFO, "Recovering deleted deadline: " + t);
-					allDeadlines.add((Deadline) t);
-				} else if (t instanceof Todo) {
-					logger.log(Level.INFO, "Recovering deleted todo: " + t);
-					allTodos.add((Todo) t);
-				}
 
-				t.setLastModifiedDate(Calendar.getInstance());
+		for (Task t : deletedTasks) {
+			// uniqueId--;
+			if (t instanceof Schedule) {
+				logger.log(Level.INFO, "Recovering deleted schedule: " + t);
+				allSchedules.add((Schedule) t);
+			} else if (t instanceof Deadline) {
+				logger.log(Level.INFO, "Recovering deleted deadline: " + t);
+				allDeadlines.add((Deadline) t);
+			} else if (t instanceof Todo) {
+				logger.log(Level.INFO, "Recovering deleted todo: " + t);
+				allTodos.add((Todo) t);
 			}
 
-			logger.log(Level.INFO, "Preparing for file sync");
-			fileSync();
-		} catch (Exception e) {
-			logger.log(Level.WARNING,
-					"Exception caught in deleteUndo: " + e.getMessage());
-			return UNDO_DELETE_UNSUCCESSFUL;
+			t.setLastModifiedDate(Calendar.getInstance());
 		}
+
+		logger.log(Level.INFO, "Preparing for file sync");
+		fileSync();
 
 		return UNDO_DELETE_SUCCESSFUL;
 	}
 
+	private TaskType classifyUpdate(UpdateAction ac) {
+		if (ac.getUpdatedStartTime() == null) {
+			if (ac.getUpdatedEndTime() == null) {
+				return TaskType.TODO;
+			} else {
+				return TaskType.DEADLINE;
+			}
+		} else {
+			return TaskType.SCHEDULE;
+		}
+		
+	}
+
 	private String update(UpdateAction ac) {
 		logger.log(Level.INFO, "In update function");
-		Task t = selectedTasks.get(ac.getReferenceNumber());
 		ArrayList<Schedule> sc = new ArrayList<Schedule>();
 		String output = String.format(UPDATE_SUCCESSFUL,
 				ac.getReferenceNumber(), ac.getUpdatedQuery());
+		System.out.println(ac);
+		if (ac.getReferenceNumber() <= selectedTasks.size()
+				&& ac.getReferenceNumber() > 0) {
+			Task t = selectedTasks.get(ac.getReferenceNumber());
+			if (t.getTaskType() != classifyUpdate(ac)) {
+				return UPDATE_TYPE_CLASH;
+			}
 
-		try {
 			if (t instanceof Schedule) {
 				logger.log(Level.INFO, "Updating schedule: " + t);
 				updateOriginalTask = (Schedule) t.clone();
@@ -741,11 +728,11 @@ public class TasksManager {
 				}
 			} else if (t instanceof Deadline) {
 				logger.log(Level.INFO, "Updating schedule: " + t);
-				updateOriginalTask = new Deadline((Deadline) t);
+				updateOriginalTask = (Deadline) t.clone();
 				((Deadline) t).setEndTime(ac.getUpdatedEndTime());
 			} else if (t instanceof Todo) {
 				logger.log(Level.INFO, "Updating todo: " + t);
-				updateOriginalTask = new Todo((Todo) t);
+				updateOriginalTask = (Todo) t.clone();
 			}
 
 			// common attributes to all schedules deadlines and todos
@@ -754,43 +741,43 @@ public class TasksManager {
 			t.setLastModifiedDate(Calendar.getInstance());
 
 			fileSync();
-
-		} catch (Exception e) {
-			logger.log(Level.WARNING, "Exception error: " + e.getMessage());
-			return UPDATE_UNSUCCESSFUL;
+			return output;
 		}
 
-		return output;
+		return INVALID_NUMBER_INPUT;
 	}
 
 	private String updateUndo() {
 		logger.log(Level.INFO, "In update undo function");
-		try {
-			logger.log(Level.INFO, "undoing update back to schedule:  "
-					+ updateOriginalTask);
-			for (Schedule s : allSchedules) {
-				if (s.getUniqueId() == updateOriginalTask.getUniqueId()) {
-					s = (Schedule) updateOriginalTask;
-					s.setLastModifiedDate(Calendar.getInstance());
-				}
+
+		logger.log(Level.INFO, "undoing update back to task:  "
+				+ updateOriginalTask);
+		for (Schedule s : allSchedules) {
+			if (s.getUniqueId() == updateOriginalTask.getUniqueId()) {
+				allSchedules.remove(s);
+				allSchedules.add((Schedule) updateOriginalTask.clone());
+				s.setLastModifiedDate(Calendar.getInstance());
 			}
-			for (Deadline d : allDeadlines) {
-				if (d.getUniqueId() == updateOriginalTask.getUniqueId()) {
-					d = (Deadline) updateOriginalTask;
-					d.setLastModifiedDate(Calendar.getInstance());
-				}
-			}
-			for (Todo td : allTodos) {
-				if (td.getUniqueId() == updateOriginalTask.getUniqueId()) {
-					td = (Todo) updateOriginalTask;
-					td.setLastModifiedDate(Calendar.getInstance());
-				}
-			}
-			fileSync();
-		} catch (Exception e) {
-			logger.log(Level.WARNING, "Exception error: " + e.getMessage());
-			return UNDO_UPDATE_UNSUCCESSFUL;
 		}
+		for (Deadline d : allDeadlines) {
+			if (d.getUniqueId() == updateOriginalTask.getUniqueId()) {
+				allDeadlines.remove(d);
+				allDeadlines.add((Deadline) updateOriginalTask.clone());
+				d.setLastModifiedDate(Calendar.getInstance());
+			}
+		}
+		for (Todo td : allTodos) {
+			if (td.getUniqueId() == updateOriginalTask.getUniqueId()) {
+				allTodos.remove(td);
+				allTodos.add((Todo) updateOriginalTask.clone());
+				System.out.println("Todo: " + td);
+				td.setLastModifiedDate(Calendar.getInstance());
+			}
+		}
+
+		fileSync();
+		updateOriginalTask = null;
+
 		return UNDO_UPDATE_SUCCESSFUL;
 	}
 
@@ -850,73 +837,61 @@ public class TasksManager {
 		String numbers = EMPTY_STRING;
 		markUndoList = new ArrayList<Task>();
 
-		try {
+		if (checkValidReferenceNumbers(ac.getReferenceNumber())) {
 			for (Integer num : ac.getReferenceNumber()) {
-				if (num <= selectedTasks.size() && num > 0) {
-					logger.log(Level.INFO, "Number input within range");
-					Task t = selectedTasks.get(num);
-					markUndoList.add((Task) t.clone());
-					numbers = numbers + num + BLANK_SPACE;
 
-					if (t instanceof Deadline) {
-						logger.log(Level.INFO,
-								"Marking deadline as " + ac.getStatus());
-						((Deadline) t).setStatus(ac.getStatus());
-					} else if (t instanceof Todo) {
-						logger.log(Level.INFO,
-								"Marking todo as " + ac.getStatus());
-						((Todo) t).setStatus(ac.getStatus());
-					} else {
-						logger.log(Level.INFO,
-								"User trying to mark schedule. Returning error");
-						return MARK_SCHEDULE_ERROR;
-					}
+				logger.log(Level.INFO, "Number input within range");
+				Task t = selectedTasks.get(num);
+				markUndoList.add((Task) t.clone());
+				numbers = numbers + num + BLANK_SPACE;
 
-					t.setLastModifiedDate(Calendar.getInstance());
+				if (t instanceof Deadline) {
+					logger.log(Level.INFO,
+							"Marking deadline as " + ac.getStatus());
+					((Deadline) t).setStatus(ac.getStatus());
+				} else if (t instanceof Todo) {
+					logger.log(Level.INFO, "Marking todo as " + ac.getStatus());
+					((Todo) t).setStatus(ac.getStatus());
 				} else {
 					logger.log(Level.INFO,
-							"Number input out of range. Returning error");
-					return INVALID_NUMBER_INPUT;
+							"User trying to mark schedule. Returning error");
+					return MARK_SCHEDULE_ERROR;
 				}
+
+				t.setLastModifiedDate(Calendar.getInstance());
 			}
-
-			logger.log(Level.INFO, "Preparing for file sync");
-			fileSync();
-
-		} catch (Exception e) {
-			logger.log(Level.WARNING, "Exception error: " + e.getMessage());
-			return MARK_UNSUCCESSFUL;
+		} else {
+			logger.log(Level.INFO, "Number input out of range. Returning error");
+			return INVALID_NUMBER_INPUT;
 		}
+
+		logger.log(Level.INFO, "Preparing for file sync");
+		fileSync();
 
 		return String.format(MARK_SUCCESSFUL, numbers, ac.getStatus());
 	}
 
 	private String markUndo() {
 		logger.log(Level.INFO, "In mark undo function");
-		try {
-			for (Task t : markUndoList) {
-				for (Deadline d : allDeadlines) {
-					if (d.getUniqueId() == t.getUniqueId()) {
-						logger.log(Level.INFO, "undoing status of deadline: "
-								+ d);
-						d.setStatus(((Deadline) t).getStatus());
-					}
-				}
-				for (Todo td : allTodos) {
-					if (td.getUniqueId() == td.getUniqueId()) {
-						logger.log(Level.INFO, "undoing status of todo: " + td);
-						td.setStatus(((Todo) t).getStatus());
-					}
-				}
-				t.setLastModifiedDate(Calendar.getInstance());
-			}
 
-			logger.log(Level.INFO, "Preparing for file sync");
-			fileSync();
-		} catch (Exception e) {
-			logger.log(Level.WARNING, "Error detected: " + e.getMessage());
-			return UNDO_MARK_UNSUCCESSFUL;
+		for (Task t : markUndoList) {
+			for (Deadline d : allDeadlines) {
+				if (d.getUniqueId() == t.getUniqueId()) {
+					logger.log(Level.INFO, "undoing status of deadline: " + d);
+					d.setStatus(((Deadline) t).getStatus());
+				}
+			}
+			for (Todo td : allTodos) {
+				if (td.getUniqueId() == t.getUniqueId()) {
+					logger.log(Level.INFO, "undoing status of todo: " + td);
+					td.setStatus(((Todo) t).getStatus());
+				}
+			}
+			t.setLastModifiedDate(Calendar.getInstance());
 		}
+
+		logger.log(Level.INFO, "Preparing for file sync");
+		fileSync();
 
 		return UNDO_MARK_SUCCESSFUL;
 	}
@@ -950,6 +925,7 @@ public class TasksManager {
 
 		} catch (IOException e) {
 			logger.log(Level.WARNING, "Error detected" + e.getMessage());
+			e.printStackTrace();
 		} finally {
 			logger.log(Level.INFO, "Closing buffered writers");
 			try {
@@ -1019,8 +995,11 @@ public class TasksManager {
 
 		else if (ac.getType() == LocalActionType.DELETE) {
 			logger.log(Level.INFO, "Command identified as delete");
-			lastAction = ac;
-			return delete((DeleteAction) ac);
+			String output = delete((DeleteAction) ac);
+			if (!output.equals(INVALID_NUMBER_INPUT)) {
+				lastAction = ac;
+			}
+			return output;
 		}
 
 		else if (ac.getType() == LocalActionType.UPDATE) {
@@ -1031,8 +1010,12 @@ public class TasksManager {
 
 		else if (ac.getType() == LocalActionType.MARK) {
 			logger.log(Level.INFO, "Command identified as mark");
-			lastAction = ac;
-			return mark((MarkAction) ac);
+			String output = mark((MarkAction) ac);
+			if (!output.equals(INVALID_NUMBER_INPUT)
+					&& !output.equals(MARK_SCHEDULE_ERROR)) {
+				lastAction = ac;
+			}
+			return output;
 		}
 
 		else if (ac.getType() == LocalActionType.UNDO) {
@@ -1136,7 +1119,10 @@ public class TasksManager {
 					|| (s.getStartTime().compareTo(sc.getStartTime()) == 0 || (s
 							.getEndTime().compareTo(sc.getEndTime()) == 0))) {
 				logger.log(Level.INFO, "Clashed schedule found: " + sc);
-				clashedSchedules.add(sc);
+				if (updateOriginalTask != null
+						&& updateOriginalTask.getUniqueId() != sc.getUniqueId()) {
+					clashedSchedules.add(sc);
+				}
 			}
 		}
 

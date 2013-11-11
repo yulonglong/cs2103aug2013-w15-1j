@@ -1236,6 +1236,36 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		
+		//update format after the ">>" delimiter is exactly the same as add
+		
+		//update #3 >> do hw by 13/2/13
+		//multiple words description
+		//single word place
+		//dd/mm time format
+		newUc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newUc = new UpdateAction();
+		newUc.setUpdatedQuery("do hw");
+		newUc.setReferenceNumber(3);
+		newUc.setUpdatedStartTime(startTime);
+		endTime = Calendar.getInstance();
+		endTime.set(2013,1,13,23,59,59);
+		newUc.setUpdatedEndTime(endTime);
+		expectedAc = newUc;
+		try{
+			ac = Parser.parse("update #3 >> do hw by 13/2/13");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
 		//................... UNDO TESTING ..............................
 		
 		newUndc = null;
@@ -1711,7 +1741,17 @@ public class ParserJUnitTest {
 		}
 		assertEquals(true,exceptionCaught);
 		
-		
+		exceptionCaught=false;
+		ac=null;
+		try{
+			ac = Parser.parse("add hello by 2359");
+			System.out.println(ac);
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+			exceptionCaught=true;
+		}
+		assertEquals(true,exceptionCaught);
 		
 		exceptionCaught=false;
 		ac=null;
@@ -2017,5 +2057,6 @@ public class ParserJUnitTest {
 			exceptionCaught=true;
 		}
 		assertEquals(true,exceptionCaught);
+		
 	}
 }
