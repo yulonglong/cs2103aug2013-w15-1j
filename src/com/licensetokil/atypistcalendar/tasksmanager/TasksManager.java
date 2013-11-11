@@ -24,11 +24,6 @@ import com.licensetokil.atypistcalendar.parser.MarkAction;
 import com.licensetokil.atypistcalendar.parser.SearchAction;
 import com.licensetokil.atypistcalendar.parser.UpdateAction;
 
-/**
- * 
- * @author Fan Yuxin Lacie A0103494J
- * 
- */
 public class TasksManager {
 
 	private static Logger logger = Logger.getLogger("TasksManager");
@@ -97,7 +92,7 @@ public class TasksManager {
 	private static ArrayList<Task> deletedTasks = new ArrayList<Task>();
 
 	private static ArrayList<Task> markUndoList;
-	private static Task updateOriginalTask;
+	private static Task updateOriginalTask = new Schedule();
 
 	private static LocalAction lastAction;
 	private static Task lastTaskCreated;
@@ -554,6 +549,7 @@ public class TasksManager {
 			if (!(sc = checkForScheduleClashes((Schedule) t)).isEmpty()) {
 				logger.log(Level.INFO, "Clashed schedules detected");
 				output += NEWLINE + ADD_WARNING_CLASH;
+				System.out.println("debugdebug");
 				for (Schedule s : sc) {
 					logger.log(Level.INFO, "Printing all clashed schedules");
 					output += s.outputStringForDisplay() + NEWLINE;
