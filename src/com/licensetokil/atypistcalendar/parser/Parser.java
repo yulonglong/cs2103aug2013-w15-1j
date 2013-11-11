@@ -15,7 +15,6 @@ public class Parser {
 	
 	private static final String CHAR_ENDLINE = "\n";
 	
-	private static final String MESSAGE_INVALID = "Invalid input!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_ACTION = "Invalid command/action entered!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_STATUS = "Invalid status entered! please enter done or undone!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_PLACE = "Invalid place entered!\n" + CHAR_ENDLINE;
@@ -38,6 +37,7 @@ public class Parser {
 	private static final int FIRST_INDEX = 0;
 	private static final int SECOND_INDEX = 1;
 	private static final int THIRD_INDEX = 2;
+	@SuppressWarnings("unused")
 	private static final int FOURTH_INDEX = 3;
 	private static final int FIFTH_INDEX = 4;
 	private static final int SIXTH_INDEX = 5;
@@ -78,7 +78,6 @@ public class Parser {
 	private static final int INDEX_MINUTE = 0;
 	
 	private static final int DEFAULT_YEAR_LENGTH = 2;
-	private static final int COMPLETE_YEAR_LENGTH = 4;
 	private static final int DEFAULT_HOUR_LENGTH = 2;
 	private static final int DEFAULT_MINUTE_LENGTH = 2;
 	private static final int DEFAULT_TIME_LENGTH = 4;
@@ -109,9 +108,12 @@ public class Parser {
 	
 	private static final int TIME_FORMAT_DIFF = 12;
 	private static final int TIME_DEFAULT_MIN_AM = 8;
+	@SuppressWarnings("unused")
 	private static final int TIME_DEFAULT_MAX_AM = 11;
 	private static final int TIME_DEFAULT_MIDNIGHT = 0;
+	@SuppressWarnings("unused")
 	private static final int TIME_DEFAULT_MIN_PM = 12;
+	@SuppressWarnings("unused")
 	private static final int TIME_DEFAULT_MAX_PM = 7;
 	
 	private static final String AM_SHORT = "am";
