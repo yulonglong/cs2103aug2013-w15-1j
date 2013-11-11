@@ -6,6 +6,7 @@
 package com.licensetokil.atypistcalendar.ui;
 
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.StringReader;
@@ -43,12 +44,12 @@ public class ATCGUI extends JFrame implements WindowListener {
 	private final static String POSITIVE_UNIT_INCREMENT = "positiveUnitIncrement";
 	private final static String NEGATIVE_UNIT_INCREMENT = "negativeUnitIncrement";
 	private final static String EMPTY_STRING = "";
-	
+
 	private final static String NEWLINE_REGEX = "\\r|\\n";
 	private final static String NEWLINE_HTML = "<br>";
-	
+
 	private final static String OUTPUT_FORMAT = "%s<hr><br>";
-	
+
 	private final static int FONT_SIZE = 14;
 	private final static int EDITOR_SCROLLPANE_FONT_SIZE = 18;
 	private final static int FONT_STYLE = 0;
@@ -64,8 +65,14 @@ public class ATCGUI extends JFrame implements WindowListener {
 	private final static int TEXTFIELD_SIZE = 33;
 	private final static int AREASCROLLPANE_SIZE = 29;
 
+	private final static String DEFAULT_ICON_RESOURCE_PATH = "/icon128.png";
+	private final static String SYNCING_ICON_RESOURCE_PATH = "/icon128sync.png";
+
 	private static Logger logger = Logger.getLogger("ATCGUI");
-	
+
+	private Image defaultIcon;
+	private Image syncingIcon;
+
 	//public constructor
 	public ATCGUI() {
 		try {
@@ -75,22 +82,24 @@ public class ATCGUI extends JFrame implements WindowListener {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Error detected: " + e.getMessage());
 		}
+
+		getResources();
 		initComponents();
 		this.setContentPane(jPanel);
 		addWindowListener(this);
 	}
-	
+
 	// function that displays responses from user input
 	public void outputWithNewline(String text) {
 		logger.log(Level.INFO, "In outputWithNewline function");
 		StringReader reader;
-	
+
 		if (text.contains(MESSAGE_WELCOME)) {
 			logger.log(Level.INFO, "Displaying Welcome Message");
 			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
 			jEditorPane.setText(String.format(MESSAGE_WELCOME_FORMAT, text));
 		}
-	
+
 		else {
 			logger.log(Level.INFO, "Displaying all other output");
 			text = text.replaceAll(NEWLINE_REGEX, NEWLINE_HTML);
@@ -102,7 +111,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 				logger.log(Level.WARNING, "Error detected: " + e.getMessage());
 			}
 		}
-	
+
 		jEditorPane.setCaretPosition(jEditorPane.getDocument().getLength());
 		jTextField.requestFocus();
 	}
@@ -117,6 +126,19 @@ public class ATCGUI extends JFrame implements WindowListener {
 	public void outputUserInput(String input) {
 		logger.log(Level.INFO, "In outputUserInput function");
 		jTextArea.setText(input);
+	}
+
+	public void changeWindowIcon(boolean useSyncingIcon) {
+		logger.log(Level.INFO, "Changing window icon");
+
+		if(useSyncingIcon) {
+			logger.log(Level.INFO, "Using syncing icon");
+			setIconImage(syncingIcon);
+		}
+		else {
+			logger.log(Level.INFO, "Using default icon");
+			setIconImage(defaultIcon);
+		}
 	}
 
 	@Override
@@ -148,6 +170,13 @@ public class ATCGUI extends JFrame implements WindowListener {
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
+	}
+
+	private void getResources() {
+		logger.log(Level.INFO, "Getting resources");
+
+		defaultIcon = (new ImageIcon(getClass().getResource(DEFAULT_ICON_RESOURCE_PATH))).getImage();
+		syncingIcon = (new ImageIcon(getClass().getResource(SYNCING_ICON_RESOURCE_PATH))).getImage();
 	}
 
 	//initialising function
@@ -205,7 +234,7 @@ public class ATCGUI extends JFrame implements WindowListener {
 		jTextArea.setEditable(false);
 		jTextArea.setBackground(new java.awt.Color(BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB, BACKGROUND_COLOR_RGB));
 		jTextArea.setColumns(TEXTAREA_COLUMNS);
-		jTextArea.setFont(new java.awt.Font("Consolas", TEXTAREA_FONT_STYLE, TEXTAREA_FONT_SIZE)); 
+		jTextArea.setFont(new java.awt.Font("Consolas", TEXTAREA_FONT_STYLE, TEXTAREA_FONT_SIZE));
 		jTextArea.setRows(TEXTAREA_ROWS);
 		jTextArea.setBorder(null);
 		areaScrollPane.setViewportView(jTextArea);
