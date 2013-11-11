@@ -637,6 +637,34 @@ public class ParserJUnitTest {
 		
 		assertEquals(expectedAc.toString(),ac.toString());
 		
+		//display deadlines today at 1pm
+		//deadlines description
+		//today date format
+		//standard 12 hr time format
+		newDc=null;
+		expectedAc=null;
+		ac=null;
+		startTime=null;
+		endTime=null;
+		
+		newDc = new DisplayAction();
+		newDc.setDescription("deadlines");
+		startTime = Calendar.getInstance();
+		startTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 13, 0, 0);
+		endTime = Calendar.getInstance();
+		endTime.set(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),  Calendar.getInstance().get(Calendar.DAY_OF_MONTH), 23,59, 59);
+		newDc.setStartTime(startTime);
+		newDc.setEndTime(endTime);
+		expectedAc = newDc;
+		try{
+			ac = Parser.parse("display deadlines today at 1pm");
+		}
+		catch(MalformedUserInputException muie){
+			System.out.println(muie);
+		}
+		
+		assertEquals(expectedAc.toString(),ac.toString());
+		
 		
 		//display deadlines today from 8am to 1pm
 		//deadlines description

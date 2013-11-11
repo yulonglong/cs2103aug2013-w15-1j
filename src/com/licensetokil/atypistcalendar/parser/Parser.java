@@ -29,6 +29,7 @@ public class Parser {
 	private static final String MESSAGE_INVALID_PREP = "Invalid preposition entered!" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_UPDATE_DELIM = "Invalid update delimiter is entered! Please enter '>>' as delimiter" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_UPDATE = "Invalid update command" + CHAR_ENDLINE;
+	private static final String MESSAGE_INVALID_DISPLAY = "Invalid display command" + CHAR_ENDLINE;
 	private static final String MESSAGE_INVALID_GOOGLE = "Invalid Google Calendar Command!" + CHAR_ENDLINE;
 	
 	private static final int DELETE_ALL_REF_NUMBER = -1;
@@ -343,7 +344,7 @@ public class Parser {
 		status=getStatus(st,tempSt);
 		st= tempSt[INDEX_ST];
 		userAction.setStatus(status);
-		if((!userAction.getDescription().equals(EMPTY_STRING))&&(!status.equals(EMPTY_STRING))){
+		if(isValidStatus(status)){
 			userAction.setDescription(EMPTY_STRING);
 		}
 		
@@ -373,6 +374,9 @@ public class Parser {
 			return userAction;
 		}
 		//get place end
+		if(isValidStatus(status)){
+			throw new MalformedUserInputException(MESSAGE_INVALID_DISPLAY);
+		}
 		
 		assert calendarArray[INDEX_START_TIME] != null;
 		assert calendarArray[INDEX_END_TIME] != null;
