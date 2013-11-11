@@ -72,16 +72,16 @@ class SyncManager {
 		runSyncer();
 	}
 
-	protected void updateRemoteTask(Task localTask, String remoteTaskID) {
-		deleteRemoteTask(remoteTaskID);
+	protected void updateRemoteTask(Task localTask, String remoteTaskId) {
+		deleteRemoteTask(remoteTaskId);
 		addRemoteTask(localTask);
 		//TODO temporary measure, cause increasing the iCal sequence number is difficult - see Dev's guide
 		//queue.add(new UpdateSyncNode(localTask, remoteTaskID));
 		runSyncer();
 	}
 
-	protected void deleteRemoteTask(String remoteTaskID) {
-		syncQueue.add(new DeleteSyncNode(remoteTaskID));
+	protected void deleteRemoteTask(String remoteTaskId) {
+		syncQueue.add(new DeleteSyncNode(remoteTaskId));
 		runSyncer();
 	}
 

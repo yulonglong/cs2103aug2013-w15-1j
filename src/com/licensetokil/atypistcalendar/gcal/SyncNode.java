@@ -13,17 +13,17 @@ public abstract class SyncNode implements Comparable<SyncNode> {
 		creationId = creationIdCounter++;
 	}
 
-	protected abstract int getPriority();
-
-	protected int getCreationId() {
-		return creationId;
-	}
-
 	@Override
 	public int compareTo(SyncNode obj) {
 		if(getPriority() == obj.getPriority()) {
 			return getCreationId() - obj.getCreationId();
 		}
 		return getPriority() - obj.getPriority();
+	}
+
+	protected abstract int getPriority();
+
+	protected int getCreationId() {
+		return creationId;
 	}
 }

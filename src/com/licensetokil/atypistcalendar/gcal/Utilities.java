@@ -33,7 +33,7 @@ public class Utilities {
 	public static final SimpleDateFormat RFC3339_FORMAT_WITHOUT_MILLISECONDS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 	public static final SimpleDateFormat GOOGLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-	private static final JsonParser jsonParser = new JsonParser();
+	private static final JsonParser JSON_PARSER = new JsonParser();
 
 	private static final String EMPTY_STRING = "";
 
@@ -98,7 +98,7 @@ public class Utilities {
 
 	public static JsonObject parseToJsonObject(String stringToParse)
 			throws JsonParseException, IllegalStateException {
-		return (JsonObject) jsonParser.parse(stringToParse);
+		return (JsonObject) JSON_PARSER.parse(stringToParse);
 	}
 
 	public static String sendJsonHttpsRequest(
@@ -169,7 +169,7 @@ public class Utilities {
 		}
 	}
 
-	public static String getJsonObjectValueOrEmptyString(JsonObject jsonObject,String key) {
+	public static String getJsonObjectValueOrEmptyString(JsonObject jsonObject, String key) {
 		if (jsonObject.get(key) != null) {
 			return jsonObject.get(key).getAsString();
 		} else {

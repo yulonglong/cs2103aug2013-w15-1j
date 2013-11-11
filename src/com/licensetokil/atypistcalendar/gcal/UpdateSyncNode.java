@@ -12,10 +12,6 @@ public class UpdateSyncNode extends SyncNode {
 		setRemoteTaskID(remoteTaskID);
 	}
 
-	protected int getPriority() {
-		return SyncNode.PRIORITY_MEDIUM;
-	}
-
 	public Task getLocalTask() {
 		return localTask;
 	}
@@ -30,5 +26,9 @@ public class UpdateSyncNode extends SyncNode {
 
 	public void setRemoteTaskID(String remoteTaskID) {
 		this.remoteTaskID = remoteTaskID;
+	}
+
+	protected int getPriority() {
+		return SyncNode.PRIORITY_MEDIUM;
 	}
 }

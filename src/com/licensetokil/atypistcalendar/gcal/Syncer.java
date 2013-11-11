@@ -134,25 +134,6 @@ class Syncer extends Thread {
 		}
 	}
 
-	private void sleep() {
-		logger.info("Sleeping for " + PERIOD_TO_SLEEP_IN_SECONDS + " seconds.");
-
-		System.out.println("shoudl be defu");
-		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_SLEEPING);
-
-		try {
-			SyncManager.getInstance().getGoToSleepLock().lock();
-			SyncManager.getInstance().getGoToSleepCondition()
-					.await(PERIOD_TO_SLEEP_IN_SECONDS, TimeUnit.SECONDS);
-			SyncManager.getInstance().getGoToSleepLock().unlock();
-		} catch (InterruptedException e) {
-			logger.severe("Thread was interrupted.");
-			e.printStackTrace();
-		}
-		System.out.println("shoudl be sync");
-		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_EXECUTING);
-	}
-
 	private void executeSyncNode(InitialiseRemoteCalendarSyncNode currentSyncNode)
 			throws JsonParseException, IllegalStateException, IOException {
 
@@ -284,59 +265,6 @@ class Syncer extends Thread {
 		);
 	}
 
-	private JsonObject createRemoteTaskRequestBody(Task localTask) {
-		if (localTask instanceof Schedule) {
-			return createRemoteTaskRequestBodyFromSchedule((Schedule)localTask);
-		} else if (localTask instanceof Deadline) {
-			return createRemoteTaskRequestBodyFromDeadline((Deadline)localTask);
-		} else if (localTask instanceof Todo) {
-			return createRemoteTaskRequestBodyFromTodo((Todo)localTask);
-		} else {
-			logger.severe("Unexpected sub-type of Task detected.");
-			assert false;
-			return null;
-		}
-	}
-
-	private JsonObject createRemoteTaskRequestBodyFromSchedule(Schedule localSchedule) {
-		JsonObject requestBody = new JsonObject();
-
-		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localSchedule.getPlace());
-		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, localSchedule.getDescription());
-		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localSchedule.getUniqueId()));
-		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateTimeObject(localSchedule.getStartTime()));
-		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateTimeObject(localSchedule.getEndTime()));
-
-		return requestBody;
-	}
-
-	private JsonObject createRemoteTaskRequestBodyFromDeadline(Deadline localDeadline) {
-		// TODO handle done/undone
-		JsonObject requestBody = new JsonObject();
-
-		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localDeadline.getPlace());
-		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, TASK_DESCRIPTION_PREFIX_DEADLINE + localDeadline.getDescription());
-		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localDeadline.getUniqueId()));
-		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
-		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
-
-		return requestBody;
-	}
-
-	private JsonObject createRemoteTaskRequestBodyFromTodo(Todo localTodo) {
-		// TODO handle done/undone
-		JsonObject requestBody = new JsonObject();
-
-		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localTodo.getPlace());
-		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, TASK_DESCRIPTION_PREFIX_TODO + localTodo.getDescription());
-		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localTodo.getUniqueId()));
-		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
-		requestBody.add(EVENT_RESOURCE_LABEL_RECURRENCE, SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
-
-		return requestBody;
-	}
-
 	private void syncAllTasks(ArrayList<Task> localTasks, String pageToken)
 			throws IOException, JsonParseException, IllegalStateException {
 		logger.info("Getting remote task list with pageToken: " + pageToken);
@@ -414,6 +342,16 @@ class Syncer extends Thread {
 		}
 	}
 
+	private Task searchForCorrespondingLocalTask(ArrayList<Task> localTasks, int extendedPropertiesLocalTaskID) {
+
+		for (Task currentLocalTask : localTasks) {
+			if (extendedPropertiesLocalTaskID == currentLocalTask.getUniqueId()) {
+				return currentLocalTask;
+			}
+		}
+		return NULL_CORRESPONDING_LOCAL_TASK;
+	}
+
 	private void synchorniseLocalAndRemoteTask(JsonObject remoteTask, Task currentLocalTask) {
 		Calendar remoteTaskLastModifiedTime = null;
 		try {
@@ -440,6 +378,157 @@ class Syncer extends Thread {
 		} else {
 			updateLocalTaskFromRemoteTask(remoteTask, currentLocalTask);
 		}
+	}
+
+	private JsonObject getRemoteTaskList(String pageToken)
+			throws IOException, JsonParseException, IllegalStateException {
+
+		HashMap<String, String> formParameters = Utilities.EMPTY_FORM_PARAMETERS;
+
+		if (pageToken != EMPTY_PAGE_TOKEN) {
+			formParameters = new HashMap<String, String>();
+			formParameters.put(EVENTS_LIST_RESOURCE_PAGE_TOKEN, pageToken);
+		}
+
+		JsonObject serverReply = Utilities.parseToJsonObject(
+				Utilities.sendUrlencodedFormHttpsRequest(
+						String.format(
+								GOOGLE_REQUEST_URL_LIST_EVENTS,
+								SyncManager.getInstance().getRemoteCalendarId()
+						),
+						Utilities.REQUEST_METHOD_GET,
+						AuthenticationManager.getInstance().getAuthorizationHeader(),
+						formParameters
+				)
+		);
+
+		return serverReply;
+	}
+
+	private int getCorrespondingLocalTaskId(JsonObject remoteTask) {
+		if (privateExtendedPropertiesExist(remoteTask)) {
+			return remoteTask
+					.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES)
+					.getAsJsonObject(EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE)
+					.get(EVENT_EXTENDED_PROPERTIES_PRIVATE_RESOURCE_LABEL_ATC_LOCAL_TASK_ID)
+					.getAsInt();
+		}
+		return NULL_CORRESPONDING_LOCAL_TASK_ID;
+	}
+
+	private boolean privateExtendedPropertiesExist(JsonObject remoteTask) {
+		if (remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES) == null) {
+			return false;
+		}
+		if (remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES)
+				.getAsJsonObject(EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE) == null) {
+			return false;
+		}
+		if (remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES)
+				.getAsJsonObject(EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE)
+				.get(EVENT_EXTENDED_PROPERTIES_PRIVATE_RESOURCE_LABEL_ATC_LOCAL_TASK_ID) == null) {
+			return false;
+		}
+		return true;
+	}
+
+	private String removePrefix(String originalString, String prefix) {
+		String originalStringInLowerCase = originalString.toLowerCase();
+		String prefixInLowerCase = prefix.toLowerCase();
+
+		if (originalStringInLowerCase.startsWith(prefixInLowerCase)) {
+			return originalString.substring(prefix.length());
+		} else {
+			return originalString;
+		}
+	}
+
+	private JsonObject createExtendedPropertiesObject(int localTaskId) {
+		JsonObject privateExtendedProperties = new JsonObject();
+		privateExtendedProperties.addProperty(
+				EVENT_EXTENDED_PROPERTIES_PRIVATE_RESOURCE_LABEL_ATC_LOCAL_TASK_ID,
+				Integer.toString(localTaskId)
+		);
+
+		JsonObject extendedProperties = new JsonObject();
+		extendedProperties.add(
+				EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE,
+				privateExtendedProperties
+		);
+
+		return extendedProperties;
+	}
+
+	private void sleep() {
+		logger.info("Sleeping for " + PERIOD_TO_SLEEP_IN_SECONDS + " seconds.");
+
+		System.out.println("shoudl be defu");
+		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_SLEEPING);
+
+		try {
+			SyncManager.getInstance().getGoToSleepLock().lock();
+			SyncManager.getInstance().getGoToSleepCondition()
+					.await(PERIOD_TO_SLEEP_IN_SECONDS, TimeUnit.SECONDS);
+			SyncManager.getInstance().getGoToSleepLock().unlock();
+		} catch (InterruptedException e) {
+			logger.severe("Thread was interrupted.");
+			e.printStackTrace();
+		}
+		System.out.println("shoudl be sync");
+		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_EXECUTING);
+	}
+
+	private JsonObject createRemoteTaskRequestBody(Task localTask) {
+		if (localTask instanceof Schedule) {
+			return createRemoteTaskRequestBodyFromSchedule((Schedule)localTask);
+		} else if (localTask instanceof Deadline) {
+			return createRemoteTaskRequestBodyFromDeadline((Deadline)localTask);
+		} else if (localTask instanceof Todo) {
+			return createRemoteTaskRequestBodyFromTodo((Todo)localTask);
+		} else {
+			logger.severe("Unexpected sub-type of Task detected.");
+			assert false;
+			return null;
+		}
+	}
+
+	private JsonObject createRemoteTaskRequestBodyFromSchedule(Schedule localSchedule) {
+		JsonObject requestBody = new JsonObject();
+
+		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localSchedule.getPlace());
+		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, localSchedule.getDescription());
+		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localSchedule.getUniqueId()));
+		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateTimeObject(localSchedule.getStartTime()));
+		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateTimeObject(localSchedule.getEndTime()));
+
+		return requestBody;
+	}
+
+	private JsonObject createRemoteTaskRequestBodyFromDeadline(Deadline localDeadline) {
+		// TODO handle done/undone
+		JsonObject requestBody = new JsonObject();
+
+		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localDeadline.getPlace());
+		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, TASK_DESCRIPTION_PREFIX_DEADLINE + localDeadline.getDescription());
+		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localDeadline.getUniqueId()));
+		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
+		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateTimeObject(localDeadline.getEndTime()));
+
+		return requestBody;
+	}
+
+	private JsonObject createRemoteTaskRequestBodyFromTodo(Todo localTodo) {
+		// TODO handle done/undone
+		JsonObject requestBody = new JsonObject();
+
+		requestBody.addProperty(EVENT_RESOURCE_LABEL_LOCATION, localTodo.getPlace());
+		requestBody.addProperty(EVENT_RESOURCE_LABEL_SUMMARY, TASK_DESCRIPTION_PREFIX_TODO + localTodo.getDescription());
+		requestBody.add(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES, createExtendedPropertiesObject(localTodo.getUniqueId()));
+		requestBody.add(EVENT_RESOURCE_LABEL_START, Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+		requestBody.add(EVENT_RESOURCE_LABEL_END, Utilities.createGoogleDateObject(SyncManager.REMOTE_TODO_START_END_DATE));
+		requestBody.add(EVENT_RESOURCE_LABEL_RECURRENCE, SyncManager.REMOTE_TODO_RECURRENCE_PROPERTY);
+
+		return requestBody;
 	}
 
 	private void updateLocalTaskFromRemoteTask(JsonObject remoteTask, Task currentLocalTask) {
@@ -483,7 +572,6 @@ class Syncer extends Thread {
 		}
 	}
 
-
 	private void updateLocalTodo(Todo localTodo, String description,
 			String location, String remoteTaskId, Calendar lastModifiedDate) {
 		localTodo.setDescription(removePrefix(description, TASK_DESCRIPTION_PREFIX_TODO));
@@ -493,7 +581,6 @@ class Syncer extends Thread {
 
 		GoogleCalendarManager.getInstance().updateTasksManagerWithUpdatedLocalTask(localTodo);
 	}
-
 
 	private void updateLocalDeadline(Deadline localDeadline,
 			String remoteTaskId, String description, String location,
@@ -506,7 +593,6 @@ class Syncer extends Thread {
 
 		GoogleCalendarManager.getInstance().updateTasksManagerWithUpdatedLocalTask(localDeadline);
 	}
-
 
 	private void updateLocalSchedule(Schedule localSchedule,
 			String remoteTaskId, String description, String location,
@@ -521,73 +607,6 @@ class Syncer extends Thread {
 		GoogleCalendarManager.getInstance().updateTasksManagerWithUpdatedLocalTask(localSchedule);
 	}
 
-
-	private JsonObject getRemoteTaskList(String pageToken)
-			throws IOException, JsonParseException, IllegalStateException {
-
-		HashMap<String, String> formParameters = Utilities.EMPTY_FORM_PARAMETERS;
-
-		if (pageToken != EMPTY_PAGE_TOKEN) {
-			formParameters = new HashMap<String, String>();
-			formParameters.put(EVENTS_LIST_RESOURCE_PAGE_TOKEN, pageToken);
-		}
-
-		JsonObject serverReply = Utilities.parseToJsonObject(
-				Utilities.sendUrlencodedFormHttpsRequest(
-						String.format(
-								GOOGLE_REQUEST_URL_LIST_EVENTS,
-								SyncManager.getInstance().getRemoteCalendarId()
-						),
-						Utilities.REQUEST_METHOD_GET,
-						AuthenticationManager.getInstance().getAuthorizationHeader(),
-						formParameters
-				)
-		);
-
-		return serverReply;
-	}
-
-
-	private Task searchForCorrespondingLocalTask(ArrayList<Task> localTasks, int extendedPropertiesLocalTaskID) {
-
-		for (Task currentLocalTask : localTasks) {
-			if (extendedPropertiesLocalTaskID == currentLocalTask.getUniqueId()) {
-				return currentLocalTask;
-			}
-		}
-		return NULL_CORRESPONDING_LOCAL_TASK;
-	}
-
-
-	private int getCorrespondingLocalTaskId(JsonObject remoteTask) {
-		if (privateExtendedPropertiesExist(remoteTask)) {
-			return remoteTask
-					.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES)
-					.getAsJsonObject(EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE)
-					.get(EVENT_EXTENDED_PROPERTIES_PRIVATE_RESOURCE_LABEL_ATC_LOCAL_TASK_ID)
-					.getAsInt();
-		}
-		return NULL_CORRESPONDING_LOCAL_TASK_ID;
-	}
-
-
-	private boolean privateExtendedPropertiesExist(JsonObject remoteTask) {
-		if (remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES) == null) {
-			return false;
-		}
-		if (remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES)
-				.getAsJsonObject(EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE) == null) {
-			return false;
-		}
-		if (remoteTask.getAsJsonObject(EVENT_RESOURCE_LABEL_EXTENDED_PROPERTIES)
-				.getAsJsonObject(EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE)
-				.get(EVENT_EXTENDED_PROPERTIES_PRIVATE_RESOURCE_LABEL_ATC_LOCAL_TASK_ID) == null) {
-			return false;
-		}
-		return true;
-	}
-
-
 	private boolean isIdentical(JsonObject remoteTask, Task localTask) {
 		if (localTask instanceof Schedule) {
 			return isIdenticalSchedule(remoteTask, (Schedule) localTask);
@@ -601,7 +620,6 @@ class Syncer extends Thread {
 			return false;
 		}
 	}
-
 
 	private boolean isIdenticalSchedule(JsonObject remoteTask, Schedule localSchedule) {
 		boolean locationIsIdentical = Utilities
@@ -623,7 +641,6 @@ class Syncer extends Thread {
 				endTimeIsIdentical;
 	}
 
-
 	private boolean isIdenticalDeadline(JsonObject remoteTask, Deadline localDeadline) {
 		// TODO handle done/undone
 		boolean locationIsIdentical = Utilities
@@ -644,7 +661,6 @@ class Syncer extends Thread {
 				startTimeIsIdentical &&
 				endTimeIsIdentical;
 	}
-
 
 	private boolean isIdenticalTodo(JsonObject remoteTask, Todo localTodo) {
 		// TODO handle done/undone
@@ -673,34 +689,5 @@ class Syncer extends Thread {
 				startTimeIsIdentical &&
 				endTimeIsIdentical &&
 				recurrenceIsIdentical;
-	}
-
-
-	private JsonObject createExtendedPropertiesObject(int localTaskID) {
-		JsonObject privateExtendedProperties = new JsonObject();
-		privateExtendedProperties.addProperty(
-				EVENT_EXTENDED_PROPERTIES_PRIVATE_RESOURCE_LABEL_ATC_LOCAL_TASK_ID,
-				Integer.toString(localTaskID)
-		);
-
-		JsonObject extendedProperties = new JsonObject();
-		extendedProperties.add(
-				EVENT_EXTENDED_PROPERTIES_RESOURCE_LABEL_PRIVATE,
-				privateExtendedProperties
-		);
-
-		return extendedProperties;
-	}
-
-
-	private String removePrefix(String originalString, String prefix) {
-		String originalStringInLowerCase = originalString.toLowerCase();
-		String prefixInLowerCase = prefix.toLowerCase();
-
-		if (originalStringInLowerCase.startsWith(prefixInLowerCase)) {
-			return originalString.substring(prefix.length());
-		} else {
-			return originalString;
-		}
 	}
 }

@@ -18,8 +18,6 @@ class AuthenticationManager {
 	protected static final String GOOGLE_API_CLIENT_ID = "896350900683.apps.googleusercontent.com";
 	protected static final String GOOGLE_API_CLIENT_SECRET = "MvKdYK7Ec74rMesvRvVfVdDF";
 
-	private static AuthenticationManager instance = null;
-
 	private static final String AUTHORIZATION_HEADER_VALUE_PREFIX = "Bearer ";
 	private static final String AUTHORIZATION_HEADER_LABEL = "Authorization";
 
@@ -48,6 +46,7 @@ class AuthenticationManager {
 
 	private static final File AUTHENTICATION_SAVE_FILE = new File("ATC_AUTH.txt");
 
+	private static AuthenticationManager instance = null;
 	private String authenticationToken;
 	private String accessToken;
 	private String refreshToken;
@@ -111,6 +110,33 @@ class AuthenticationManager {
 		return header;
 	}
 
+	//Catches all IOExceptions and fails cleanly.
+	//Upon failure, all tokens will be set to null.
+	protected void readAuthenticationDetailsFromFile() {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(AUTHENTICATION_SAVE_FILE));
+	
+			authenticationToken = reader.readLine();
+			accessToken = reader.readLine();
+			refreshToken = reader.readLine();
+	
+			boolean accessTokenIsNull = accessToken.equals(NULL_TOKEN);
+			if (accessTokenIsNull) {
+				accessTokenExpiry = null;
+			} else {
+				// assume the token has expired
+				accessTokenExpiry = UNIX_EPOCH;
+			}
+	
+			reader.close();
+		} catch (IOException e) {
+			authenticationToken = NULL_TOKEN;
+			accessToken = NULL_TOKEN;
+			refreshToken = NULL_TOKEN;
+			accessTokenExpiry = null;
+		}
+	}
+
 	private void fetchAccessTokenUsingAuthenticationToken()
 			throws IllegalStateException, JsonParseException, IOException {
 		assert !authenticationToken.equals(NULL_TOKEN);
@@ -139,33 +165,6 @@ class AuthenticationManager {
 				ACCESS_TOKEN_EXPIRY_PERIOD_CONVERSION_FACTOR;
 		long expiryTime = timeNow + accessTokenValidityPeriod - ACCESS_TOKEN_EXPIRY_BUFFER;
 		accessTokenExpiry = new Date(expiryTime);
-	}
-
-	//Catches all IOExceptions and fails cleanly.
-	//Upon failure, all tokens will be set to null.
-	protected void readAuthenticationDetailsFromFile() {
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(AUTHENTICATION_SAVE_FILE));
-
-			authenticationToken = reader.readLine();
-			accessToken = reader.readLine();
-			refreshToken = reader.readLine();
-
-			boolean accessTokenIsNull = accessToken.equals(NULL_TOKEN);
-			if (accessTokenIsNull) {
-				accessTokenExpiry = null;
-			} else {
-				// assume the token has expired
-				accessTokenExpiry = UNIX_EPOCH;
-			}
-
-			reader.close();
-		} catch (IOException e) {
-			authenticationToken = NULL_TOKEN;
-			accessToken = NULL_TOKEN;
-			refreshToken = NULL_TOKEN;
-			accessTokenExpiry = null;
-		}
 	}
 
 	private void fetchAccessTokenUsingRefreshToken()
