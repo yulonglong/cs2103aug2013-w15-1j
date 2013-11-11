@@ -1,3 +1,4 @@
+//@author A0103494J
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import java.util.Calendar;
@@ -33,3 +34,4 @@ public abstract class Task implements Cloneable{
 	@Override
 	public abstract Object clone();
 }
+//@author A0103494J

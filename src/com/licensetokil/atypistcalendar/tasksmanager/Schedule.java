@@ -1,3 +1,4 @@
+//@author A0103494J
 package com.licensetokil.atypistcalendar.tasksmanager;
 
 import java.text.SimpleDateFormat;
@@ -143,3 +144,4 @@ public class Schedule extends Task implements Comparable<Schedule>, Cloneable {
 		return clonedObject;
 	}
 }
+//@author A0103494J
