@@ -8,6 +8,10 @@ public class DeleteSyncAction extends SyncAction {
 		setRemoteTaskID(remoteTaskID);
 	}
 
+	protected int getPriority() {
+		return SyncAction.PRIORITY_MEDIUM;
+	}
+
 	public String getRemoteTaskID() {
 		return remoteTaskID;
 	}

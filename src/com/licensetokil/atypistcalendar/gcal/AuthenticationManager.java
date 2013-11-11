@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 
@@ -19,12 +18,35 @@ class AuthenticationManager {
 	protected static final String GOOGLE_API_CLIENT_ID = "896350900683.apps.googleusercontent.com";
 	protected static final String GOOGLE_API_CLIENT_SECRET = "MvKdYK7Ec74rMesvRvVfVdDF";
 
-	private static final long TOKEN_EXPIRY_BUFFER = 120; //in seconds
-	private static final File AUTHENTICATION_SAVE_FILE = new File("ATC_AUTH.txt");
-
 	private static AuthenticationManager instance = null;
 
-	private static Logger logger = Logger.getLogger(AuthenticationManager.class.getName());
+	private static final String AUTHORIZATION_HEADER_VALUE_PREFIX = "Bearer ";
+	private static final String AUTHORIZATION_HEADER_LABEL = "Authorization";
+
+	private static final String NULL_TOKEN = "";
+
+	private static final String GOOGLE_REQUEST_URL_FETCH_ACCESS_TOKEN = "https://accounts.google.com/o/oauth2/token";
+
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_LABEL_CODE = "code";
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_ID = "client_id";
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_SECRET = "client_secret";
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_LABEL_REDIRECT_URI = "redirect_uri";
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_LABEL_GRANT_TYPE = "grant_type";
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_LABEL_REFRESH_TOKEN = "refresh_token";
+
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_VALUE_GRANT_TYPE = "authorization_code";
+	private static final String FETCH_ACCESS_TOKEN_REQUEST_VALUE_REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+
+	private static final String FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN = "access_token";
+	private static final String FETCH_ACCESS_TOKEN_REPLY_LABEL_REFRESH_TOKEN = "refresh_token";
+	private static final String FETCH_ACCESS_TOKEN_REPLY_LABEL_EXPIRES_IN = "expires_in";
+
+	private static final long ACCESS_TOKEN_EXPIRY_BUFFER = 120_000L; // in milliseconds
+	private static final long ACCESS_TOKEN_EXPIRY_PERIOD_CONVERSION_FACTOR = 1_000L; // factor to multiply by to convert the period to milliseconds
+
+	private static final Date UNIX_EPOCH = new Date(0L);
+
+	private static final File AUTHENTICATION_SAVE_FILE = new File("ATC_AUTH.txt");
 
 	private String authenticationToken;
 	private String accessToken;
@@ -32,22 +54,21 @@ class AuthenticationManager {
 	private Date accessTokenExpiry;
 
 	private AuthenticationManager() {
-		logger.fine("AuthenticationManager constructor called.");
-		authenticationToken = "";
-		accessToken = "";
-		refreshToken = "";
+		authenticationToken = NULL_TOKEN;
+		accessToken = NULL_TOKEN;
+		refreshToken = NULL_TOKEN;
 		accessTokenExpiry = null;
 	}
 
 	protected static AuthenticationManager getInstance() {
-		if(instance == null) {
+		if (instance == null) {
 			instance = new AuthenticationManager();
 		}
 		return instance;
 	}
 
 	protected boolean isAuthenticated() {
-		if(authenticationToken.equals("")) {
+		if (authenticationToken.equals(NULL_TOKEN)) {
 			return false;
 		}
 		return true;
@@ -57,85 +78,112 @@ class AuthenticationManager {
 		AuthenticationManager.getInstance().openAuthenticationDialog();
 	}
 
-	//TODO refactor this to Dialog class?
-	/**
-	 * This should only be called by the AuthenticationDialog class
-	 * This method is fail safe. The user will not be registered as authenticated should any exceptions occur.
-	 * @param authenticationToken
-	 */
+	// The following two methods should only be called by the
+	// AuthenticationDialog class
 	protected void authenticateUserSuccess(String authenticationToken) {
 		this.authenticationToken = authenticationToken;
 	}
 
+	// This method is a fail safe. The user will not be registered as
+	// authenticated should any exceptions occur.
 	protected void authenticateUserFailed() {
-		//TODO what to do? what to do?!?!
+		deleteAuthenticationDetails();
 	}
 
-	protected void forgetAuthenticationDetails() {
-		authenticationToken = "";
-		accessToken = "";
-		refreshToken = "";
+	protected void deleteAuthenticationDetails() {
+		authenticationToken = NULL_TOKEN;
+		accessToken = NULL_TOKEN;
+		refreshToken = NULL_TOKEN;
 		accessTokenExpiry = null;
 	}
 
 	protected HashMap<String, String> getAuthorizationHeader()
 			throws IllegalStateException, JsonParseException, IOException {
 		HashMap<String, String> header = new HashMap<>();
-		header.put("Authorization", "Bearer " + getAccessToken());
+		header.put(AUTHORIZATION_HEADER_LABEL,
+				AUTHORIZATION_HEADER_VALUE_PREFIX + getAccessToken());
 		return header;
 	}
 
 	private void fetchAccessTokenUsingAuthenticationToken()
 			throws IllegalStateException, JsonParseException, IOException {
-		assert !authenticationToken.equals("");
+		assert !authenticationToken.equals(NULL_TOKEN);
 
 		HashMap<String, String> parameters = new HashMap<>();
-		parameters.put("code", authenticationToken);
-		parameters.put("client_id", GOOGLE_API_CLIENT_ID);
-		parameters.put("client_secret", GOOGLE_API_CLIENT_SECRET);
-		parameters.put("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
-		parameters.put("grant_type", "authorization_code");
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_CODE, authenticationToken);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_ID, GOOGLE_API_CLIENT_ID);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_SECRET, GOOGLE_API_CLIENT_SECRET);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_REDIRECT_URI, FETCH_ACCESS_TOKEN_REQUEST_VALUE_REDIRECT_URI);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_GRANT_TYPE, FETCH_ACCESS_TOKEN_REQUEST_VALUE_GRANT_TYPE);
 
 		JsonObject serverReply = Util.parseToJsonObject(
 				Util.sendUrlencodedFormHttpsRequest(
-						"https://accounts.google.com/o/oauth2/token",
+						GOOGLE_REQUEST_URL_FETCH_ACCESS_TOKEN,
 						Util.REQUEST_METHOD_POST,
-						null,
+						Util.EMPTY_ADDITIONAL_HEADERS,
 						parameters
 				)
 		);
 
-		accessToken = serverReply.get("access_token").getAsString();
-		refreshToken = serverReply.get("refresh_token").getAsString();
+		accessToken = Util.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN);
+		refreshToken = Util.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_REFRESH_TOKEN);
 
 		long timeNow = new Date().getTime();
-		long expiryTime = timeNow + (serverReply.get("expires_in").getAsLong() - TOKEN_EXPIRY_BUFFER) * 1000L;
+		long accessTokenValidityPeriod = serverReply.get(FETCH_ACCESS_TOKEN_REPLY_LABEL_EXPIRES_IN).getAsLong() *
+				ACCESS_TOKEN_EXPIRY_PERIOD_CONVERSION_FACTOR;
+		long expiryTime = timeNow + accessTokenValidityPeriod - ACCESS_TOKEN_EXPIRY_BUFFER;
 		accessTokenExpiry = new Date(expiryTime);
+	}
+
+	//Catches all IOExceptions and fails cleanly.
+	//Upon failure, all tokens will be set to null.
+	protected void readAuthenticationDetailsFromFile() {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(AUTHENTICATION_SAVE_FILE));
+
+			authenticationToken = reader.readLine();
+			accessToken = reader.readLine();
+			refreshToken = reader.readLine();
+
+			boolean accessTokenIsNull = accessToken.equals(NULL_TOKEN);
+			if (accessTokenIsNull) {
+				accessTokenExpiry = null;
+			} else {
+				// assume the token has expired
+				accessTokenExpiry = UNIX_EPOCH;
+			}
+
+			reader.close();
+		} catch (IOException e) {
+			deleteAuthenticationDetails();
+		}
 	}
 
 	private void fetchAccessTokenUsingRefreshToken()
 			throws IllegalStateException, JsonParseException, IOException {
-		assert !refreshToken.equals("");
+		assert !refreshToken.equals(NULL_TOKEN);
 
 		HashMap<String, String> parameters = new HashMap<>();
-		parameters.put("refresh_token", refreshToken);
-		parameters.put("client_id", GOOGLE_API_CLIENT_ID);
-		parameters.put("client_secret", GOOGLE_API_CLIENT_SECRET);
-		parameters.put("grant_type", "refresh_token");
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_REFRESH_TOKEN, refreshToken);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_ID, GOOGLE_API_CLIENT_ID);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_CLIENT_SECRET, GOOGLE_API_CLIENT_SECRET);
+		parameters.put(FETCH_ACCESS_TOKEN_REQUEST_LABEL_GRANT_TYPE, FETCH_ACCESS_TOKEN_REQUEST_LABEL_REFRESH_TOKEN);
 
 		JsonObject serverReply = Util.parseToJsonObject(
 				Util.sendUrlencodedFormHttpsRequest(
-						"https://accounts.google.com/o/oauth2/token",
+						GOOGLE_REQUEST_URL_FETCH_ACCESS_TOKEN,
 						Util.REQUEST_METHOD_POST,
-						null,
+						Util.EMPTY_ADDITIONAL_HEADERS,
 						parameters
 				)
 		);
 
-		accessToken = serverReply.get("access_token").getAsString();
+		accessToken = Util.getJsonObjectValueOrEmptyString(serverReply, FETCH_ACCESS_TOKEN_REPLY_LABEL_ACCESS_TOKEN);
 
 		long timeNow = new Date().getTime();
-		long expiryTime = timeNow + (serverReply.get("expires_in").getAsLong() - TOKEN_EXPIRY_BUFFER) * 1000L;
+		long accessTokenValidityPeriod = serverReply.get(FETCH_ACCESS_TOKEN_REPLY_LABEL_EXPIRES_IN).getAsLong() *
+				ACCESS_TOKEN_EXPIRY_PERIOD_CONVERSION_FACTOR;
+		long expiryTime = timeNow + accessTokenValidityPeriod - ACCESS_TOKEN_EXPIRY_BUFFER;
 		accessTokenExpiry = new Date(expiryTime);
 	}
 
@@ -144,11 +192,6 @@ class AuthenticationManager {
 		new AuthenticationDialog();
 	}
 
-	/**
-	 * ...
-	 * This method bypasses the getter accessToken.
-	 * @throws IOException
-	 */
 	private void writeAuthenticationDetailsToFile() throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(AUTHENTICATION_SAVE_FILE));
 
@@ -162,45 +205,17 @@ class AuthenticationManager {
 		writer.close();
 	}
 
-	/**
-	 * ...
-	 * Catches all IOExceptions and fails cleanly; upon failure, all tokens will be set to null.
-	 */
-	protected void readAuthenticationDetailsFromFile() {
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(AUTHENTICATION_SAVE_FILE));
-
-			authenticationToken = reader.readLine();
-			accessToken = reader.readLine();
-			refreshToken = reader.readLine();
-
-			if(accessToken.equals("")) {
-				accessTokenExpiry = null;
-			}
-			else {
-				accessTokenExpiry = new Date(0L); //assume the token has expired
-			}
-
-			reader.close();
-		}
-		catch(IOException e) {
-			authenticationToken = "";
-			accessToken = "";
-			refreshToken = "";
-			accessTokenExpiry = null;
-		}
-	}
-
-	private String getAccessToken() throws IllegalStateException, JsonParseException, IOException {
+	private String getAccessToken()
+			throws IllegalStateException, JsonParseException, IOException {
 		assert isAuthenticated();
 
-		if(accessToken.equals("")) {
+		boolean accessTokenIsNull = accessToken.equals(NULL_TOKEN);
+		if (accessTokenIsNull) {
 			fetchAccessTokenUsingAuthenticationToken();
 			writeAuthenticationDetailsToFile();
-		}
-		else {
-			final boolean accessTokenHasExpired = accessTokenExpiry.getTime() < new Date().getTime();
-			if(accessTokenHasExpired) {
+		} else {
+			boolean accessTokenHasExpired = accessTokenExpiry.getTime() < new Date().getTime();
+			if (accessTokenHasExpired) {
 				fetchAccessTokenUsingRefreshToken();
 				writeAuthenticationDetailsToFile();
 			}
@@ -208,4 +223,3 @@ class AuthenticationManager {
 		return accessToken;
 	}
 }
-

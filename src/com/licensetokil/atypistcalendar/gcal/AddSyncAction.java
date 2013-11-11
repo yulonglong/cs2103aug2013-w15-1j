@@ -10,6 +10,10 @@ public class AddSyncAction extends SyncAction {
 		setLocalTask(localTask);
 	}
 
+	protected int getPriority() {
+		return SyncAction.PRIORITY_MEDIUM;
+	}
+
 	public Task getLocalTask() {
 		return localTask;
 	}

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -24,15 +25,34 @@ import com.licensetokil.atypistcalendar.parser.Parser;
 import com.licensetokil.atypistcalendar.parser.SearchAction;
 import com.licensetokil.atypistcalendar.parser.SystemAction;
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
+import com.licensetokil.atypistcalendar.tasksmanager.TaskNotFoundException;
 import com.licensetokil.atypistcalendar.tasksmanager.TasksManager;
 import com.licensetokil.atypistcalendar.ui.ATCGUI;
 
 public class ATypistCalendar {
+	private static final String EMPTY_STRING = "";
+
+	private static final String ERROR_DIALOG_TITLE = "Fatal Error";
+	private static final String ERROR_DIALOG_MESSAGE = "A Typist's Calendar is unable to load the SWT library that is required for running. Exiting...";
+
+	private static final String RESOURCE_PATH_SWT_X64_JAR = "/swt_x64.jar";
+	private static final String RESOURCE_PATH_SWT_X86_JAR = "/swt_x86.jar";
+
+	private static final String JAVA_VM_NAME = "java.vm.name";
+	private static final String JAVA_VM_NAME_KEYWORD_64_BIT = "64-Bit";
+
+	private static final String PROGRAM_ARGUMENT_LOG_TO_FILE = "-logToFile";
+
+	private static final String ATC_ERROR_STREAM_LOG_FILE_NAME = "atc_errorStream.log";
+
+	private static final String MESSAGE_USER_INPUT_FEEDBACK_UPON_SUCCESSFUL_COMMAND = "Your previous command: %s";
+	private static final String MESSAGE_USER_INPUT_FEEDBACK_UPON_FAILED_COMMAND = "Your previous (erroneous) command: %s";
+
 	private static ATypistCalendar instance = null;
 
 	private static Logger logger = Logger.getLogger(ATypistCalendar.class.getName());
 
-	public static ATCGUI gui;
+	private ATCGUI gui;
 
 	private ATypistCalendar() {
 	}
@@ -47,7 +67,7 @@ public class ATypistCalendar {
 	public static void main(String[] args) {
 		//No logging allowed until we set the System.err stream (if needed)
 		//Logging before setting the stream will make the logging system hook on the original System.err stream.
-		if(containsStringIgnoreCase(args, "-logToFile")) {
+		if(containsStringIgnoreCase(args, PROGRAM_ARGUMENT_LOG_TO_FILE)) {
 			redirectSystemErrorStream();
 		}
 		else {
@@ -73,7 +93,7 @@ public class ATypistCalendar {
 
 	private static void redirectSystemErrorStream() {
 		try {
-			PrintStream errStream = new PrintStream("atc_errorStream.log");
+			PrintStream errStream = new PrintStream(ATC_ERROR_STREAM_LOG_FILE_NAME);
 			System.setErr(errStream);
 
 			//We can start logging from here onwards.
@@ -110,14 +130,14 @@ public class ATypistCalendar {
 
 		logger.info("Deciding which version (32- or 64-bit) of the SWT library to include.");
 		URL pathToSWT;
-		if(System.getProperty("java.vm.name").contains("64-Bit")) {
+		if(System.getProperty(JAVA_VM_NAME).contains(JAVA_VM_NAME_KEYWORD_64_BIT)) {
 			logger.info("Finding path to 64-bit SWT library.");
-			pathToSWT = getClass().getResource("/swt_x64.jar");
+			pathToSWT = getClass().getResource(RESOURCE_PATH_SWT_X64_JAR);
 			logger.info("Path to 64-bit SWT library found.");
 		}
 		else {
 			logger.info("Finding path to 32-bit SWT library.");
-			pathToSWT = getClass().getResource("/swt_x86.jar");
+			pathToSWT = getClass().getResource(RESOURCE_PATH_SWT_X86_JAR);
 			logger.info("Path to 32-bit SWT library found.");
 		}
 
@@ -132,7 +152,7 @@ public class ATypistCalendar {
 		catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			logger.severe("Unable to load the SWT library! Displaying error message and exiting.");
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(new JDialog(), "A Typist's Calendar is unable to load the SWT library that is required for running. Exiting...", "Fatal Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JDialog(), ERROR_DIALOG_MESSAGE, ERROR_DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
 		logger.info("SWT library loaded successful.");
@@ -141,12 +161,12 @@ public class ATypistCalendar {
 
 
 	public void userInput(String input) {
-		String reply = "";
+		String reply = EMPTY_STRING;
 		Action action;
 		try {
 			action = Parser.parse(input);
 		} catch (MalformedUserInputException muie) {
-			gui.outputUserInput("Your erroneous command: " + input);
+			gui.outputUserInput(String.format(MESSAGE_USER_INPUT_FEEDBACK_UPON_FAILED_COMMAND, input));
 			gui.outputWithNewline(muie.getMessage());
 			return;
 		}
@@ -168,7 +188,7 @@ public class ATypistCalendar {
 			assert false;
 		}
 
-		gui.outputUserInput("Your previous command: " + input);
+		gui.outputUserInput(String.format(MESSAGE_USER_INPUT_FEEDBACK_UPON_SUCCESSFUL_COMMAND, input));
 		gui.outputWithNewline(reply);
 	}
 
@@ -180,15 +200,63 @@ public class ATypistCalendar {
 		return TasksManager.getInstance().getAllTasks();
 	}
 
+	public void updateLocalTaskWithCorrespondingTaskRemoteId(int localTaskId, String remoteTaskId) {
+		try {
+			TasksManager.getInstance().updateCorrespondingTaskRemoteId(localTaskId, remoteTaskId);
+		} catch (TaskNotFoundException e) {
+			logger.warning("Local task not found. Nothing to do - discrepancies will be handle by next sync.");
+		}
+	}
+
+	public void updateTasksManagerWithUpdatedLocalTask(Task updatedLocalTask) {
+		try {
+			TasksManager.getInstance().updateGoogleTask(updatedLocalTask);
+		} catch (TaskNotFoundException e) {
+			logger.warning("Local task could not found. Nothing to do - discrepancies will be handle by next sync.");
+		}
+	}
+
+	public void deleteLocalTaskfromTasksManager(int localTaskId) {
+		try {
+			TasksManager.getInstance().deleteGoogleTask(localTaskId);
+		} catch (TaskNotFoundException e) {
+			logger.warning("Local task could not found. Nothing to do - discrepancies will be handle by next sync.");
+		}
+	}
+
+	public Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId) {
+		return TasksManager.getInstance().addTodoFromGoogle(description, location, lastModifiedDate, remoteTaskId);
+	}
+
+	public Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime) {
+		//TODO change the order
+		return TasksManager.getInstance().addDeadlineFromGoogle(endTime, description, location, lastModifiedDate, remoteTaskId);
+	}
+
+	public Task insertLocalTaskIntoTasksManager(String description, String location, Calendar lastModifiedDate, String remoteTaskId, Calendar endTime, Calendar startTime) {
+		//TODO change the order
+		return TasksManager.getInstance().addScheduleFromGoogle(startTime, endTime, description, location, lastModifiedDate, remoteTaskId);
+	}
+
+	public void setSyncerStatus(boolean syncerIsExecuting) {
+		//TODO
+		if(syncerIsExecuting) {
+			gui.setIconImage(new ImageIcon(getClass().getResource("/icon128sync.png")).getImage());
+		}
+		else {
+			gui.setIconImage(new ImageIcon(getClass().getResource("/icon128.png")).getImage());
+		}
+	}
+
 	private String executeCommand(SystemAction action) {
 		if(action instanceof ExitAction) {
 			gui.dispatchWindowClosingEvent();
-			return "";
+			return EMPTY_STRING;
 		}
 		else {
 			logger.severe("Unknown sub-class of SystemAction!");
 			assert false;
-			return "";
+			return EMPTY_STRING;
 		}
 	}
 }

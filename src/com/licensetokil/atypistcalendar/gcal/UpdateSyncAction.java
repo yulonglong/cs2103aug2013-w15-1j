@@ -12,6 +12,10 @@ public class UpdateSyncAction extends SyncAction {
 		setRemoteTaskID(remoteTaskID);
 	}
 
+	protected int getPriority() {
+		return SyncAction.PRIORITY_MEDIUM;
+	}
+
 	public Task getLocalTask() {
 		return localTask;
 	}

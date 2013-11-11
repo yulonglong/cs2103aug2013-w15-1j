@@ -13,9 +13,7 @@ public abstract class SyncAction implements Comparable<SyncAction> {
 		creationId = creationIdCounter++;
 	}
 
-	protected int getPriority() {
-		return PRIORITY_MEDIUM;
-	}
+	protected abstract int getPriority();
 
 	protected int getCreationId() {
 		return creationId;

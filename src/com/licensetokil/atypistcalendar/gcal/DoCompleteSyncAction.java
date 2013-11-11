@@ -5,7 +5,6 @@ public class DoCompleteSyncAction extends SyncAction {
 		super();
 	}
 
-	@Override
 	protected int getPriority() {
 		return SyncAction.PRIORITY_LOW;
 	}
