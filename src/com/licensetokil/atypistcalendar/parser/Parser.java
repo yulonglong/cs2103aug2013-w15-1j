@@ -430,8 +430,7 @@ public class Parser {
 		
 		StringTokenizer[] tempSt = new StringTokenizer[DEFAULT_ST_ARR_SIZE];
 		Calendar[] calendarArray = new Calendar[DEFAULT_CAL_ARR_SIZE];
-		calendarArray[INDEX_START_TIME] = Calendar.getInstance();
-		calendarArray[INDEX_START_TIME].set(Calendar.MILLISECOND, MIN_MILLISECOND);
+		calendarArray[INDEX_START_TIME] = null;
 		calendarArray[INDEX_END_TIME] = null;
 		String description = null;
 		String place = null;
@@ -476,7 +475,7 @@ public class Parser {
 		}
 
 		
-		assert calendarArray[INDEX_START_TIME] != null;
+		assert calendarArray[INDEX_START_TIME] == null;
 		assert calendarArray[INDEX_END_TIME] == null;
 		getCompleteDate(calendarArray,st,LocalActionType.UPDATE);
 		userAction.setUpdatedStartTime(calendarArray[INDEX_START_TIME]);
