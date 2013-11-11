@@ -420,7 +420,6 @@ public class TasksManager {
 	}
 
 	private String display(DisplayAction ac) {
-		System.out.println(ac);
 		logger.log(Level.INFO,
 				"In display function. Clearing all previously requested tasks by the user");
 		requestedSchedules.clear();
@@ -436,8 +435,10 @@ public class TasksManager {
 		case DISPLAY_TYPE_SCHEDULE:
 			logger.log(Level.INFO, "Display schedules requested");
 			for (Schedule s : allSchedules) {
-				if (s.getStartTime().after(ac.getStartTime())
-						&& s.getEndTime().before(ac.getEndTime())) {
+				if ((s.getStartTime().after(ac.getStartTime()) && s
+						.getEndTime().before(ac.getEndTime()))
+						|| (s.getStartTime().compareTo(ac.getStartTime()) == 0 || (s
+								.getEndTime().compareTo(ac.getEndTime()) == 0))) {
 					logger.log(Level.INFO,
 							"schedule within specified timeframe found. Adding in particular schedule");
 					requestedSchedules.add(s);
@@ -450,15 +451,19 @@ public class TasksManager {
 			logger.log(Level.INFO, "Display deadlines requested");
 			for (Deadline d : allDeadlines) {
 				if (ac.getStatus().equals(EMPTY_STRING)) {
-					if (d.getEndTime().after(ac.getStartTime())
-							&& d.getEndTime().before(ac.getEndTime())) {
+					if ((d.getEndTime().after(ac.getStartTime()) && d
+							.getEndTime().before(ac.getEndTime()))
+							|| (d.getEndTime().compareTo(ac.getStartTime()) == 0)
+							|| (d.getEndTime().compareTo(ac.getEndTime()) == 0)) {
 						logger.log(Level.INFO,
 								"deadline within specified timeframe found. Adding in particular deadline");
 						requestedDeadlines.add(d);
 					}
 				} else {
-					if (d.getEndTime().after(ac.getStartTime())
-							&& d.getEndTime().before(ac.getEndTime())
+					if (((d.getEndTime().after(ac.getStartTime()) && d
+							.getEndTime().before(ac.getEndTime()))
+							|| (d.getEndTime().compareTo(ac.getStartTime()) == 0) || (d
+							.getEndTime().compareTo(ac.getEndTime()) == 0))
 							&& d.getStatus().equals(ac.getStatus())) {
 						logger.log(
 								Level.INFO,
@@ -491,16 +496,20 @@ public class TasksManager {
 		case DISPLAY_TYPE_ALL:
 			logger.log(Level.INFO, "Display all requested");
 			for (Schedule s : allSchedules) {
-				if (s.getStartTime().after(ac.getStartTime())
-						&& s.getEndTime().before(ac.getEndTime())) {
+				if ((s.getStartTime().after(ac.getStartTime()) && s
+						.getEndTime().before(ac.getEndTime()))
+						|| (s.getStartTime().compareTo(ac.getStartTime()) == 0 || (s
+								.getEndTime().compareTo(ac.getEndTime()) == 0))) {
 					logger.log(Level.INFO,
 							"schedule within specified timeframe found. Adding in particular schedule");
 					requestedSchedules.add(s);
 				}
 			}
 			for (Deadline d : allDeadlines) {
-				if (d.getEndTime().after(ac.getStartTime())
-						&& d.getEndTime().before(ac.getEndTime())) {
+				if ((d.getEndTime().after(ac.getStartTime()) && d
+						.getEndTime().before(ac.getEndTime()))
+						|| (d.getEndTime().compareTo(ac.getStartTime()) == 0)
+						|| (d.getEndTime().compareTo(ac.getEndTime()) == 0)) {
 					logger.log(Level.INFO,
 							"deadline within specified timeframe found. Adding in particular deadline");
 					requestedDeadlines.add(d);
@@ -515,17 +524,17 @@ public class TasksManager {
 			break;
 		case DISPLAY_TYPE_EMPTY:
 			logger.log(Level.INFO, "Display done or undone requested");
-			for(Deadline d: allDeadlines){
-				if(d.getStatus().equals(ac.getStatus())){
+			for (Deadline d : allDeadlines) {
+				if (d.getStatus().equals(ac.getStatus())) {
 					requestedDeadlines.add(d);
 				}
 			}
-			for(Todo td: allTodos){
-				if(td.getStatus().equals(ac.getStatus())){
+			for (Todo td : allTodos) {
+				if (td.getStatus().equals(ac.getStatus())) {
 					requestedTodos.add(td);
 				}
 			}
-			
+
 		default:
 			break;
 		}
@@ -655,7 +664,7 @@ public class TasksManager {
 			for (Integer i : selectedTasks.keySet()) {
 				Task t = selectedTasks.get(i);
 				logger.log(Level.INFO, "Removing every trace of " + t);
-				deletedTasks.add((Task)t.clone());
+				deletedTasks.add((Task) t.clone());
 				allSchedules.remove(t);
 				allDeadlines.remove(t);
 				allTodos.remove(t);
@@ -712,7 +721,7 @@ public class TasksManager {
 		} else {
 			return TaskType.SCHEDULE;
 		}
-		
+
 	}
 
 	private String update(UpdateAction ac) {
@@ -808,8 +817,10 @@ public class TasksManager {
 		for (Schedule s : allSchedules) {
 			if (((s.getDescription()).toLowerCase()).contains((ac.getQuery()
 					.toLowerCase()))) {
-				if (s.getStartTime().after(ac.getStartTime())
-						&& s.getEndTime().before(ac.getEndTime())) {
+				if ((s.getStartTime().after(ac.getStartTime()) && s
+						.getEndTime().before(ac.getEndTime()))
+						|| (s.getStartTime().compareTo(ac.getStartTime()) == 0 || (s
+								.getEndTime().compareTo(ac.getEndTime()) == 0))) {
 					logger.log(Level.INFO, "Found schedule match");
 					requestedSchedules.add(s);
 				}
@@ -819,8 +830,10 @@ public class TasksManager {
 		for (Deadline d : allDeadlines) {
 			if (((d.getDescription()).toLowerCase()).contains((ac.getQuery()
 					.toLowerCase()))) {
-				if (d.getEndTime().after(ac.getStartTime())
-						&& d.getEndTime().before(ac.getEndTime())) {
+				if ((d.getEndTime().after(ac.getStartTime()) && d
+						.getEndTime().before(ac.getEndTime()))
+						|| (d.getEndTime().compareTo(ac.getStartTime()) == 0)
+						|| (d.getEndTime().compareTo(ac.getEndTime()) == 0)) {
 					logger.log(Level.INFO, "Found deadline match");
 					requestedDeadlines.add(d);
 				}
