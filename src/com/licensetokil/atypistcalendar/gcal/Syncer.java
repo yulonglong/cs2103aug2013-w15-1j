@@ -60,6 +60,7 @@ class Syncer extends Thread {
 	private static Logger logger = Logger.getLogger(Syncer.class.getName());
 
 	public Syncer() {
+		setPriority(Thread.MIN_PRIORITY);
 	}
 
 	@Override
@@ -69,15 +70,15 @@ class Syncer extends Thread {
 		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_EXECUTING);
 
 		while (true) {
-			SyncAction currentSyncAction = SyncManager.getInstance().getQueue().poll();
+			SyncNode currentSyncNode = SyncManager.getInstance().getSyncQueue().poll();
 
-			while (currentSyncAction != null) {
+			while (currentSyncNode != null) {
 				try {
-					logger.info("Working on next SyncAction. Figuring out the sub-type.");
-					determineSyncActionSubtypeAndExecute(currentSyncAction);
+					logger.info("Working on next SyncNode. Figuring out the sub-type.");
+					determineSyncNodeSubtypeAndExecute(currentSyncNode);
 
-					logger.info("Dequeuing SyncAction item that has been completed (removing head of queue).");
-					currentSyncAction = SyncManager.getInstance().getQueue().poll();
+					logger.info("Dequeuing SyncNode item that has been completed (removing head of queue).");
+					currentSyncNode = SyncManager.getInstance().getSyncQueue().poll();
 				} catch (IllegalStateException | JsonParseException | IOException e) {
 					logger.warning("Exception thrown: " + e.getMessage());
 					logger.warning("Sleeping before retrying...");
@@ -91,44 +92,44 @@ class Syncer extends Thread {
 			logger.info("Queue is empty, sleeping before next sync...");
 			sleep();
 			logger.info("Thread woke up. Checking if queue is empty.");
-			if (SyncManager.getInstance().getQueue().isEmpty()) {
+			if (SyncManager.getInstance().getSyncQueue().isEmpty()) {
 				logger.info("Queue is empty. Doing a complete sync.");
 				SyncManager.getInstance().doCompleteSync();
 			} else {
-				logger.info("Queue is not empty. Continuing with enqueued SyncAction.");
+				logger.info("Queue is not empty. Continuing with enqueued SyncNode.");
 			}
 		}
 	}
 
-	private void determineSyncActionSubtypeAndExecute(SyncAction currentSyncAction)
+	private void determineSyncNodeSubtypeAndExecute(SyncNode currentSyncNode)
 			throws IllegalStateException, JsonParseException, IOException {
-		if (currentSyncAction instanceof InitialiseRemoteCalendarSyncAction) {
-			logger.info("InitialiseRemoteCalendarSyncAction sub-type detected.");
-			executeSyncAction((InitialiseRemoteCalendarSyncAction) currentSyncAction);
-		} else if (currentSyncAction instanceof AddSyncAction) {
-			logger.info("AddSyncAction sub-type detected.");
-			executeSyncAction((AddSyncAction) currentSyncAction);
-		} else if (currentSyncAction instanceof UpdateSyncAction) {
-			logger.info("UpdateSyncAction sub-type detected.");
-			executeSyncAction((UpdateSyncAction) currentSyncAction);
-		} else if (currentSyncAction instanceof DeleteSyncAction) {
-			logger.info("DeleteSyncAction sub-type detected.");
-			executeSyncAction((DeleteSyncAction) currentSyncAction);
-		} else if (currentSyncAction instanceof DoCompleteSyncAction) {
-			logger.info("DoCompleteSyncAction sub-type detected.");
+		if (currentSyncNode instanceof InitialiseRemoteCalendarSyncNode) {
+			logger.info("InitialiseRemoteCalendarSyncNode sub-type detected.");
+			executeSyncNode((InitialiseRemoteCalendarSyncNode) currentSyncNode);
+		} else if (currentSyncNode instanceof AddSyncNode) {
+			logger.info("AddSyncNode sub-type detected.");
+			executeSyncNode((AddSyncNode) currentSyncNode);
+		} else if (currentSyncNode instanceof UpdateSyncNode) {
+			logger.info("UpdateSyncNode sub-type detected.");
+			executeSyncNode((UpdateSyncNode) currentSyncNode);
+		} else if (currentSyncNode instanceof DeleteSyncNode) {
+			logger.info("DeleteSyncNode sub-type detected.");
+			executeSyncNode((DeleteSyncNode) currentSyncNode);
+		} else if (currentSyncNode instanceof DoCompleteSyncNode) {
+			logger.info("DoCompleteSyncNode sub-type detected.");
 
-			logger.info("Checking if following SyncActions in queue are DoCompleteSyncAction. Dropping them if they are, for efficency.");
-			SyncAction nextSyncAction = SyncManager.getInstance().getQueue().peek();
-			while (nextSyncAction instanceof DoCompleteSyncAction) {
-				logger.info("Dropping next DoCompleteSyncAction");
-				SyncManager.getInstance().getQueue().poll();
-				nextSyncAction = SyncManager.getInstance().getQueue().peek();
+			logger.info("Checking if following SyncNodes in queue are DoCompleteSyncNode. Dropping them if they are, for efficency.");
+			SyncNode nextSyncNode = SyncManager.getInstance().getSyncQueue().peek();
+			while (nextSyncNode instanceof DoCompleteSyncNode) {
+				logger.info("Dropping next DoCompleteSyncNode");
+				SyncManager.getInstance().getSyncQueue().poll();
+				nextSyncNode = SyncManager.getInstance().getSyncQueue().peek();
 			}
 			logger.info("Check done.");
 
-			executeSyncAction((DoCompleteSyncAction) currentSyncAction);
+			executeSyncNode((DoCompleteSyncNode) currentSyncNode);
 		} else {
-			logger.severe("Unexcepted (subclass of) SyncAction enqueued.");
+			logger.severe("Unexcepted (subclass of) SyncNode enqueued.");
 			assert false;
 		}
 	}
@@ -151,7 +152,7 @@ class Syncer extends Thread {
 		GoogleCalendarManager.getInstance().setSyncerStatus(GoogleCalendarManager.SYNCER_STATUS_EXECUTING);
 	}
 
-	private void executeSyncAction(InitialiseRemoteCalendarSyncAction currentSyncAction)
+	private void executeSyncNode(InitialiseRemoteCalendarSyncNode currentSyncNode)
 			throws JsonParseException, IllegalStateException, IOException {
 
 		logger.info("Checking if remote calendar exists.");
@@ -163,11 +164,11 @@ class Syncer extends Thread {
 		}
 	}
 
-	private void executeSyncAction(AddSyncAction addSyncAction)
+	private void executeSyncNode(AddSyncNode addSyncNode)
 			throws JsonParseException, IllegalStateException, IOException {
-		logger.info("Adding: " + addSyncAction.getLocalTask().toString());
+		logger.info("Adding: " + addSyncNode.getLocalTask().toString());
 
-		JsonObject requestBody = createRemoteTaskRequestBody(addSyncAction.getLocalTask());
+		JsonObject requestBody = createRemoteTaskRequestBody(addSyncNode.getLocalTask());
 
 		JsonObject serverReply = Utilities.parseToJsonObject(
 				Utilities.sendJsonHttpsRequest(
@@ -179,22 +180,22 @@ class Syncer extends Thread {
 		);
 
 		GoogleCalendarManager.getInstance().updateLocalTaskWithCorrespondingTaskRemoteId(
-				addSyncAction.getLocalTask().getUniqueId(),
+				addSyncNode.getLocalTask().getUniqueId(),
 				Utilities.getJsonObjectValueOrEmptyString(serverReply, EVENT_RESOURCE_LABEL_ID)
 		);
 	}
 
-	private void executeSyncAction(UpdateSyncAction updateSyncAction)
+	private void executeSyncNode(UpdateSyncNode updateSyncNode)
 			throws JsonParseException, IllegalStateException, IOException {
-		logger.info("Updating remote copy: " + updateSyncAction.getRemoteTaskID() + " to match " + updateSyncAction.getLocalTask().toString());
+		logger.info("Updating remote copy: " + updateSyncNode.getRemoteTaskID() + " to match " + updateSyncNode.getLocalTask().toString());
 
-		JsonObject requestBody = createRemoteTaskRequestBody(updateSyncAction.getLocalTask());
+		JsonObject requestBody = createRemoteTaskRequestBody(updateSyncNode.getLocalTask());
 
 		Utilities.sendJsonHttpsRequest(
 				String.format(
 						GOOGLE_REQUEST_URL_UPDATE_EVENT,
 						SyncManager.getInstance().getRemoteCalendarId(),
-						updateSyncAction.getRemoteTaskID()
+						updateSyncNode.getRemoteTaskID()
 				),
 				Utilities.REQUEST_METHOD_PUT,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
@@ -202,15 +203,15 @@ class Syncer extends Thread {
 		);
 	}
 
-	private void executeSyncAction(DeleteSyncAction deleteSyncAction)
+	private void executeSyncNode(DeleteSyncNode deleteSyncNode)
 			throws JsonParseException, IllegalStateException, IOException {
-		logger.info("Deleting: " + deleteSyncAction.getRemoteTaskID());
+		logger.info("Deleting: " + deleteSyncNode.getRemoteTaskID());
 
 		Utilities.sendJsonHttpsRequest(
 				String.format(
 						GOOGLE_REQUEST_URL_DELETE_EVENT,
 						SyncManager.getInstance().getRemoteCalendarId(),
-						deleteSyncAction.getRemoteTaskID()
+						deleteSyncNode.getRemoteTaskID()
 				),
 				Utilities.REQUEST_METHOD_DELETE,
 				AuthenticationManager.getInstance().getAuthorizationHeader(),
@@ -218,9 +219,9 @@ class Syncer extends Thread {
 		);
 	}
 
-	private void executeSyncAction(DoCompleteSyncAction currentSyncAction)
+	private void executeSyncNode(DoCompleteSyncNode currentSyncNode)
 			throws JsonParseException, IllegalStateException, IOException {
-		logger.fine("executeSyncAction(DoCompleteSyncAction currentSyncAction) called.");
+		logger.fine("executeSyncNode(DoCompleteSyncNode currentSyncNode) called.");
 
 		logger.info("Getting a copy of all local tasks from TasksManager. Tasks will be deleted from this local copy as its corresponding remote task is found. All remaining local tasks without the corresponding remote task will be uploaded accordingly.");
 		syncAllTasks(GoogleCalendarManager.getInstance().getCopyOfAllLocalTasks(), EMPTY_PAGE_TOKEN);

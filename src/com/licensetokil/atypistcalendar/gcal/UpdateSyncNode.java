@@ -2,18 +2,18 @@ package com.licensetokil.atypistcalendar.gcal;
 
 import com.licensetokil.atypistcalendar.tasksmanager.Task;
 
-public class UpdateSyncAction extends SyncAction {
+public class UpdateSyncNode extends SyncNode {
 	private Task localTask;
 	private String remoteTaskID;
 
-	public UpdateSyncAction(Task localTask, String remoteTaskID) {
+	public UpdateSyncNode(Task localTask, String remoteTaskID) {
 		super();
 		setLocalTask(localTask);
 		setRemoteTaskID(remoteTaskID);
 	}
 
 	protected int getPriority() {
-		return SyncAction.PRIORITY_MEDIUM;
+		return SyncNode.PRIORITY_MEDIUM;
 	}
 
 	public Task getLocalTask() {

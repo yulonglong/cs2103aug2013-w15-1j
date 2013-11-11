@@ -40,7 +40,7 @@ class SyncManager {
 	private Lock goToSleepLock = new ReentrantLock();
 	private Condition goToSleepCondition = goToSleepLock.newCondition();
 
-	private PriorityBlockingQueue<SyncAction> queue;
+	private PriorityBlockingQueue<SyncNode> syncQueue;
 	private Syncer syncer;
 	private String remoteCalendarId;
 
@@ -50,7 +50,7 @@ class SyncManager {
 	}
 
 	private SyncManager() {
-		queue = new PriorityBlockingQueue<SyncAction>();
+		syncQueue = new PriorityBlockingQueue<SyncNode>();
 		syncer = null;
 		remoteCalendarId = null;
 	}
@@ -63,12 +63,12 @@ class SyncManager {
 	}
 
 	protected void initialiseRemoteCalendar() {
-		queue.add(new InitialiseRemoteCalendarSyncAction());
+		syncQueue.add(new InitialiseRemoteCalendarSyncNode());
 		runSyncer();
 	}
 
 	protected void addRemoteTask(Task localTask) {
-		queue.add(new AddSyncAction(localTask));
+		syncQueue.add(new AddSyncNode(localTask));
 		runSyncer();
 	}
 
@@ -76,22 +76,22 @@ class SyncManager {
 		deleteRemoteTask(remoteTaskID);
 		addRemoteTask(localTask);
 		//TODO temporary measure, cause increasing the iCal sequence number is difficult - see Dev's guide
-		//queue.add(new UpdateSyncAction(localTask, remoteTaskID));
+		//queue.add(new UpdateSyncNode(localTask, remoteTaskID));
 		runSyncer();
 	}
 
 	protected void deleteRemoteTask(String remoteTaskID) {
-		queue.add(new DeleteSyncAction(remoteTaskID));
+		syncQueue.add(new DeleteSyncNode(remoteTaskID));
 		runSyncer();
 	}
 
 	protected void doCompleteSync() {
-		queue.add(new DoCompleteSyncAction());
+		syncQueue.add(new DoCompleteSyncNode());
 		runSyncer();
 	}
 
-	protected PriorityBlockingQueue<SyncAction> getQueue() {
-		return queue;
+	protected PriorityBlockingQueue<SyncNode> getSyncQueue() {
+		return syncQueue;
 	}
 
 	protected String getRemoteCalendarId() {

@@ -1,6 +1,6 @@
 package com.licensetokil.atypistcalendar.gcal;
 
-public abstract class SyncAction implements Comparable<SyncAction> {
+public abstract class SyncNode implements Comparable<SyncNode> {
 	public static final int PRIORITY_HIGH = 1;
 	public static final int PRIORITY_MEDIUM = 2;
 	public static final int PRIORITY_LOW = 3;
@@ -9,7 +9,7 @@ public abstract class SyncAction implements Comparable<SyncAction> {
 
 	protected int creationId = 0;
 
-	public SyncAction() {
+	public SyncNode() {
 		creationId = creationIdCounter++;
 	}
 
@@ -20,7 +20,7 @@ public abstract class SyncAction implements Comparable<SyncAction> {
 	}
 
 	@Override
-	public int compareTo(SyncAction obj) {
+	public int compareTo(SyncNode obj) {
 		if(getPriority() == obj.getPriority()) {
 			return getCreationId() - obj.getCreationId();
 		}
