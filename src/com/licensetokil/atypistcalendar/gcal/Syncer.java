@@ -51,7 +51,7 @@ class Syncer extends Thread {
 	private static final String GOOGLE_REQUEST_URL_UPDATE_EVENT = "https://www.googleapis.com/calendar/v3/calendars/%s/events/%s";
 	private static final String GOOGLE_REQUEST_URL_DELETE_EVENT = "https://www.googleapis.com/calendar/v3/calendars/%s/events/%s";
 
-	private static final int PERIOD_TO_SLEEP_IN_SECONDS = 15;
+	private static final int PERIOD_TO_SLEEP_IN_SECONDS = 15000;
 
 	private static final String EMPTY_PAGE_TOKEN = "";
 	private static final Task NULL_CORRESPONDING_LOCAL_TASK = null;
@@ -606,7 +606,7 @@ class Syncer extends Thread {
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_LOCATION)
 				.equals(localSchedule.getPlace());
 		boolean summaryIsIdentical = Utilities
-				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
+				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_SUMMARY)
 				.equals(localSchedule.getDescription());
 		boolean startTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_START)
@@ -628,7 +628,7 @@ class Syncer extends Thread {
 				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_LOCATION)
 				.equals(localDeadline.getPlace());
 		boolean summaryIsIdentical = Utilities
-				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
+				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_SUMMARY)
 				.equals(TASK_DESCRIPTION_PREFIX_DEADLINE + localDeadline.getDescription());
 		boolean startTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_START)
@@ -650,7 +650,7 @@ class Syncer extends Thread {
 				.getJsonObjectValueOrEmptyString(remoteTask, CALENDAR_RESOURCE_LABEL_LOCATION)
 				.equals(localTodo.getPlace());
 		boolean summaryIsIdentical = Utilities
-				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_ID)
+				.getJsonObjectValueOrEmptyString(remoteTask, EVENT_RESOURCE_LABEL_SUMMARY)
 				.equals(TASK_DESCRIPTION_PREFIX_TODO + localTodo.getDescription());
 		boolean startTimeIsIdentical = remoteTask
 				.getAsJsonObject(EVENT_RESOURCE_LABEL_START)
