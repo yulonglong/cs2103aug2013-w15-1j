@@ -77,7 +77,6 @@ public class TasksManager {
 	private static final String EMPTY_STRING = "";
 	private static final String BLANK_SPACE = " ";
 	private static final String NULL_STRING = "null";
-	private static final String UNIQUE_ID = "uniqueID";
 	private static final String DELIMITER = "@s";
 	private static final String NEWLINE = "\n";
 	private static final String UNIQUEID = "uniqueId";
@@ -239,7 +238,7 @@ public class TasksManager {
 						logger.log(Level.INFO, "setting remote ID");
 						td.setRemoteId(fileData[6]);
 					}
-				} else if (fileData[0].equals(UNIQUE_ID)) {
+				} else if (fileData[0].equals(UNIQUEID)) {
 					uniqueId = Integer.parseInt(fileData[1]); // the last
 																// uniqueId
 																// is stored
@@ -255,6 +254,7 @@ public class TasksManager {
 																// is
 																// reopened.
 					logger.log(Level.INFO, "Tracking the last uniqueID");
+					System.out.println("UNIQUE ID = " +uniqueId);
 				}
 			}
 			fileSync();
