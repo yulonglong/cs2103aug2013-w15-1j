@@ -41,6 +41,7 @@ public class TasksManager {
 	private static final String DISPLAY_TYPE_DEADLINE = "deadlines";
 	private static final String DISPLAY_TYPE_TODO = "todos";
 	private static final String DISPLAY_TYPE_ALL = "all";
+	private static final String DISPLAY_TYPE_EMPTY = "";
 	private static final String DISPLAY_SCHEDULE_PREFIX = "Schedules: \n";
 	private static final String DISPLAY_DEADLINE_PREFIX = "Deadlines: \n";
 	private static final String DISPLAY_TODO_PREFIX = "Todos: \n";
@@ -76,7 +77,6 @@ public class TasksManager {
 	private static final String EMPTY_STRING = "";
 	private static final String BLANK_SPACE = " ";
 	private static final String NULL_STRING = "null";
-	private static final String UNIQUE_ID = "uniqueID";
 	private static final String DELIMITER = "@s";
 	private static final String NEWLINE = "\n";
 	private static final String UNIQUEID = "uniqueId";
@@ -238,7 +238,7 @@ public class TasksManager {
 						logger.log(Level.INFO, "setting remote ID");
 						td.setRemoteId(fileData[6]);
 					}
-				} else if (fileData[0].equals(UNIQUE_ID)) {
+				} else if (fileData[0].equals(UNIQUEID)) {
 					uniqueId = Integer.parseInt(fileData[1]); // the last
 																// uniqueId
 																// is stored
@@ -254,6 +254,7 @@ public class TasksManager {
 																// is
 																// reopened.
 					logger.log(Level.INFO, "Tracking the last uniqueID");
+					System.out.println("UNIQUE ID = " +uniqueId);
 				}
 			}
 			fileSync();
@@ -513,6 +514,19 @@ public class TasksManager {
 				}
 			}
 			break;
+		case DISPLAY_TYPE_EMPTY:
+			logger.log(Level.INFO, "Display done or undone requested");
+			for(Deadline d: allDeadlines){
+				if(d.getStatus().equals(ac.getStatus())){
+					requestedDeadlines.add(d);
+				}
+			}
+			for(Todo td: allTodos){
+				if(td.getStatus().equals(ac.getStatus())){
+					requestedTodos.add(td);
+				}
+			}
+			
 		default:
 			break;
 		}
@@ -642,7 +656,7 @@ public class TasksManager {
 			for (Integer i : selectedTasks.keySet()) {
 				Task t = selectedTasks.get(i);
 				logger.log(Level.INFO, "Removing every trace of " + t);
-				deletedTasks.add(t);
+				deletedTasks.add((Task)t.clone());
 				allSchedules.remove(t);
 				allDeadlines.remove(t);
 				allTodos.remove(t);
@@ -665,7 +679,7 @@ public class TasksManager {
 
 	private String deleteUndo() {
 		logger.log(Level.INFO, "In delete undo function");
-
+		System.out.println(deletedTasks);
 		for (Task t : deletedTasks) {
 			// uniqueId--;
 			if (t instanceof Schedule) {
