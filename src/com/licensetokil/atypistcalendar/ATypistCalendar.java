@@ -1,6 +1,7 @@
 package com.licensetokil.atypistcalendar;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,6 +9,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -50,6 +52,7 @@ public class ATypistCalendar {
 
 	private static ATypistCalendar instance = null;
 
+	private static Logger masterLogger = Logger.getLogger(ATypistCalendar.class.getPackage().getName());
 	private static Logger logger = Logger.getLogger(ATypistCalendar.class.getName());
 
 	private ATCGUI gui;
@@ -97,6 +100,17 @@ public class ATypistCalendar {
 			System.setErr(errStream);
 
 			//We can start logging from here onwards.
+			//TODO delete start
+			try {
+				FileHandler fHandler = new FileHandler("LOGGED.xml");
+				masterLogger.addHandler(fHandler);
+			} catch (SecurityException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//TODO TODO delete end
+
+
 			logger.info("Successfully redirected System.err to file.");
 		} catch (FileNotFoundException e) {
 			logger.severe("Unable to redirect System.err to file! Continuing with default System.err. (Quiet failure)");
