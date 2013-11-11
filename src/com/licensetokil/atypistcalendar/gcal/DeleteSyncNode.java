@@ -1,3 +1,4 @@
+//@author A0097142E
 package com.licensetokil.atypistcalendar.gcal;
 
 public class DeleteSyncNode extends SyncNode {

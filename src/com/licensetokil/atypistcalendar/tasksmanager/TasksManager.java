@@ -151,10 +151,11 @@ public class TasksManager {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String currLine;
 			String[] fileData;
-	
+			
 			// To import all tasks from file to ArrayList
 			while ((currLine = reader.readLine()) != null) {
 				fileData = currLine.split(DELIMITER);
+				assert fileData[0] !=null;
 				if (fileData[0].equals(TaskType.SCHEDULE.toString())) {
 					Schedule s = new Schedule(Integer.parseInt(fileData[1]),
 							convertTimeFromStringToCalendar(fileData[2]),
@@ -566,10 +567,11 @@ public class TasksManager {
 
 		} else if (t.getTaskType().equals(TaskType.TODO)) {
 			logger.log(Level.INFO, "Adding todo");
-			allTodos.add((Todo) t);
+			allTodos.add((Todo) t); 
 		}
 
 		lastTaskCreated = t;
+		assert lastTaskCreated!=null;
 		fileSync();
 
 		return output + NEWLINE;
@@ -785,11 +787,14 @@ public class TasksManager {
 					"No display matches detected. Reuturning no match");
 			output = DISPLAY_NO_MATCHES;
 		}
+		
+		assert output!=EMPTY_STRING;
 
 		return output;
 	}
 
 	private boolean checkValidReferenceNumbers(ArrayList<Integer> refNum) {
+		assert !refNum.isEmpty();
 		for (Integer num : refNum) {
 			if (num > selectedTasks.size() || num <= 0) {
 				return false;

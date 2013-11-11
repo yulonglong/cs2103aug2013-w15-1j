@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.licensetokil.atypistcalendar.parser.*;
 
-public class JUnitTestAdd {
+public class JUnitTestOutput {
 
 	@Test
 	public void testOutput() {
